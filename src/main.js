@@ -2678,6 +2678,9 @@ function formatAuthError(error) {
   if (code === "auth/too-many-requests" || msg.includes("too-many-requests")) {
     return "Access temporarily blocked due to too many failed attempts. Try again later or reset your password.";
   }
+  if (code === "auth/unauthorized-domain" || msg.includes("unauthorized-domain")) {
+    return "Domain Authorization Required: Please add 'physi-x-orcin.vercel.app' (and 'vercel.app') in Firebase Console > Authentication > Settings > Authorized domains.";
+  }
   if (code === "auth/user-disabled" || msg.includes("user-disabled")) {
     return "This user account has been disabled by an administrator.";
   }
