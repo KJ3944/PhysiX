@@ -2476,17 +2476,30 @@
     <div class="modal-card modal-card-quiz">
       <div class="modal-header">
         <div>
-          <span class="quiz-badge-header">MASTERY EVALUATION</span>
-          <h2>
+          <span class="quiz-badge-header" id="quiz-badge-header">MASTERY EVALUATION • EXP 1</span>
+          <h2 id="quiz-modal-title">
             <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#a855f7;">
               <circle cx="12" cy="12" r="9"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line>
             </svg>
             2D Kinematics Knowledge Check
           </h2>
-          <p>Test your conceptual and mathematical understanding of projectile physics</p>
+          <p id="quiz-modal-desc">Test your conceptual and mathematical understanding of projectile physics</p>
         </div>
         <button id="btn-close-quiz" class="modal-close-btn" title="Close Quiz">
           <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <!-- QUIZ EXPERIMENT SWITCHER TABS -->
+      <div class="quiz-exp-tabs" id="quiz-exp-tabs">
+        <button type="button" class="quiz-exp-tab-btn active" data-quiz-exp="projectile">
+          <span>🚀 Exp 1: Projectile Motion</span>
+        </button>
+        <button type="button" class="quiz-exp-tab-btn" data-quiz-exp="optical">
+          <span>✨ Exp 2: Optical Fibre NA</span>
+        </button>
+        <button type="button" class="quiz-exp-tab-btn" data-quiz-exp="colour-sensor">
+          <span>🌈 Exp 3: Colour Sensor</span>
         </button>
       </div>
 
@@ -2495,9 +2508,9 @@
         <div class="quiz-top-info">
           <span class="quiz-progress-text">Question <span id="quiz-current-num">1</span> of <span
               id="quiz-total-num">10</span></span>
-          <span class="quiz-score-pill">
+          <span class="quiz-score-pill" id="quiz-score-pill">
             <svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-            PhysiX Knowledge Check
+            <span id="quiz-pill-text">Randomized 10Q Set</span>
           </span>
         </div>
 
@@ -2530,21 +2543,23 @@
             <span class="score-denom">/ 10</span>
           </div>
           <div class="quiz-results-meta">
-            <h3 id="quiz-grade-badge">Kinematics Master!</h3>
-            <p>Score: <strong id="quiz-final-percent">0%</strong> accuracy on 2D Projectile Kinematics.</p>
+            <h3 id="quiz-grade-badge">Evaluation Complete!</h3>
+            <p id="quiz-results-summary-text">Score: <strong id="quiz-final-percent">0%</strong> accuracy.</p>
           </div>
         </div>
 
         <div class="quiz-review-section">
-          <h4>Detailed Concept Review</h4>
+          <h4>Detailed Concept & Solution Review</h4>
           <div id="quiz-review-list" class="quiz-review-list"></div>
         </div>
 
         <div class="quiz-actions-bar">
-          <button id="btn-retake-quiz" class="quiz-btn quiz-btn-retake">Retake Quiz</button>
-          <button id="btn-quiz-to-sim" class="quiz-btn quiz-btn-sim">Practice Solution in Simulator</button>
+          <button id="btn-retake-quiz" class="quiz-btn quiz-btn-retake">🔄 Retake New Shuffled Quiz (10Q)</button>
+          <button id="btn-quiz-to-sim" class="quiz-btn quiz-btn-sim">Back to Active Lab Experiment</button>
         </div>
       </div>
+    </div>
+  </div>
     </div>
   </div>
 
@@ -3040,6 +3055,20 @@
                 <button type="submit" class="auth-btn auth-btn-primary" id="btn-submit-login">
                   Sign In to PhysiX
                 </button>
+
+                <div class="auth-oauth-divider">
+                  <span>OR</span>
+                </div>
+
+                <button type="button" class="auth-btn auth-btn-google btn-google-signin" id="btn-google-login">
+                  <svg class="svg-google-logo" viewBox="0 0 24 24" width="18" height="18">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                    <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                  </svg>
+                  <span>Continue with Google</span>
+                </button>
               </form>
             </div>
 
@@ -3081,6 +3110,20 @@
 
                 <button type="submit" class="auth-btn auth-btn-primary" id="btn-submit-signup">
                   Create PhysiX Account
+                </button>
+
+                <div class="auth-oauth-divider">
+                  <span>OR</span>
+                </div>
+
+                <button type="button" class="auth-btn auth-btn-google btn-google-signin" id="btn-google-signup">
+                  <svg class="svg-google-logo" viewBox="0 0 24 24" width="18" height="18">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                    <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                  </svg>
+                  <span>Continue with Google</span>
                 </button>
               </form>
             </div>
@@ -3127,7 +3170,7 @@
               </div>
               <div class="sec-item">
                 <span class="sec-item-label">Authentication Provider</span>
-                <strong>Firebase Email / Password</strong>
+                <strong id="sec-detail-provider">Firebase Email / Password</strong>
               </div>
               <div class="sec-item">
                 <span class="sec-item-label">Session Status</span>

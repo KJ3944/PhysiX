@@ -485,7 +485,7 @@ $$\\theta_a = \\arcsin(NA)$$
 #### 4. Practical Guidance
 - Move the screen closer (smaller $L$) to decrease spot diameter $W$.
 - Move the screen farther (larger $L$) to expand spot diameter $W$.
-- Select wavelengths (**650nm**, **532nm**, **405nm**, **850nm**) to observe chromatic dispersion.
+- Select wavelengths (**650nm**, **532nm**, **405nm**, **850nm**) to observe chromatic dispersion.`;
   }
 
   const gt = calculateTrajectoryGroundTruth(context);
