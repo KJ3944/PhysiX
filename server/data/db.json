@@ -484,6 +484,80 @@
         }
       ],
       "bonusXp": 5675
+    },
+    "VdIOxR1F27YYgAHBC3Ic4UnNREa2": {
+      "userId": "VdIOxR1F27YYgAHBC3Ic4UnNREa2",
+      "profile": {
+        "name": "",
+        "avatar": "quantum",
+        "handle": "",
+        "edu": "",
+        "occ": "",
+        "interests": "",
+        "bio": "",
+        "createdAt": "2026-09-21T15:52:28.137Z",
+        "updatedAt": "2026-09-21T15:52:28.137Z"
+      },
+      "telemetry": {
+        "totalLaunches": 0,
+        "maxRange": 0,
+        "maxHeight": 0,
+        "maxVelocity": 0,
+        "totalAirtime": 0,
+        "targetHits": 0,
+        "planetsUsed": {
+          "Earth": 0,
+          "Moon": 0,
+          "Mars": 0,
+          "Jupiter": 0
+        }
+      },
+      "flightLogs": [],
+      "observations": [],
+      "challenges": {},
+      "bonusXp": 275,
+      "badges": [],
+      "quizHighScore": 0
+    },
+    "oyzXOlVh6waIwwKg8N0g4DUrO702": {
+      "userId": "oyzXOlVh6waIwwKg8N0g4DUrO702",
+      "profile": {
+        "name": "",
+        "avatar": "quantum",
+        "handle": "",
+        "edu": "",
+        "occ": "",
+        "interests": "",
+        "bio": "",
+        "createdAt": "2026-09-21T16:15:28.210Z",
+        "updatedAt": "2026-09-21T16:25:33.550Z",
+        "email": "jeshurunselvakumar640@gmail.com",
+        "streak": 1,
+        "highestStreak": 1,
+        "lastLoginDate": "2026-09-21"
+      },
+      "telemetry": {
+        "totalLaunches": 0,
+        "maxRange": 0,
+        "maxHeight": 0,
+        "maxVelocity": 0,
+        "totalAirtime": 0,
+        "targetHits": 0,
+        "planetsUsed": {
+          "Earth": 0,
+          "Moon": 0,
+          "Mars": 0,
+          "Jupiter": 0
+        }
+      },
+      "flightLogs": [],
+      "observations": [],
+      "challenges": {},
+      "bonusXp": 575,
+      "badges": [
+        "badge-profile-saved"
+      ],
+      "quizHighScore": 0
     }
   }
 }

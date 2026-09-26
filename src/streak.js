@@ -95,8 +95,12 @@ export async function syncStreakWithFirebase(user, streakData) {
   // 1. Sync to Firebase Firestore
   if (db) {
     try {
-      const userRef = doc(db, "physix_users", user.uid);
-      await setDoc(userRef, { tracking: payload }, { merge: true });
+      const userRef = doc(db, "users", user.uid);
+      await setDoc(userRef, {
+        streak: payload.streak,
+        lastActiveDate: payload.lastSeenAt,
+        updatedAt: payload.updatedAt
+      }, { merge: true });
     } catch (err) {
       // If Firestore rules or offline, fallback smoothly
       console.warn("[Firebase] Firestore streak sync notice:", err.message);
@@ -118,15 +122,15 @@ export async function syncStreakWithFirebase(user, streakData) {
 export async function fetchStreakFromFirebase(user) {
   if (!user || !user.uid || !db) return null;
   try {
-    const userRef = doc(db, "physix_users", user.uid);
+    const userRef = doc(db, "users", user.uid);
     const snap = await getDoc(userRef);
     if (snap.exists()) {
       const data = snap.data();
-      if (data && data.tracking) {
+      if (data) {
         return {
-          currentStreak: data.tracking.streak || 0,
-          highestStreak: data.tracking.highestStreak || 0,
-          lastLoginDate: data.tracking.lastLoginDate || null
+          currentStreak: data.streak || 0,
+          highestStreak: data.highestStreak || data.streak || 0,
+          lastLoginDate: data.lastActiveDate || null
         };
       }
     }

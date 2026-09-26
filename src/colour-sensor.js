@@ -11,7 +11,7 @@ import { api } from "./api.js";
 import { generateLabReportPdf } from "./pdf-export.js";
 
 export function createColourSensorExperiment(callbacks = {}) {
-  const { onXpAwarded, showToast, getActiveUserId, loadUserProfile, getStoredUserProfile, unlockBadge, isUserAuthenticated, openLoginModal } = callbacks;
+  const { onXpAwarded, onExperimentRecorded, showToast, getActiveUserId, loadUserProfile, getStoredUserProfile, unlockBadge, isUserAuthenticated, openLoginModal } = callbacks;
 
   // Preset Calibrated Swatches
   const PRESET_SWATCHES = {
@@ -1099,8 +1099,48 @@ export function createColourSensorExperiment(callbacks = {}) {
       swatchReconPreview.style.backgroundColor = state.powerSupplyOn ? state.reconHex : "#000000";
     }
 
-    // 9. Mean Observation Statistics
+    // 9. Procedure Guide Ribbon Steps
+    updateProcedureRibbonDom();
+
+    // 10. Mean Observation Statistics
     updateObservationStats();
+  }
+
+  function updateProcedureRibbonDom() {
+    const step1 = document.getElementById("cs-step-indicator-1");
+    const step2 = document.getElementById("cs-step-indicator-2");
+    const step3 = document.getElementById("cs-step-indicator-3");
+    const step4 = document.getElementById("cs-step-indicator-4");
+    const step5 = document.getElementById("cs-step-indicator-5");
+
+    if (step1) {
+      if (state.powerSupplyOn) step1.className = "cs-proc-step step-done";
+      else step1.className = "cs-proc-step step-current";
+    }
+
+    if (step2) {
+      if (state.ledArrayActive && state.powerSupplyOn) step2.className = "cs-proc-step step-done";
+      else if (state.powerSupplyOn) step2.className = "cs-proc-step step-current";
+      else step2.className = "cs-proc-step";
+    }
+
+    if (step3) {
+      if (state.scaling !== "0%" && state.powerSupplyOn) step3.className = "cs-proc-step step-done";
+      else if (state.ledArrayActive && state.powerSupplyOn) step3.className = "cs-proc-step step-current";
+      else step3.className = "cs-proc-step";
+    }
+
+    if (step4) {
+      if (state.filterChannel && state.distanceMm && state.powerSupplyOn) step4.className = "cs-proc-step step-done";
+      else if (state.scaling !== "0%" && state.powerSupplyOn) step4.className = "cs-proc-step step-current";
+      else step4.className = "cs-proc-step";
+    }
+
+    if (step5) {
+      if (state.observations.length > 0) step5.className = "cs-proc-step step-done";
+      else if (state.powerSupplyOn && state.ledArrayActive) step5.className = "cs-proc-step step-current";
+      else step5.className = "cs-proc-step";
+    }
   }
 
   // ==========================================
@@ -1138,6 +1178,15 @@ export function createColourSensorExperiment(callbacks = {}) {
     else if (state.distanceMm >= 22.0) state.challenges.distanceSweep.zones.far = true;
 
     evaluateDistanceSweepChallenge();
+
+    if (onExperimentRecorded) {
+      onExperimentRecorded("colour-sensor", {
+        experimentName: "Study of Colour Sensor (TCS3200)",
+        completed: true,
+        score: state.matchFidelityPct,
+        xpEarned: 20
+      });
+    }
 
     if (showToast) showToast(`Recorded Reading #${reading.id}: ${sample.name} (${state.filterChannel.toUpperCase()})`);
   }
@@ -1204,7 +1253,7 @@ export function createColourSensorExperiment(callbacks = {}) {
           const idx = parseInt(delBtn.getAttribute("data-del-cs-obs"), 10);
           if (!isNaN(idx) && idx >= 0 && idx < state.observations.length) {
             const deleted = state.observations.splice(idx, 1)[0];
-            saveState();
+            state.observations.forEach((o, i) => { o.id = i + 1; });
             renderObservationsTable();
             if (showToast) showToast(`Colour Sensor Reading #${deleted.id} deleted.`);
           }
@@ -1493,7 +1542,8 @@ export function createColourSensorExperiment(callbacks = {}) {
         tag1.innerHTML = `<svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> Complete (+100 XP)`;
       } else {
         tag1.className = "challenge-status-tag pending";
-        const calCount = (ch.primaryCalib.calibratedSwatches.white ? 1 : 0) + (ch.primaryCalib.calibratedSwatches.red ? 1 : 0) + (ch.primaryCalib.calibratedSwatches.green ? 1 : 0) + (ch.primaryCalib.calibratedSwatches.blue ? 1 : 0);
+        const steps = ch.primaryCalib.calibratedSteps || ch.primaryCalib.calibratedSwatches || {};
+        const calCount = (steps.white ? 1 : 0) + (steps.red ? 1 : 0) + (steps.green ? 1 : 0) + (steps.blue ? 1 : 0);
         tag1.textContent = `${calCount} / 4 Calibrated`;
       }
     }
@@ -1729,6 +1779,16 @@ export function createColourSensorExperiment(callbacks = {}) {
     btnCloseResults?.addEventListener("click", () => {
       document.getElementById("cs-results-modal")?.classList.add("hidden");
     });
+
+    const resultsModal = document.getElementById("cs-results-modal");
+    resultsModal?.addEventListener("click", (e) => {
+      if (e.target === resultsModal) {
+        resultsModal.classList.add("hidden");
+      }
+    });
+
+    const btnClearObs = document.getElementById("cs-btn-clear-obs");
+    btnClearObs?.addEventListener("click", clearObservations);
 
     const btnExportCsv = document.getElementById("cs-btn-export-csv");
     btnExportCsv?.addEventListener("click", exportObservationsCsv);

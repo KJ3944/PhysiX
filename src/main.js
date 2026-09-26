@@ -3,6 +3,8 @@ import "./style.css";
 import "./light-mode.css";
 import {
   auth,
+  googleProvider,
+  signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
@@ -10,7 +12,7 @@ import {
   updatePassword,
   onAuthStateChanged
 } from "./firebase.js";
-import { QUIZ_DATA } from "./quiz-data.js";
+import { QUIZ_DATA, generateRandom10QuestionQuiz } from "./quiz-data.js";
 import { api } from "./api.js";
 import { ICONS, AVATAR_SVGS, BADGE_SVGS } from "./icons.js";
 import { createOpticalFibreExperiment } from "./optical-fibre.js";
@@ -32,6 +34,12 @@ import {
   getStoredUserStreak,
   getNextStreakMilestone
 } from "./streak.js";
+import {
+  syncUserToFirestore,
+  recordExperimentInFirestore,
+  recordQuizAttemptInFirestore,
+  fetchFullUserDataFromFirestore
+} from "./user-data-service.js";
 
 const {
   Engine,
@@ -1197,6 +1205,38 @@ function saveStoredUserProfile(profileData) {
   }
   // Asynchronously sync with Express backend
   api.saveProfile(getActiveUserId(), profileData).catch(() => {});
+
+  // Asynchronously sync with Firestore users/{uid}
+  if (auth.currentUser) {
+    try {
+      const stats = getStoredTelemetry();
+      const badges = getStoredBadges();
+      const quizHigh = Number(localStorage.getItem("physix_quiz_highscore") || 0);
+      const targetScore = simState?.targetScore || 0;
+      const rankInfo = calculateStudentRankAndLevel(stats, quizHigh, targetScore, badges.length);
+      const streak = getStoredUserStreak(auth.currentUser.uid);
+
+      syncUserToFirestore(auth.currentUser, {
+        name: profileData.name || auth.currentUser.displayName || (auth.currentUser.email ? auth.currentUser.email.split("@")[0] : "PhysiX Scholar"),
+        email: auth.currentUser.email,
+        totalXP: rankInfo.totalXp,
+        level: rankInfo.level,
+        streak: streak.currentStreak || 1,
+        experimentsPerformed: stats.totalLaunches || 0,
+        bestQuizScore: quizHigh,
+        extra: {
+          avatar: profileData.avatar || "quantum",
+          handle: profileData.handle || "",
+          edu: profileData.edu || "",
+          occ: profileData.occ || "",
+          interests: profileData.interests || "",
+          bio: profileData.bio || ""
+        }
+      });
+    } catch (e) {
+      console.warn("[Firestore] saveStoredUserProfile sync notice:", e);
+    }
+  }
 }
 
 function getStoredTelemetry() {
@@ -1350,6 +1390,19 @@ function addStudentXp(amount, reason) {
 
   // Sync to Express backend
   api.addXp(getActiveUserId(), amount, reason).catch(() => {});
+
+  // Sync to Firestore
+  if (auth.currentUser) {
+    const stats = getStoredTelemetry();
+    const badges = getStoredBadges();
+    const quizHigh = Number(localStorage.getItem("physix_quiz_highscore") || 0);
+    const targetScore = simState?.targetScore || 0;
+    const rankInfo = calculateStudentRankAndLevel(stats, quizHigh, targetScore, badges.length);
+    syncUserToFirestore(auth.currentUser, {
+      totalXP: rankInfo.totalXp,
+      level: rankInfo.level
+    }).catch(() => {});
+  }
 
   // Trigger celebratory cyber graffiti banner and confetti shower
   showChallengeGraffiti(reason || "Laboratory Challenge Completed", amount);
@@ -1637,6 +1690,16 @@ function recordCurrentObservation() {
 
   // Sync with Express backend
   api.addObservation(getActiveUserId(), obsEntry).catch(() => {});
+
+  // Sync to Firestore users/{uid}/experiments/projectile
+  if (auth.currentUser) {
+    recordExperimentInFirestore(auth.currentUser.uid, "projectile", {
+      experimentName: "2D Projectile Motion",
+      completed: true,
+      score: Number(rangeVal),
+      xpEarned: 15
+    });
+  }
 
   renderObservationsTable();
   showToast(`Observation #${obsList.length} Recorded: v₀=${v0}m/s, θ=${angle}°, R=${Number(rangeVal).toFixed(1)}m`);
@@ -2140,6 +2203,11 @@ function loadUserProfile() {
     if (secUserEmailDisplay) secUserEmailDisplay.textContent = `Connected: ${user.email}`;
     if (secDetailEmail) secDetailEmail.textContent = user.email;
     if (secDetailUid) secDetailUid.textContent = user.uid;
+    const secDetailProvider = document.getElementById("sec-detail-provider");
+    if (secDetailProvider) {
+      const isGoogle = user.providerData?.some(p => p.providerId === "google.com");
+      secDetailProvider.textContent = isGoogle ? "Google Account (OAuth)" : "Firebase Email / Password";
+    }
 
     // Show active tab
     const activeBtn = document.querySelector(".profile-tab-btn.active");
@@ -2411,7 +2479,7 @@ formLogin?.addEventListener("submit", async (e) => {
     openEditProfileModal();
   } catch (error) {
     console.error("Login error:", error);
-    loginErrorMsg.textContent = formatAuthError(error.message);
+    loginErrorMsg.textContent = formatAuthError(error);
     loginErrorMsg.classList.remove("hidden");
   }
 });
@@ -2452,7 +2520,7 @@ formSignup?.addEventListener("submit", async (e) => {
     openEditProfileModal();
   } catch (error) {
     console.error("Signup error:", error);
-    signupErrorMsg.textContent = formatAuthError(error.message);
+    signupErrorMsg.textContent = formatAuthError(error);
     signupErrorMsg.classList.remove("hidden");
   }
 });
@@ -2475,9 +2543,36 @@ formForgot?.addEventListener("submit", async (e) => {
     showToast("Password reset email sent.");
   } catch (error) {
     console.error("Forgot password error:", error);
-    forgotErrorMsg.textContent = formatAuthError(error.message);
+    forgotErrorMsg.textContent = formatAuthError(error);
     forgotErrorMsg.classList.remove("hidden");
   }
+});
+
+// Google Sign-In Handler
+async function handleGoogleSignIn() {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    showToast(`Signed in with Google as ${result.user.displayName || result.user.email}!`);
+    await processUserDailyStreak(result.user);
+    loadUserProfile();
+    openEditProfileModal();
+  } catch (error) {
+    console.error("Google sign-in error:", error);
+    if (error.code === "auth/popup-closed-by-user" || error.code === "auth/cancelled-popup-request") {
+      return;
+    }
+    const formatted = formatAuthError(error);
+    showToast(formatted);
+    const activeErrEl = document.querySelector("#auth-view-login:not(.hidden) #login-error-msg, #auth-view-signup:not(.hidden) #signup-error-msg");
+    if (activeErrEl) {
+      activeErrEl.textContent = formatted;
+      activeErrEl.classList.remove("hidden");
+    }
+  }
+}
+
+document.querySelectorAll(".btn-google-signin").forEach((btn) => {
+  btn.addEventListener("click", handleGoogleSignIn);
 });
 
 formChangePassword?.addEventListener("submit", async (e) => {
@@ -2518,7 +2613,7 @@ formChangePassword?.addEventListener("submit", async (e) => {
     loadUserProfile();
   } catch (error) {
     console.error("Change password error:", error);
-    changeErrorMsg.textContent = formatAuthError(error.message);
+    changeErrorMsg.textContent = formatAuthError(error);
     changeErrorMsg.classList.remove("hidden");
   }
 });
@@ -2554,23 +2649,41 @@ document.querySelectorAll(".btn-toggle-password").forEach(btn => {
   });
 });
 
-function formatAuthError(msg) {
-  if (msg.includes("invalid-credential") || msg.includes("wrong-password") || msg.includes("user-not-found")) {
-    return "Invalid email or password. Please try again.";
+function formatAuthError(error) {
+  if (!error) return "An unknown error occurred. Please try again.";
+  const code = typeof error === "object" && error.code ? error.code : "";
+  const msg = typeof error === "object" && error.message ? error.message : String(error);
+
+  if (code === "auth/operation-not-allowed" || msg.includes("operation-not-allowed")) {
+    return "Email/Password sign-in is disabled in your Firebase project. Please enable 'Email/Password' under Firebase Console > Build > Authentication > Sign-in method.";
   }
-  if (msg.includes("email-already-in-use")) {
+  if (code === "auth/invalid-credential" || code === "auth/wrong-password" || code === "auth/user-not-found" || msg.includes("invalid-credential") || msg.includes("wrong-password") || msg.includes("user-not-found")) {
+    return "Invalid email or password. If you haven't created an account yet in this Firebase project, please click the 'Create Account' tab first.";
+  }
+  if (code === "auth/email-already-in-use" || msg.includes("email-already-in-use")) {
     return "This email is already registered. Please sign in instead.";
   }
-  if (msg.includes("invalid-email")) {
+  if (code === "auth/invalid-email" || msg.includes("invalid-email")) {
     return "Please enter a valid email address.";
   }
-  if (msg.includes("weak-password")) {
-    return "Password is too weak. Must be at least 6 characters.";
+  if (code === "auth/weak-password" || msg.includes("weak-password")) {
+    return "Password is too weak. Must be at least 6 characters long.";
   }
-  if (msg.includes("requires-recent-login")) {
+  if (code === "auth/requires-recent-login" || msg.includes("requires-recent-login")) {
     return "This action requires recent login. Please log in again first.";
   }
-  return msg.replace("Firebase: ", "").replace(/\(auth\/.*\)\.?/, "").trim();
+  if (code === "auth/network-request-failed" || msg.includes("network-request-failed")) {
+    return "Network connection failed. Please check your internet connection.";
+  }
+  if (code === "auth/too-many-requests" || msg.includes("too-many-requests")) {
+    return "Access temporarily blocked due to too many failed attempts. Try again later or reset your password.";
+  }
+  if (code === "auth/user-disabled" || msg.includes("user-disabled")) {
+    return "This user account has been disabled by an administrator.";
+  }
+
+  const cleaned = msg.replace(/^Firebase:\s*/i, "").replace(/\s*\(auth\/[^\)]+\)\.?/i, "").trim();
+  return cleaned || msg;
 }
 
 // Edit Profile Modal Elements
@@ -2710,6 +2823,12 @@ userProfileBtn?.addEventListener("click", () => {
 // ==========================================
 // QUIZ ENGINE & INTERACTIVITY (ANTI-COPY SECURED)
 // ==========================================
+// QUIZ ENGINE & INTERACTIVITY (MULTI-EXPERIMENT SHUFFLER)
+// ==========================================
+let activeQuizData = null;
+const quizModalTitle = document.getElementById("quiz-modal-title");
+const quizModalDesc = document.getElementById("quiz-modal-desc");
+const quizBadgeHeader = document.getElementById("quiz-badge-header");
 const quizCurrentNum = document.getElementById("quiz-current-num");
 const quizTotalNum = document.getElementById("quiz-total-num");
 const quizProgressBar = document.getElementById("quiz-progress-bar");
@@ -2723,32 +2842,91 @@ const quizResultsView = document.getElementById("quiz-results-view");
 const quizFinalScore = document.getElementById("quiz-final-score");
 const quizFinalPercent = document.getElementById("quiz-final-percent");
 const quizGradeBadge = document.getElementById("quiz-grade-badge");
+const quizResultsSummaryText = document.getElementById("quiz-results-summary-text");
 const quizReviewList = document.getElementById("quiz-review-list");
 const btnRetakeQuiz = document.getElementById("btn-retake-quiz");
 const btnQuizToSim = document.getElementById("btn-quiz-to-sim");
+const quizExpTabBtns = document.querySelectorAll(".quiz-exp-tab-btn");
 
-function initQuiz() {
+function initQuiz(expId) {
+  const chosenExp = (typeof expId === "string" && expId) ? expId : (activeExperimentId || "projectile");
+  activeQuizData = generateRandom10QuestionQuiz(chosenExp);
+
   quizState = {
     currentQuestionIndex: 0,
     userAnswers: {},
     score: 0
   };
-  quizTotalNum.textContent = QUIZ_DATA.questions.length;
-  quizActiveView.classList.remove("hidden");
-  quizResultsView.classList.add("hidden");
+
+  // Update tabs UI
+  quizExpTabBtns.forEach(btn => {
+    if (btn.getAttribute("data-quiz-exp") === chosenExp) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+
+  // Update Header details
+  if (quizBadgeHeader) {
+    if (chosenExp === "projectile") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 1";
+    else if (chosenExp === "optical") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 2";
+    else if (chosenExp === "colour-sensor") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 3";
+  }
+
+  if (quizModalTitle) {
+    if (chosenExp === "projectile") {
+      quizModalTitle.innerHTML = `
+        <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#a855f7;">
+          <circle cx="12" cy="12" r="9"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        2D Kinematics Knowledge Check (10Q)
+      `;
+    } else if (chosenExp === "optical") {
+      quizModalTitle.innerHTML = `
+        <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#06b6d4;">
+          <circle cx="12" cy="12" r="9"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        Optical Fibre Numerical Aperture Quiz (10Q)
+      `;
+    } else if (chosenExp === "colour-sensor") {
+      quizModalTitle.innerHTML = `
+        <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#ec4899;">
+          <circle cx="12" cy="12" r="9"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        Colour Sensor TCS3200 Quiz (10Q)
+      `;
+    }
+  }
+
+  if (quizModalDesc) {
+    if (chosenExp === "projectile") {
+      quizModalDesc.textContent = "Randomized 10-question evaluation sampled from 50-question 2D Kinematics bank";
+    } else if (chosenExp === "optical") {
+      quizModalDesc.textContent = "Randomized 10-question evaluation sampled from 50-question Optical Fibre & TIR bank";
+    } else if (chosenExp === "colour-sensor") {
+      quizModalDesc.textContent = "Randomized 10-question evaluation sampled from 50-question Colour Sensor & Photometry bank";
+    }
+  }
+
+  if (quizTotalNum) quizTotalNum.textContent = activeQuizData.questions.length;
+  quizActiveView?.classList.remove("hidden");
+  quizResultsView?.classList.add("hidden");
   renderQuizQuestion(0);
 }
 
 function renderQuizQuestion(index) {
+  if (!activeQuizData || !activeQuizData.questions[index]) return;
+
   quizState.currentQuestionIndex = index;
-  const q = QUIZ_DATA.questions[index];
+  const q = activeQuizData.questions[index];
 
-  quizCurrentNum.textContent = index + 1;
-  const progressPercent = ((index + 1) / QUIZ_DATA.questions.length) * 100;
-  quizProgressBar.style.width = `${progressPercent}%`;
+  if (quizCurrentNum) quizCurrentNum.textContent = index + 1;
+  const progressPercent = ((index + 1) / activeQuizData.questions.length) * 100;
+  if (quizProgressBar) quizProgressBar.style.width = `${progressPercent}%`;
 
-  quizQuestionText.textContent = `${index + 1}. ${q.question}`;
-  quizOptionsList.innerHTML = "";
+  if (quizQuestionText) quizQuestionText.textContent = `${index + 1}. ${q.question}`;
+  if (quizOptionsList) quizOptionsList.innerHTML = "";
 
   const savedAnswer = quizState.userAnswers[q.id];
   const chosenOption = savedAnswer ? savedAnswer.chosenOption : null;
@@ -2770,48 +2948,49 @@ function renderQuizQuestion(index) {
     `;
 
     card.addEventListener("click", () => handleSelectOption(q, opt));
-    quizOptionsList.appendChild(card);
+    quizOptionsList?.appendChild(card);
   });
 
   // Previous Button
-  btnQuizPrev.disabled = index === 0;
-  btnQuizPrev.innerHTML = `
-    <svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-    <span>Previous Question</span>
-  `;
+  if (btnQuizPrev) {
+    btnQuizPrev.disabled = index === 0;
+    btnQuizPrev.innerHTML = `
+      <svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      <span>Previous Question</span>
+    `;
+  }
 
   // Next / Submit Button
-  const isLastQuestion = index === QUIZ_DATA.questions.length - 1;
-  if (isLastQuestion) {
-    btnQuizNext.classList.add("finish-btn");
-    btnQuizNext.innerHTML = `
-      <span>Finish & View Evaluation</span>
-      <svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-    `;
-  } else {
-    btnQuizNext.classList.remove("finish-btn");
-    btnQuizNext.innerHTML = `
-      <span>Next Question</span>
-      <svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-    `;
+  const isLastQuestion = index === activeQuizData.questions.length - 1;
+  if (btnQuizNext) {
+    if (isLastQuestion) {
+      btnQuizNext.classList.add("finish-btn");
+      btnQuizNext.innerHTML = `
+        <span>Finish & View Evaluation</span>
+        <svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      `;
+    } else {
+      btnQuizNext.classList.remove("finish-btn");
+      btnQuizNext.innerHTML = `
+        <span>Next Question</span>
+        <svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      `;
+    }
   }
 }
 
 function handleSelectOption(question, chosenOption) {
-  // Save answer in secret
   quizState.userAnswers[question.id] = { chosenOption };
   renderQuizQuestion(quizState.currentQuestionIndex);
 }
 
 // ANTI-COPY SECURITY LAYER ON QUIZ MODAL
 if (quizModal) {
-  // Prevent context menu (right click)
   quizModal.addEventListener("contextmenu", (e) => {
     e.preventDefault();
     showToast("Right-click context menu is disabled during the quiz.");
   });
 
-  // Prevent copy, cut, drag, and selection copying
   ["copy", "cut", "dragstart"].forEach(eventName => {
     quizModal.addEventListener(eventName, (e) => {
       e.preventDefault();
@@ -2819,7 +2998,6 @@ if (quizModal) {
     });
   });
 
-  // Prevent keyboard shortcuts (Ctrl+C, Ctrl+X, Ctrl+A, Ctrl+U, Ctrl+P)
   quizModal.addEventListener("keydown", (e) => {
     if ((e.ctrlKey || e.metaKey) && ["c", "x", "a", "u", "p"].includes(e.key.toLowerCase())) {
       e.preventDefault();
@@ -2828,15 +3006,25 @@ if (quizModal) {
   });
 }
 
+// Bind Quiz Experiment Tabs
+quizExpTabBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const targetExp = btn.getAttribute("data-quiz-exp");
+    initQuiz(targetExp);
+  });
+});
+
 function showQuizResults() {
-  quizActiveView.classList.add("hidden");
-  quizResultsView.classList.remove("hidden");
+  if (!activeQuizData) return;
+
+  quizActiveView?.classList.add("hidden");
+  quizResultsView?.classList.remove("hidden");
 
   // Calculate final score
   let score = 0;
-  const total = QUIZ_DATA.questions.length;
+  const total = activeQuizData.questions.length;
 
-  QUIZ_DATA.questions.forEach(q => {
+  activeQuizData.questions.forEach(q => {
     const userAns = quizState.userAnswers[q.id];
     if (userAns && userAns.chosenOption === q.answer) {
       score += 1;
@@ -2845,54 +3033,77 @@ function showQuizResults() {
   quizState.score = score;
 
   const pct = Math.round((score / total) * 100);
-  quizFinalScore.textContent = score;
-  quizFinalPercent.textContent = `${pct}%`;
+  if (quizFinalScore) quizFinalScore.textContent = score;
+  if (quizFinalPercent) quizFinalPercent.textContent = `${pct}%`;
+  if (quizResultsSummaryText) {
+    quizResultsSummaryText.innerHTML = `Score: <strong id="quiz-final-percent">${pct}%</strong> accuracy on ${activeQuizData.experimentName}.`;
+  }
 
-  if (pct >= 90) {
-    quizGradeBadge.textContent = "Kinematics Master (Outstanding)";
-    quizGradeBadge.style.color = "#fde68a";
-  } else if (pct >= 70) {
-    quizGradeBadge.textContent = "Physics Ace (Proficient)";
-    quizGradeBadge.style.color = "#a7f3d0";
-  } else if (pct >= 50) {
-    quizGradeBadge.textContent = "Apprentice Physicist (Good Effort)";
-    quizGradeBadge.style.color = "#93c5fd";
-  } else {
-    quizGradeBadge.textContent = "Keep Exploring Simulator!";
-    quizGradeBadge.style.color = "#fca5a5";
+  // Grade Titles based on experiment
+  if (quizGradeBadge) {
+    if (pct >= 90) {
+      quizGradeBadge.textContent = activeQuizData.experimentId === "projectile" ? "Kinematics Master (Outstanding)" : (activeQuizData.experimentId === "optical" ? "Photonics Virtuoso (Outstanding)" : "Spectrometry Virtuoso (Outstanding)");
+      quizGradeBadge.style.color = "#fde68a";
+      triggerConfetti();
+    } else if (pct >= 70) {
+      quizGradeBadge.textContent = "Physics Ace (Proficient)";
+      quizGradeBadge.style.color = "#a7f3d0";
+    } else if (pct >= 50) {
+      quizGradeBadge.textContent = "Apprentice Physicist (Good Effort)";
+      quizGradeBadge.style.color = "#93c5fd";
+    } else {
+      quizGradeBadge.textContent = "Keep Exploring Simulator!";
+      quizGradeBadge.style.color = "#fca5a5";
+    }
   }
 
   // Populate Review List
-  quizReviewList.innerHTML = "";
-  QUIZ_DATA.questions.forEach((q, i) => {
-    const userAns = quizState.userAnswers[q.id];
-    const userChoice = userAns ? userAns.chosenOption : "Not Answered";
-    const isCorrect = userChoice === q.answer;
+  if (quizReviewList) {
+    quizReviewList.innerHTML = "";
+    activeQuizData.questions.forEach((q, i) => {
+      const userAns = quizState.userAnswers[q.id];
+      const userChoice = userAns ? userAns.chosenOption : "Not Answered";
+      const isCorrect = userChoice === q.answer;
 
-    const item = document.createElement("div");
-    item.className = `review-item ${isCorrect ? "is-correct" : "is-incorrect"}`;
-    item.innerHTML = `
-      <div class="review-q">${i + 1}. ${q.question}</div>
-      <div class="review-ans-row">
-        <span class="review-user-ans ${isCorrect ? "" : "wrong"}">
-          Your Answer: <strong>${userChoice} (${isCorrect ? "Correct" : "Incorrect"})</strong>
-        </span>
-        ${!isCorrect ? `<span class="review-correct-ans">Correct Answer: <strong>${q.answer}</strong></span>` : ""}
-      </div>
-      <div class="review-exp"><strong>Solution & Concept:</strong> ${q.explanation}</div>
-    `;
-    quizReviewList.appendChild(item);
-  });
+      const item = document.createElement("div");
+      item.className = `review-item ${isCorrect ? "is-correct" : "is-incorrect"}`;
+      item.innerHTML = `
+        <div class="review-q">${i + 1}. ${q.question}</div>
+        <div class="review-ans-row">
+          <span class="review-user-ans ${isCorrect ? "" : "wrong"}">
+            Your Answer: <strong>${userChoice} (${isCorrect ? "Correct ✓" : "Incorrect ✗"})</strong>
+          </span>
+          ${!isCorrect ? `<span class="review-correct-ans">Correct Answer: <strong>${q.answer}</strong></span>` : ""}
+        </div>
+        <div class="review-exp"><strong>Concept & Explanation:</strong> ${q.explanation}</div>
+      `;
+      quizReviewList.appendChild(item);
+    });
+  }
 
   // Save High Score and update profile telemetry
   try {
-    const currentHigh = Number(localStorage.getItem("physix_quiz_highscore") || 0);
+    const storageKey = `physix_quiz_highscore_${activeQuizData.experimentId}`;
+    const currentHigh = Number(localStorage.getItem(storageKey) || 0);
     if (score > currentHigh) {
-      localStorage.setItem("physix_quiz_highscore", score);
-      showToast(`New Quiz High Score: ${score}/${total}!`);
+      localStorage.setItem(storageKey, score);
+      showToast(`New ${activeQuizData.experimentName} High Score: ${score}/${total}!`);
     }
+    localStorage.setItem("physix_quiz_highscore", Math.max(score, Number(localStorage.getItem("physix_quiz_highscore") || 0)));
+
     recordQuizTelemetry(score, total);
     api.submitQuiz(getActiveUserId(), quizState.userAnswers).catch(() => {});
+
+    // Sync to Firestore users/{uid}/quizAttempts/{attemptId}
+    if (auth.currentUser) {
+      recordQuizAttemptInFirestore(auth.currentUser.uid, {
+        quizId: activeQuizData.quizId,
+        score,
+        totalQuestions: total,
+        percentage: pct,
+        xpEarned: score * 10
+      });
+    }
   } catch (e) {
     console.warn("Storage error", e);
   }
@@ -3017,87 +3228,39 @@ btnQuizPrev.addEventListener("click", () => {
 });
 
 btnQuizNext.addEventListener("click", () => {
-  if (quizState.currentQuestionIndex < QUIZ_DATA.questions.length - 1) {
+  const total = activeQuizData ? activeQuizData.questions.length : 10;
+  if (quizState.currentQuestionIndex < total - 1) {
     renderQuizQuestion(quizState.currentQuestionIndex + 1);
   } else {
     showQuizResults();
   }
 });
 
-btnRetakeQuiz.addEventListener("click", initQuiz);
+btnRetakeQuiz.addEventListener("click", () => {
+  initQuiz(activeQuizData?.experimentId || activeExperimentId || "projectile");
+});
 
 btnQuizToSim.addEventListener("click", () => {
   quizModal.classList.add("hidden");
-  // Set simulator to Question 7 values (v=20, theta=45, g=10 -> Range = 40m)
-  velocitySlider.value = 20;
-  velocityValue.textContent = "20.0 m/s";
-  angleSlider.value = 45;
-  angleValue.textContent = "45°";
-  heightSlider.value = 0;
-  heightValue.textContent = "0.0 m";
-  gravitySlider.value = 10;
-  gravityValue.textContent = "10.0 m/s²";
-
-  updateLauncher(45, 0);
-  calculateTheoreticalResults();
-  launchProjectile();
-
-  showToast("Loaded Quiz Q7 Setup: v₀=20m/s, θ=45°, g=10m/s² -> R=40.0m");
+  if (activeQuizData && activeQuizData.experimentId !== activeExperimentId) {
+    switchExperiment(activeQuizData.experimentId);
+  }
 });
 
 // ==========================================
 // MODALS & NAVIGATION LOGIC
 // ==========================================
-// Quiz Modal & Optical Fibre Alert
-const ofQuizAlertModal = document.getElementById("optical-quiz-alert-modal");
-const btnCloseOfQuizAlert = document.getElementById("btn-close-of-quiz-alert");
-const btnOfQuizSwitchProj = document.getElementById("btn-of-quiz-switch-proj");
-const btnOfQuizDismiss = document.getElementById("btn-of-quiz-dismiss");
-
+// Quiz Modal
 btnOpenQuiz.addEventListener("click", () => {
   if (!isUserAuthenticated()) {
-    openLoginModal("The 2D Kinematics Mastery Quiz is locked for guest mode. Sign in or create a free account to test your physics skills!");
+    openLoginModal("Please sign in or create a free account to test your physics skills and earn student XP!");
     return;
   }
-  if (activeExperimentId === "optical" || activeExperimentId === "colour-sensor") {
-    const titleEl = ofQuizAlertModal?.querySelector("h3");
-    const descEl = ofQuizAlertModal?.querySelector("p");
-
-    if (activeExperimentId === "colour-sensor") {
-      if (titleEl) titleEl.textContent = "Colour Sensor Quiz • Coming Soon";
-      if (descEl) {
-        descEl.innerHTML = `The knowledge check for <strong>Experiment 3: Study of Colour Sensor (TCS3200)</strong> will arrive in the upcoming version. You can take the 2D Kinematics Quiz in Experiment 1 anytime!`;
-      }
-    } else {
-      if (titleEl) titleEl.textContent = "Optical Fibre Quiz • Coming Soon";
-      if (descEl) {
-        descEl.innerHTML = `The knowledge check for <strong>Experiment 2: Determination of Numerical Aperture</strong> will arrive in the upcoming version. You can take the 2D Kinematics Quiz in Experiment 1 anytime!`;
-      }
-    }
-
-    ofQuizAlertModal?.classList.remove("hidden");
-    return;
-  }
-  initQuiz();
+  initQuiz(activeExperimentId || "projectile");
   quizModal.classList.remove("hidden");
 });
 btnCloseQuiz.addEventListener("click", () => {
   quizModal.classList.add("hidden");
-});
-
-btnCloseOfQuizAlert?.addEventListener("click", () => {
-  ofQuizAlertModal?.classList.add("hidden");
-});
-
-btnOfQuizDismiss?.addEventListener("click", () => {
-  ofQuizAlertModal?.classList.add("hidden");
-});
-
-btnOfQuizSwitchProj?.addEventListener("click", () => {
-  ofQuizAlertModal?.classList.add("hidden");
-  switchExperiment("projectile");
-  initQuiz();
-  quizModal.classList.remove("hidden");
 });
 
 // Explorer Modal
@@ -3584,6 +3747,9 @@ function switchExperiment(expId) {
     if (!colourSensorExperimentInstance) {
       colourSensorExperimentInstance = createColourSensorExperiment({
         onXpAwarded: (amount, reason) => addStudentXp(amount, reason),
+        onExperimentRecorded: (id, data) => {
+          if (auth.currentUser) recordExperimentInFirestore(auth.currentUser.uid, id, data);
+        },
         showToast,
         getActiveUserId,
         loadUserProfile,
@@ -3605,6 +3771,9 @@ function switchExperiment(expId) {
     if (!opticalExperimentInstance) {
       opticalExperimentInstance = createOpticalFibreExperiment({
         onXpAwarded: (amount, reason) => addStudentXp(amount, reason),
+        onExperimentRecorded: (id, data) => {
+          if (auth.currentUser) recordExperimentInFirestore(auth.currentUser.uid, id, data);
+        },
         showToast,
         getActiveUserId,
         loadUserProfile,
@@ -3838,6 +4007,29 @@ document.addEventListener("click", (e) => {
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     await processUserDailyStreak(user);
+
+    // Sync user schema to Firestore users/{uid}
+    try {
+      const profile = getStoredUserProfile();
+      const stats = getStoredTelemetry();
+      const badges = getStoredBadges();
+      const quizHigh = Number(localStorage.getItem("physix_quiz_highscore") || 0);
+      const targetScore = simState.targetScore || 0;
+      const rankInfo = calculateStudentRankAndLevel(stats, quizHigh, targetScore, badges.length);
+      const streak = getStoredUserStreak(user.uid);
+
+      await syncUserToFirestore(user, {
+        name: profile.name || user.displayName || (user.email ? user.email.split("@")[0] : "PhysiX Scholar"),
+        email: user.email,
+        totalXP: rankInfo.totalXp,
+        level: rankInfo.level,
+        streak: streak.currentStreak || 1,
+        experimentsPerformed: stats.totalLaunches || 0,
+        bestQuizScore: quizHigh
+      });
+    } catch (e) {
+      console.warn("[Firestore] User sync notice:", e);
+    }
   }
   updateAuthStateRestrictions();
   loadUserProfile();

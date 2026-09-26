@@ -10,7 +10,7 @@ import { api } from "./api.js";
 import { generateLabReportPdf } from "./pdf-export.js";
 
 export function createOpticalFibreExperiment(callbacks = {}) {
-  const { onXpAwarded, showToast, getActiveUserId, loadUserProfile, getStoredUserProfile, unlockBadge, isUserAuthenticated, openLoginModal } = callbacks;
+  const { onXpAwarded, onExperimentRecorded, showToast, getActiveUserId, loadUserProfile, getStoredUserProfile, unlockBadge, isUserAuthenticated, openLoginModal } = callbacks;
 
   // Scientific Model State
   const state = {
@@ -941,6 +941,15 @@ export function createOpticalFibreExperiment(callbacks = {}) {
       experiment: "Optical Fibre NA",
       ...obsEntry
     }).catch(() => { });
+
+    if (onExperimentRecorded) {
+      onExperimentRecorded("optical", {
+        experimentName: "Determination of Numerical Aperture of an Optical Fibre",
+        completed: true,
+        score: Number((obsEntry.na * 100).toFixed(1)),
+        xpEarned: 20
+      });
+    }
   }
 
   function clearObservations() {
@@ -1032,7 +1041,6 @@ export function createOpticalFibreExperiment(callbacks = {}) {
             if (!isNaN(idx) && idx >= 0 && idx < state.observations.length) {
               const deleted = state.observations.splice(idx, 1)[0];
               state.observations.forEach((o, i) => { o.reading = i + 1; });
-              saveState();
               renderObservationsDom();
               if (showToast) showToast(`Optical Fibre Reading #${deleted.reading} deleted.`);
             }

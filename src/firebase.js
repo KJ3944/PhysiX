@@ -1,8 +1,11 @@
 import { initializeApp } from "firebase/app";
+import { getAnalytics, isSupported } from "firebase/analytics";
 import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
   signOut,
   sendPasswordResetEmail,
   updatePassword,
@@ -11,25 +14,34 @@ import {
 import {
   getFirestore,
   doc,
+  collection,
   getDoc,
+  getDocs,
   setDoc,
-  updateDoc
+  updateDoc,
+  addDoc,
+  query,
+  orderBy,
+  limit,
+  serverTimestamp,
+  increment
 } from "firebase/firestore";
 
 // Firebase Configuration from User Project
 const firebaseConfig = {
-  apiKey: "AIzaSyCaxt7IyXNAm5N41gWX0AJA3iJsq9_O-Cc",
-  authDomain: "authentication-2708d.firebaseapp.com",
-  projectId: "authentication-2708d",
-  storageBucket: "authentication-2708d.firebasestorage.app",
-  messagingSenderId: "101323771563",
-  appId: "1:101323771563:web:68073d61462d90b39471ee",
-  measurementId: "G-9P985Z2SN2"
+  apiKey: "AIzaSyDEp6ZlkieVFUeC4mdUrP8g8AymT14PQwc",
+  authDomain: "physix-d4860.firebaseapp.com",
+  projectId: "physix-d4860",
+  storageBucket: "physix-d4860.firebasestorage.app",
+  messagingSenderId: "180090395467",
+  appId: "1:180090395467:web:b2a79a451c0676f131e6ce",
+  measurementId: "G-1V2QBTZGF4"
 };
 
 // Initialize Firebase App
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
 let db = null;
 try {
   db = getFirestore(app);
@@ -37,14 +49,35 @@ try {
   console.warn("Firestore initialization notice:", e);
 }
 
+let analytics = null;
+if (typeof window !== "undefined") {
+  isSupported().then((supported) => {
+    if (supported) {
+      analytics = getAnalytics(app);
+    }
+  }).catch(() => {});
+}
+
 export {
   app,
   auth,
+  googleProvider,
+  GoogleAuthProvider,
+  signInWithPopup,
   db,
+  analytics,
   doc,
+  collection,
   getDoc,
+  getDocs,
   setDoc,
   updateDoc,
+  addDoc,
+  query,
+  orderBy,
+  limit,
+  serverTimestamp,
+  increment,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
