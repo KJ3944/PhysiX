@@ -1219,6 +1219,7 @@ function saveStoredUserProfile(profileData) {
       syncUserToFirestore(auth.currentUser, {
         name: profileData.name || auth.currentUser.displayName || (auth.currentUser.email ? auth.currentUser.email.split("@")[0] : "PhysiX Scholar"),
         email: auth.currentUser.email,
+        photoURL: auth.currentUser.photoURL || null,
         totalXP: rankInfo.totalXp,
         level: rankInfo.level,
         streak: streak.currentStreak || 1,
@@ -1971,6 +1972,25 @@ function recordQuizTelemetry(score, total) {
   loadUserProfile();
 }
 
+function setAvatarElement(container, photoUrl, defaultSvg) {
+  if (!container) return;
+  if (photoUrl) {
+    const isHero = container.classList.contains("profile-avatar-large") || container.id === "hero-avatar-char";
+    const img = document.createElement("img");
+    img.src = photoUrl;
+    img.alt = "Profile Picture";
+    img.className = isHero ? "profile-avatar-img" : "user-avatar-img";
+    img.setAttribute("referrerpolicy", "no-referrer");
+    img.onerror = () => {
+      container.innerHTML = defaultSvg;
+    };
+    container.innerHTML = "";
+    container.appendChild(img);
+  } else {
+    container.innerHTML = defaultSvg;
+  }
+}
+
 function loadUserProfile() {
   const profile = getStoredUserProfile();
   const stats = getStoredTelemetry();
@@ -2003,11 +2023,13 @@ function loadUserProfile() {
     localStorage.setItem(prevLevelKey, rankInfo.level.toString());
   } catch (e) {}
 
-  const displayName = profile.name || (user ? user.email.split("@")[0] : "");
-  const displayEmail = user ? user.email : "";
+  const displayName = (user && user.displayName) || profile.name || (user ? user.email.split("@")[0] : "");
+  const displayEmail = (user && user.email) || "";
   const displayHandle = profile.handle || (displayName ? `@${displayName.toLowerCase().replace(/[^a-z0-9_]/g, "")}` : (user ? `@${user.email.split("@")[0]}` : ""));
   const avatar = profile.avatar || "quantum";
   selectedAvatar = avatar;
+  const defaultAvatarSvg = AVATAR_SVGS[avatar] || AVATAR_SVGS.quantum;
+  const photoUrl = (user && user.photoURL) || null;
 
   // Check Express Backend Status
   checkBackendStatus();
@@ -2058,7 +2080,7 @@ function loadUserProfile() {
 
   } else {
     // AUTHENTICATED MODE: Show complete student profile hero card and detail tabs
-    if (navAvatarChar) navAvatarChar.innerHTML = AVATAR_SVGS[avatar] || AVATAR_SVGS.quantum;
+    if (navAvatarChar) setAvatarElement(navAvatarChar, photoUrl, defaultAvatarSvg);
     if (userNameEl) userNameEl.textContent = displayName || user.email.split("@")[0];
     if (userStatusEl) {
       userStatusEl.textContent = "● Firebase Online";
@@ -2081,7 +2103,7 @@ function loadUserProfile() {
     }
 
     // 2. Update Profile Hero Card
-    if (heroAvatarChar) heroAvatarChar.innerHTML = AVATAR_SVGS[avatar] || AVATAR_SVGS.quantum;
+    if (heroAvatarChar) setAvatarElement(heroAvatarChar, photoUrl, defaultAvatarSvg);
     if (heroLevelBadge) heroLevelBadge.textContent = `LVL ${rankInfo.level}`;
     if (heroStudentName) heroStudentName.textContent = displayName || "Student Physicist";
     if (heroStudentHandle) heroStudentHandle.textContent = displayHandle || "@student";
@@ -2677,6 +2699,9 @@ function formatAuthError(error) {
   }
   if (code === "auth/too-many-requests" || msg.includes("too-many-requests")) {
     return "Access temporarily blocked due to too many failed attempts. Try again later or reset your password.";
+  }
+  if (code === "auth/unauthorized-domain" || msg.includes("unauthorized-domain")) {
+    return "Domain Authorization Required: Please add 'physi-x-orcin.vercel.app' (and 'vercel.app') in Firebase Console > Authentication > Settings > Authorized domains.";
   }
   if (code === "auth/user-disabled" || msg.includes("user-disabled")) {
     return "This user account has been disabled by an administrator.";
@@ -4019,8 +4044,9 @@ onAuthStateChanged(auth, async (user) => {
       const streak = getStoredUserStreak(user.uid);
 
       await syncUserToFirestore(user, {
-        name: profile.name || user.displayName || (user.email ? user.email.split("@")[0] : "PhysiX Scholar"),
+        name: (user && user.displayName) || profile.name || (user.email ? user.email.split("@")[0] : "PhysiX Scholar"),
         email: user.email,
+        photoURL: user.photoURL || null,
         totalXP: rankInfo.totalXp,
         level: rankInfo.level,
         streak: streak.currentStreak || 1,

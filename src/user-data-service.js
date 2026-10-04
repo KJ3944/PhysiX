@@ -64,12 +64,14 @@ export async function syncUserToFirestore(user, customData = {}) {
 
     const name = customData.name || user.displayName || (user.email ? user.email.split("@")[0] : "PhysiX Scholar");
     const email = user.email || "";
+    const photoURL = user.photoURL || customData.photoURL || null;
 
     if (!snap.exists()) {
       // Create initial document matching schema
       const initialDoc = {
         name,
         email,
+        photoURL,
         totalXP: customData.totalXP || 0,
         level: customData.level || 1,
         streak: customData.streak || 1,
@@ -91,8 +93,9 @@ export async function syncUserToFirestore(user, customData = {}) {
       // Update existing document
       const current = snap.data();
       const updates = {
-        name: customData.name || current.name || name,
+        name: customData.name || user.displayName || current.name || name,
         email: email || current.email,
+        photoURL: user.photoURL !== undefined ? (user.photoURL || null) : (customData.photoURL !== undefined ? (customData.photoURL || null) : (current.photoURL || null)),
         lastActiveDate: now,
         updatedAt: now
       };
