@@ -56,6 +56,23 @@ import {
 } from "./firebase.js";
 
 /**
+ * Network status check for offline protection
+ * Uses navigator.onLine as fast path; can be overridden by offline-manager for more accuracy
+ */
+let _networkStatusOverride = null;
+export function setNetworkStatusOverride(fn) {
+  _networkStatusOverride = fn;
+}
+
+export function isCloudOperationAllowed() {
+  if (_networkStatusOverride) {
+    return _networkStatusOverride();
+  }
+  // Fast path: browser's online status
+  return navigator.onLine;
+}
+
+/**
  * Standard Progressive Doubling Level Calculation from Authoritative XP.
  * Preserves the exact PhysiX formula:
  * Level 1: 0 -> 1000 XP
@@ -113,6 +130,10 @@ export function calculateRankFromXp(totalScore = 0) {
  */
 export async function syncUserToFirestore(user, customData = {}) {
   if (!user || !user.uid || !db) return null;
+  if (!isCloudOperationAllowed()) {
+    console.log("[Firestore] Offline mode: Skipping syncUserToFirestore");
+    return null;
+  }
 
   try {
     const userRef = doc(db, "users", user.uid);
@@ -213,6 +234,10 @@ export async function syncUserToFirestore(user, customData = {}) {
  */
 export async function recordChallengeCompletionInFirestore(uid, challengeId, xpAmount = 0, badgeId = null) {
   if (!uid || !db || uid === "guest" || !challengeId) return null;
+  if (!isCloudOperationAllowed()) {
+    console.log("[Firestore] Offline mode: Skipping recordChallengeCompletionInFirestore");
+    return { alreadyCompleted: false, offline: true };
+  }
 
   try {
     const userRef = doc(db, "users", uid);
@@ -279,7 +304,10 @@ export async function recordChallengeCompletionInFirestore(uid, challengeId, xpA
     return result;
   } catch (err) {
     console.error(`[Firestore] recordChallengeCompletionInFirestore error for ${challengeId}:`, err);
-    // Fallback: If transaction failed (e.g. offline mode), use safe atomic setDoc
+    if (!isCloudOperationAllowed()) {
+      return { alreadyCompleted: false, offline: true };
+    }
+    // Fallback: If transaction failed while online, use safe atomic setDoc
     try {
       const userRef = doc(db, "users", uid);
       const updates = {
@@ -306,6 +334,10 @@ export async function recordChallengeCompletionInFirestore(uid, challengeId, xpA
  */
 export async function unlockBadgeInFirestore(uid, badgeId) {
   if (!uid || !db || uid === "guest" || !badgeId) return null;
+  if (!isCloudOperationAllowed()) {
+    console.log("[Firestore] Offline mode: Skipping unlockBadgeInFirestore");
+    return { alreadyUnlocked: false, offline: true };
+  }
 
   try {
     const userRef = doc(db, "users", uid);
@@ -339,6 +371,9 @@ export async function unlockBadgeInFirestore(uid, badgeId) {
     return result;
   } catch (err) {
     console.error("[Firestore] unlockBadgeInFirestore error:", err);
+    if (!isCloudOperationAllowed()) {
+      return { alreadyUnlocked: false, offline: true };
+    }
     try {
       const userRef = doc(db, "users", uid);
       await setDoc(userRef, {
@@ -358,6 +393,10 @@ export async function unlockBadgeInFirestore(uid, badgeId) {
  */
 export async function recordExperimentActivity(uid, experimentId, expData = {}) {
   if (!uid || !db || uid === "guest") return null;
+  if (!isCloudOperationAllowed()) {
+    console.log("[Firestore] Offline mode: Skipping recordExperimentActivity");
+    return null;
+  }
 
   try {
     const expDocRef = doc(db, "users", uid, "experiments", experimentId);
@@ -439,6 +478,10 @@ export async function recordExperimentInFirestore(uid, experimentId, expData = {
  */
 export async function awardUserXpInFirestore(uid, amount, reason = "") {
   if (!uid || !db || uid === "guest" || !amount || Number(amount) <= 0) return null;
+  if (!isCloudOperationAllowed()) {
+    console.log("[Firestore] Offline mode: Skipping awardUserXpInFirestore");
+    return null;
+  }
 
   try {
     const userRef = doc(db, "users", uid);
@@ -484,6 +527,10 @@ export async function awardUserXpInFirestore(uid, amount, reason = "") {
  */
 export function subscribeToUserDoc(uid, onUpdate) {
   if (!uid || !db || uid === "guest" || typeof onUpdate !== "function") return () => {};
+  if (!isCloudOperationAllowed()) {
+    console.log("[Firestore] Offline mode: Skipping subscribeToUserDoc");
+    return () => {};
+  }
 
   try {
     const userRef = doc(db, "users", uid);
@@ -506,6 +553,10 @@ export function subscribeToUserDoc(uid, onUpdate) {
  */
 export async function recordQuizAttemptInFirestore(uid, attemptData) {
   if (!uid || !db || uid === "guest") return null;
+  if (!isCloudOperationAllowed()) {
+    console.log("[Firestore] Offline mode: Skipping recordQuizAttemptInFirestore");
+    return null;
+  }
 
   try {
     const attemptsColl = collection(db, "users", uid, "quizAttempts");
@@ -577,6 +628,10 @@ export async function recordQuizAttemptInFirestore(uid, attemptData) {
  */
 export async function fetchFullUserDataFromFirestore(uid) {
   if (!uid || !db || uid === "guest") return null;
+  if (!isCloudOperationAllowed()) {
+    console.log("[Firestore] Offline mode: Skipping fetchFullUserDataFromFirestore");
+    return null;
+  }
 
   try {
     const userRef = doc(db, "users", uid);

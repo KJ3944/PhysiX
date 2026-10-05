@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhysiX — Offline</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#1e293b">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0b0f1a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+    }
+    .container { max-width: 480px; }
+    .logo {
+      font-size: 3.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #06b6d4 0%, #a855f7 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+    h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 1rem; color: #f8fafc; }
+    p { color: #94a3b8; font-size: 1.1rem; line-height: 1.6; margin-bottom: 2rem; }
+    .icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem;
+      opacity: 0.6;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.75rem;
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      color: #0b0f1a;
+      font-weight: 600;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      text-decoration: none;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(6, 182, 212, 0.4); }
+    .btn:active { transform: translateY(0); }
+    .info { margin-top: 2rem; padding: 1.5rem; background: rgba(15, 23, 42, 0.8); border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.15); text-align: left; }
+    .info h3 { font-size: 0.875rem; font-weight: 600; color: #06b6d4; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .info ul { list-style: none; font-size: 0.9rem; color: #94a3b8; line-height: 1.8; }
+    .info li::before { content: "• "; color: #06b6d4; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="16"></line>
+      <line x1="8" y1="12" x2="16" y2="12"></line>
+    </svg>
+    <div class="logo">PhysiX</div>
+    <h1>You're Offline</h1>
+    <p>PhysiX is operating in Offline Simulator Mode. All physics simulations and educational manuals are fully functional. Cloud progress remains authoritative and unchanged until you return online.</p>
+    <a href="/" class="btn" onclick="event.preventDefault(); window.location.reload();">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M23 4v6h-6"></path>
+        <path d="M1 20v-6h6"></path>
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+      </svg>
+      Try Again
+    </a>
+    <div class="info">
+      <h3>Available Offline</h3>
+      <ul>
+        <li>All 4 experiments: Projectile Motion, Optical Fibre, Colour Sensor, Physics Sandbox</li>
+        <li>Full physics simulations, controls (Kick, Apply Force), and parameter adjustments</li>
+        <li>Laboratory manuals, theory, procedures, and formulas</li>
+        <li>In-session challenge attempts and interactive quizzes</li>
+        <li>Read-only view of your previously cached profile</li>
+      </ul>
+    </div>
+    <div class="info" style="margin-top: 1rem;">
+      <h3>Online Only</h3>
+      <ul>
+        <li>Vectra AI Copilot (requires live cloud model)</li>
+        <li>Cloud progress persistence (XP, level, badges, streak tracking)</li>
+        <li>Account login, registration, and email verification</li>
+        <li>Multi-device synchronization</li>
+      </ul>
+    </div>
+  </div>
+  <script>
+    // Auto-retry when online
+    window.addEventListener('online', () => window.location.reload());
+  </script>
+</body>
+</html>

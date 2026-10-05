@@ -41,6 +41,13 @@ import {
   getNextStreakMilestone
 } from "./streak.js";
 import {
+  initPwaSystem,
+  getNetworkStatus,
+  canPerformCloudOperation,
+  onNetworkChange,
+  setNetworkStatusOverride
+} from "./offline-manager.js";
+import {
   syncUserToFirestore,
   recordExperimentInFirestore,
   recordQuizAttemptInFirestore,
@@ -51,7 +58,8 @@ import {
   getExperimentNameById,
   calculateRankFromXp,
   awardUserXpInFirestore,
-  subscribeToUserDoc
+  subscribeToUserDoc,
+  isCloudOperationAllowed
 } from "./user-data-service.js";
 
 // ==========================================
@@ -79,10 +87,10 @@ export function getAuthoritativeUserXp(uid) {
   return 0;
 }
 
-export function setAuthoritativeUserXp(uid, xp) {
+export function setAuthoritativeUserXp(uid, xp, persistToStorage = true) {
   const cleanXp = Math.max(0, Number(xp) || 0);
   activeAuthoritativeXp = cleanXp;
-  if (uid && uid !== "guest") {
+  if (persistToStorage && canPerformCloudOperation() && uid && uid !== "guest") {
     try {
       localStorage.setItem(`physix_xp_${uid}`, String(cleanXp));
     } catch (e) {}
@@ -1411,10 +1419,17 @@ function saveStoredBadges(badges, userId = getActiveUserId()) {
   }
 }
 
-async function unlockBadge(badgeId, badgeTitle) {
+async function unlockBadge(badgeId, badgeTitle, persistToStorage = true) {
   if (!badgeId) return;
   const userId = getActiveUserId();
   const currentBadges = getStoredBadges(userId);
+
+  // In offline mode or transient session: do NOT persist to cloud or localStorage
+  if (!canPerformCloudOperation() || !persistToStorage) {
+    console.log(`[Badge] Offline unlock of "${badgeTitle}" (${badgeId}) — in-memory only`);
+    showToast(`Milestone Unlocked: ${badgeTitle} (Offline Session)`);
+    return;
+  }
 
   // 1. Fast local idempotency check & in-flight debouncing
   if (inFlightBadges.has(badgeId) || currentBadges.includes(badgeId)) {
@@ -1538,7 +1553,7 @@ function saveStoredChallenges(challenges) {
   }
 }
 
-function syncChallengeToLocalState(challengeId) {
+function syncChallengeToLocalState(challengeId, persistToStorage = true) {
   if (!challengeId) return;
   if (!activeAuthoritativeCompletedChallenges.includes(challengeId)) {
     activeAuthoritativeCompletedChallenges.push(challengeId);
@@ -1550,7 +1565,9 @@ function syncChallengeToLocalState(challengeId) {
     const projState = getStoredChallenges();
     if (projState[projKey]) {
       projState[projKey].completed = true;
-      saveStoredChallenges(projState);
+      if (persistToStorage && canPerformCloudOperation()) {
+        saveStoredChallenges(projState);
+      }
     }
     renderChallenges();
   }
@@ -1558,12 +1575,14 @@ function syncChallengeToLocalState(challengeId) {
   // Exp 2: Optical Fibre
   if (challengeId.startsWith("optical.")) {
     const ofKey = challengeId.replace("optical.", "");
-    try {
-      const savedOf = JSON.parse(localStorage.getItem("physix_of_challenges") || "{}");
-      if (!savedOf[ofKey]) savedOf[ofKey] = {};
-      savedOf[ofKey].completed = true;
-      localStorage.setItem("physix_of_challenges", JSON.stringify(savedOf));
-    } catch (e) {}
+    if (persistToStorage && canPerformCloudOperation()) {
+      try {
+        const savedOf = JSON.parse(localStorage.getItem("physix_of_challenges") || "{}");
+        if (!savedOf[ofKey]) savedOf[ofKey] = {};
+        savedOf[ofKey].completed = true;
+        localStorage.setItem("physix_of_challenges", JSON.stringify(savedOf));
+      } catch (e) {}
+    }
     if (opticalExperimentInstance && typeof opticalExperimentInstance.hydrateChallenges === "function") {
       opticalExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
     }
@@ -1572,12 +1591,14 @@ function syncChallengeToLocalState(challengeId) {
   // Exp 3: Colour Sensor
   if (challengeId.startsWith("colour-sensor.")) {
     const csKey = challengeId.replace("colour-sensor.", "");
-    try {
-      const savedCs = JSON.parse(localStorage.getItem("physix_cs_challenges") || "{}");
-      if (!savedCs[csKey]) savedCs[csKey] = {};
-      savedCs[csKey].completed = true;
-      localStorage.setItem("physix_cs_challenges", JSON.stringify(savedCs));
-    } catch (e) {}
+    if (persistToStorage && canPerformCloudOperation()) {
+      try {
+        const savedCs = JSON.parse(localStorage.getItem("physix_cs_challenges") || "{}");
+        if (!savedCs[csKey]) savedCs[csKey] = {};
+        savedCs[csKey].completed = true;
+        localStorage.setItem("physix_cs_challenges", JSON.stringify(savedCs));
+      } catch (e) {}
+    }
     if (colourSensorExperimentInstance && typeof colourSensorExperimentInstance.hydrateChallenges === "function") {
       colourSensorExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
     }
@@ -1586,12 +1607,14 @@ function syncChallengeToLocalState(challengeId) {
   // Exp 4: Physics Sandbox
   if (challengeId.startsWith("sandbox.")) {
     const sbKey = challengeId.replace("sandbox.", "");
-    try {
-      const savedSb = JSON.parse(localStorage.getItem("physix_sb_challenges") || "{}");
-      if (!savedSb[sbKey]) savedSb[sbKey] = {};
-      savedSb[sbKey].completed = true;
-      localStorage.setItem("physix_sb_challenges", JSON.stringify(savedSb));
-    } catch (e) {}
+    if (persistToStorage && canPerformCloudOperation()) {
+      try {
+        const savedSb = JSON.parse(localStorage.getItem("physix_sb_challenges") || "{}");
+        if (!savedSb[sbKey]) savedSb[sbKey] = {};
+        savedSb[sbKey].completed = true;
+        localStorage.setItem("physix_sb_challenges", JSON.stringify(savedSb));
+      } catch (e) {}
+    }
     if (physicsSandboxExperimentInstance && typeof physicsSandboxExperimentInstance.hydrateChallenges === "function") {
       physicsSandboxExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
     }
@@ -1604,7 +1627,7 @@ export async function completeChallengeAuthoritatively({ challengeId, xp, badgeI
   // Fast client idempotency / in-flight check
   if (inFlightChallenges.has(challengeId) || activeAuthoritativeCompletedChallenges.includes(challengeId)) {
     console.log(`[Challenge] Challenge ${challengeId} already in flight or completed. Skipping.`);
-    syncChallengeToLocalState(challengeId);
+    syncChallengeToLocalState(challengeId, canPerformCloudOperation());
     return { alreadyCompleted: true };
   }
   inFlightChallenges.add(challengeId);
@@ -1613,6 +1636,31 @@ export async function completeChallengeAuthoritatively({ challengeId, xp, badgeI
     const user = auth.currentUser;
     const isAuth = isUserAuthenticated();
     const numXp = Math.max(0, Number(xp) || 0);
+
+    // OFFLINE MODE:
+    // In-session temporary interaction ONLY.
+    // Do NOT write to Firestore, do NOT sync to API, do NOT persist to permanent localStorage.
+    if (!canPerformCloudOperation()) {
+      console.log(`[Challenge] Offline completion of ${challengeId} (+${numXp} XP) — in-memory session only`);
+      
+      activeAuthoritativeCompletedChallenges = Array.from(new Set([...activeAuthoritativeCompletedChallenges, challengeId]));
+      if (typeof activeAuthoritativeXp === "number") {
+        activeAuthoritativeXp += numXp;
+      }
+      
+      // Update in-memory state of active experiment simulators without writing to localStorage
+      syncChallengeToLocalState(challengeId, false);
+
+      showChallengeGraffiti(title || "Laboratory Challenge Completed", numXp);
+      showToast(`Challenge Accomplished: ${title || challengeId} +${numXp} XP (Offline Session)`);
+      if (badgeId && badgeTitle) {
+        unlockBadge(badgeId, badgeTitle, false);
+      }
+
+      loadUserProfile();
+      renderChallenges();
+      return { alreadyCompleted: false, offline: true };
+    }
 
     if (user && isAuth) {
       try {
@@ -1769,6 +1817,17 @@ function addStudentXp(amount, reason) {
   if (numAmount <= 0) return;
 
   if (user && isUserAuthenticated()) {
+    if (!canPerformCloudOperation()) {
+      // In offline mode: ONLY in-memory visual update for this session!
+      // Do NOT persist to localStorage or call Firestore / Express.
+      activeAuthoritativeXp = (activeAuthoritativeXp !== null ? activeAuthoritativeXp : getAuthoritativeUserXp(user.uid)) + numAmount;
+      loadUserProfile();
+      showChallengeGraffiti(reason || "Laboratory Challenge Completed", numAmount);
+      showToast(`+${numAmount} XP (Offline Session): ${reason}!`);
+      renderChallenges();
+      return;
+    }
+
     // 1. Optimistically update local authoritative XP so the UI responds immediately
     const prevXp = getAuthoritativeUserXp(user.uid);
     const optimisticXp = prevXp + numAmount;
@@ -1787,6 +1846,11 @@ function addStudentXp(amount, reason) {
     // Sync to Express backend
     api.addXp(user.uid, numAmount, reason).catch(() => {});
   } else {
+    if (!canPerformCloudOperation()) {
+      showChallengeGraffiti(reason || "Laboratory Challenge Completed", numAmount);
+      showToast(`+${numAmount} XP (Offline Session): ${reason}!`);
+      return;
+    }
     // Guest mode: save to guest bonus XP
     const guestXp = getStoredBonusXp() + numAmount;
     saveStoredBonusXp(guestXp);
@@ -2086,11 +2150,13 @@ function recordCurrentObservation() {
   if (obsList.length > 50) obsList.pop();
   saveStoredObservations(obsList);
 
-  // Sync with Express backend
-  api.addObservation(getActiveUserId(), obsEntry).catch(() => {});
+  // Sync with Express backend if online
+  if (canPerformCloudOperation()) {
+    api.addObservation(getActiveUserId(), obsEntry).catch(() => {});
+  }
 
-  // Sync to Firestore users/{uid}/experiments/projectile
-  if (auth.currentUser) {
+  // Sync to Firestore users/{uid}/experiments/projectile if online
+  if (auth.currentUser && canPerformCloudOperation()) {
     recordExperimentInFirestore(auth.currentUser.uid, "projectile", {
       experimentName: "2D Projectile Motion",
       completed: true,
@@ -3680,6 +3746,10 @@ function showQuizResults() {
       localStorage.setItem(storageKey, score);
       showToast(`New ${activeQuizData.experimentName} High Score: ${score}/${total}!`);
     }
+    if (!canPerformCloudOperation()) {
+      console.log("[Quiz] Offline mode: quiz completed in-memory. Skipping persistence.");
+      return;
+    }
     localStorage.setItem("physix_quiz_highscore", Math.max(score, Number(localStorage.getItem("physix_quiz_highscore") || 0)));
 
     recordQuizTelemetry(score, total);
@@ -4023,6 +4093,11 @@ function updateAiContextStrip() {
 
 async function updateAiServerStatus() {
   if (!aiLiveBadge) return;
+  if (!canPerformCloudOperation()) {
+    aiLiveBadge.textContent = "○ Vectra Offline";
+    aiLiveBadge.style.color = "#94a3b8";
+    return;
+  }
   const isAuth = isUserAuthenticated();
   if (!isAuth) {
     const used = getGuestAiMessageCount();
@@ -4216,6 +4291,13 @@ async function handleSendAiChat(userText) {
   const message = (userText || aiChatInput?.value || "").trim();
   if (!message) return;
 
+  if (!canPerformCloudOperation()) {
+    if (aiChatInput) aiChatInput.value = "";
+    appendAiMessage("user", message);
+    appendAiMessage("bot", "Vectra AI is currently unavailable offline. An active internet connection is required for cloud physics intelligence. All simulators, experiments, formulas, and sandbox controls remain fully operational offline!");
+    return;
+  }
+
   const isAuth = isUserAuthenticated();
   if (!isAuth) {
     const used = getGuestAiMessageCount();
@@ -4331,6 +4413,7 @@ const btnSwitchColour = document.getElementById("btn-switch-exp-colour");
 const btnSwitchSandbox = document.getElementById("btn-switch-exp-sandbox");
 
 async function trackExperimentEngagement(expId) {
+  if (!canPerformCloudOperation()) return;
   const userId = getActiveUserId();
   const isAuth = !!auth.currentUser;
 
@@ -4423,7 +4506,7 @@ function switchExperiment(expId) {
       colourSensorExperimentInstance = createColourSensorExperiment({
         onXpAwarded: (amount, reason) => addStudentXp(amount, reason),
         onExperimentRecorded: (id, data) => {
-          if (auth.currentUser) {
+          if (auth.currentUser && canPerformCloudOperation()) {
             recordExperimentInFirestore(auth.currentUser.uid, id, data).then(res => {
               if (res && typeof res.totalXP === "number") {
                 setAuthoritativeUserXp(auth.currentUser.uid, res.totalXP);
@@ -4464,7 +4547,7 @@ function switchExperiment(expId) {
       opticalExperimentInstance = createOpticalFibreExperiment({
         onXpAwarded: (amount, reason) => addStudentXp(amount, reason),
         onExperimentRecorded: (id, data) => {
-          if (auth.currentUser) {
+          if (auth.currentUser && canPerformCloudOperation()) {
             recordExperimentInFirestore(auth.currentUser.uid, id, data).then(res => {
               if (res && typeof res.totalXP === "number") {
                 setAuthoritativeUserXp(auth.currentUser.uid, res.totalXP);
@@ -4758,6 +4841,42 @@ async function completeVerifiedUserInitialization(user) {
   isInitializingUser = true;
 
   try {
+    if (!canPerformCloudOperation()) {
+      console.log("[Auth] Offline mode detected during user initialization. Loading cached profile/progression in read-only mode.");
+      const cachedXp = Number(localStorage.getItem(`physix_xp_${user.uid}`) || 0);
+      setAuthoritativeUserXp(user.uid, cachedXp, false);
+
+      const localCandidates = [];
+      try {
+        const p = getStoredChallenges();
+        if (p.target?.completed) localCandidates.push("projectile.target");
+        if (p.complementary?.completed) localCandidates.push("projectile.complementary");
+        if (p.apex?.completed) localCandidates.push("projectile.apex");
+
+        const ofSaved = JSON.parse(localStorage.getItem("physix_of_challenges") || "{}");
+        if (ofSaved.spotMatch?.completed) localCandidates.push("optical.spotMatch");
+        if (ofSaved.rapidCalib?.completed) localCandidates.push("optical.rapidCalib");
+        if (ofSaved.multiSweep?.completed) localCandidates.push("optical.multiSweep");
+
+        const csSaved = JSON.parse(localStorage.getItem("physix_cs_challenges") || "{}");
+        if (csSaved.primaryCalib?.completed) localCandidates.push("colour-sensor.primaryCalib");
+        if (csSaved.mysteryDetective?.completed) localCandidates.push("colour-sensor.mysteryDetective");
+        if (csSaved.distanceSweep?.completed) localCandidates.push("colour-sensor.distanceSweep");
+
+        const sbSaved = JSON.parse(localStorage.getItem("physix_sb_challenges") || "{}");
+        if (sbSaved.thrust?.completed) localCandidates.push("sandbox.thrust");
+        if (sbSaved.kick?.completed) localCandidates.push("sandbox.kick");
+        if (sbSaved.zerog?.completed) localCandidates.push("sandbox.zerog");
+      } catch (e) {}
+
+      activeAuthoritativeCompletedChallenges = localCandidates;
+      hydrateAllExperimentChallenges(localCandidates);
+      updateAuthStateRestrictions();
+      loadUserProfile();
+      renderChallenges();
+      return;
+    }
+
     await processUserDailyStreak(user);
 
     // 1. Authoritative Firestore fetch: populate user progress, XP, and unlocked badges from Firestore
@@ -5316,6 +5435,33 @@ if (navLogo) {
 // ==========================================
 initContentProtection();
 initCelebrations();
+
+// Initialize PWA / Offline System
+initPwaSystem().then(() => {
+  // Connect offline-manager's accurate network status to user-data-service
+  setNetworkStatusOverride(() => canPerformCloudOperation());
+}).catch(err => console.warn("[PWA] Initialization error:", err));
+
+// Listen for network changes to handle transitions
+onNetworkChange((isOnline, quality) => {
+  if (isOnline) {
+    console.log("[Network] Back online - restoring authoritative cloud state...");
+    updateAiServerStatus();
+    if (aiChatInput) aiChatInput.placeholder = "Ask Vectra AI about physics, formulas, or experiments...";
+    if (auth.currentUser && isUserAuthenticated()) {
+      completeVerifiedUserInitialization(auth.currentUser);
+    }
+  } else {
+    console.log("[Network] Gone offline - pausing cloud operations");
+    updateAiServerStatus();
+    if (aiChatInput) aiChatInput.placeholder = "Vectra AI is unavailable while offline";
+    // Clear any pending Firestore listeners to prevent errors
+    if (userDocUnsubscribe) {
+      userDocUnsubscribe();
+      userDocUnsubscribe = null;
+    }
+  }
+});
 
 // Start on appropriate page based on current URL path and hash
 const initialPath = window.location.pathname.toLowerCase();
