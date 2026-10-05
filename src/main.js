@@ -5300,8 +5300,14 @@ btnLegalTabPrivacy?.addEventListener("click", () => openLegalModal("privacy"));
 if (navLogo) {
   navLogo.style.cursor = "pointer";
   navLogo.setAttribute("title", "Return to PhysiX Homepage");
-  navLogo.addEventListener("click", () => {
-    navigateTo("/");
+  navLogo.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Strip any experiment hash (e.g. #sandbox) so the router cannot re-enter a simulation
+    if (window.location.hash) {
+      window.history.replaceState({}, "", window.location.pathname || "/");
+    }
+    handleRoute("/", "");
   });
 }
 
