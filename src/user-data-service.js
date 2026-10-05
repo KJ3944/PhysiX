@@ -48,7 +48,9 @@ import {
   addDoc,
   query,
   orderBy,
-  limit
+  limit,
+  increment,
+  arrayUnion
 } from "./firebase.js";
 
 /**
@@ -81,6 +83,7 @@ export async function syncUserToFirestore(user, customData = {}) {
         quizzesCompleted: customData.quizzesCompleted || 0,
         totalQuizScore: customData.totalQuizScore || 0,
         bestQuizScore: customData.bestQuizScore || 0,
+        badges: Array.isArray(customData.badges) ? Array.from(new Set(customData.badges)) : [],
         createdAt: now,
         updatedAt: now,
         ...(customData.extra || {})
@@ -103,11 +106,19 @@ export async function syncUserToFirestore(user, customData = {}) {
       if (typeof customData.totalXP === "number") updates.totalXP = Math.max(current.totalXP || 0, customData.totalXP);
       if (typeof customData.level === "number") updates.level = Math.max(current.level || 1, customData.level);
       if (typeof customData.streak === "number") updates.streak = customData.streak;
-      if (typeof customData.experimentsPerformed === "number") updates.experimentsPerformed = customData.experimentsPerformed;
+      // Never overwrite a higher Firestore experimentsPerformed with a lower local count
+      if (typeof customData.experimentsPerformed === "number") {
+        updates.experimentsPerformed = Math.max(current.experimentsPerformed || 0, customData.experimentsPerformed);
+      }
       if (typeof customData.quizzesAttempted === "number") updates.quizzesAttempted = customData.quizzesAttempted;
       if (typeof customData.quizzesCompleted === "number") updates.quizzesCompleted = customData.quizzesCompleted;
       if (typeof customData.totalQuizScore === "number") updates.totalQuizScore = customData.totalQuizScore;
       if (typeof customData.bestQuizScore === "number") updates.bestQuizScore = Math.max(current.bestQuizScore || 0, customData.bestQuizScore);
+
+      // Preserve existing badges and merge any new ones safely
+      if (Array.isArray(customData.badges)) {
+        updates.badges = Array.from(new Set([...(current.badges || []), ...customData.badges]));
+      }
 
       await setDoc(userRef, updates, { merge: true });
       console.log(`%c[Firestore] ✓ Successfully synced user document: users/${user.uid}`, "color: #10b981; font-weight: bold;");
@@ -120,60 +131,115 @@ export async function syncUserToFirestore(user, customData = {}) {
 }
 
 /**
- * Record experiment activity in users/{uid}/experiments/{experimentId}
+ * Atomically and idempotently unlock a badge in Firestore users/{uid}.badges
  */
-export async function recordExperimentInFirestore(uid, experimentId, expData = {}) {
+export async function unlockBadgeInFirestore(uid, badgeId) {
+  if (!uid || !db || uid === "guest" || !badgeId) return null;
+
+  try {
+    const userRef = doc(db, "users", uid);
+    
+    // Read Firestore state first
+    const snap = await getDoc(userRef);
+    if (!snap.exists()) {
+      console.warn(`[Firestore] User document users/${uid} does not exist yet.`);
+      return null;
+    }
+
+    const currentData = snap.data();
+    const existingBadges = Array.isArray(currentData.badges) ? currentData.badges : [];
+    
+    console.log(`[Firestore] Existing unlocked badges:`, existingBadges);
+    const isAlreadyUnlocked = existingBadges.includes(badgeId);
+    console.log(`[Firestore] Badge already unlocked?:`, isAlreadyUnlocked);
+
+    if (isAlreadyUnlocked) {
+      console.log(`[Firestore] Badge '${badgeId}' already present in Firestore for users/${uid}. No update needed.`);
+      return { alreadyUnlocked: true, badges: existingBadges };
+    }
+
+    console.log(`[Firestore] Before Firestore write: Unlocking badge '${badgeId}' for users/${uid}`);
+    const now = new Date().toISOString();
+    await setDoc(userRef, {
+      badges: arrayUnion(badgeId),
+      updatedAt: now
+    }, { merge: true });
+
+    console.log(`%c[Firestore] ✓ Firestore write successful: Badge '${badgeId}' persisted in users/${uid}`, "color: #10b981; font-weight: bold;");
+    const updatedBadges = [...existingBadges, badgeId];
+    return { alreadyUnlocked: false, badges: updatedBadges };
+  } catch (err) {
+    console.error("[Firestore] unlockBadgeInFirestore error:", err);
+    return null;
+  }
+}
+
+/**
+ * Record experiment open or activity in users/{uid}/experiments/{experimentId}
+ * and atomically increment the parent user's experimentsPerformed count.
+ */
+export async function recordExperimentActivity(uid, experimentId, expData = {}) {
   if (!uid || !db || uid === "guest") return null;
 
   try {
     const expDocRef = doc(db, "users", uid, "experiments", experimentId);
-    const expSnap = await getDoc(expDocRef);
+    const userRef = doc(db, "users", uid);
     const now = new Date().toISOString();
 
-    let attempts = 1;
-    let completed = Boolean(expData.completed);
-    let bestScore = expData.score || expData.accuracy || 100;
-    let xpEarned = expData.xpEarned || 0;
+    console.log(`[Firestore] Before Firestore write: Incrementing activity count for ${experimentId}`);
 
-    if (expSnap.exists()) {
-      const prev = expSnap.data();
-      attempts = (prev.attempts || 0) + 1;
-      completed = completed || Boolean(prev.completed);
-      bestScore = Math.max(prev.bestScore || 0, bestScore);
-      xpEarned = (prev.xpEarned || 0) + (expData.xpEarned || 0);
-    }
-
-    const payload = {
+    // Atomic increments in subcollection document
+    await setDoc(expDocRef, {
       experimentName: expData.experimentName || getExperimentNameById(experimentId),
-      attempts,
-      completed,
-      bestScore,
-      xpEarned,
-      lastPerformed: now
-    };
+      attempts: increment(1),
+      completed: Boolean(expData.completed || false),
+      lastPerformed: now,
+      ...(expData.bestScore !== undefined ? { bestScore: expData.bestScore } : {}),
+      ...(expData.score !== undefined ? { bestScore: expData.score } : {}),
+      ...(expData.xpEarned ? { xpEarned: increment(expData.xpEarned) } : {})
+    }, { merge: true });
 
-    await setDoc(expDocRef, payload, { merge: true });
-    console.log(`%c[Firestore] ✓ Recorded experiment in users/${uid}/experiments/${experimentId}`, "color: #06b6d4; font-weight: bold;");
+    // Atomic increment on parent user document
+    await setDoc(userRef, {
+      experimentsPerformed: increment(1),
+      lastActiveDate: now,
+      updatedAt: now
+    }, { merge: true });
 
-    // Also update parent user document counter
-    const userRef = doc(db, "users", uid);
+    console.log(`%c[Firestore] ✓ Firestore write successful: Recorded activity for users/${uid}/experiments/${experimentId}`, "color: #06b6d4; font-weight: bold;");
+
+    // Read the authoritative updated document
     const userSnap = await getDoc(userRef);
-    if (userSnap.exists()) {
-      const uData = userSnap.data();
-      const newTotalXp = (uData.totalXP || 0) + (expData.xpEarned || 0);
-      await setDoc(userRef, {
-        experimentsPerformed: (uData.experimentsPerformed || 0) + 1,
-        totalXP: newTotalXp,
-        lastActiveDate: now,
-        updatedAt: now
-      }, { merge: true });
-    }
+    const expSnap = await getDoc(expDocRef);
 
-    return payload;
+    const userData = userSnap.exists() ? userSnap.data() : {};
+    const expDocData = expSnap.exists() ? expSnap.data() : {};
+
+    const totalExperiments = userData.experimentsPerformed || 0;
+    const currentBadges = Array.isArray(userData.badges) ? userData.badges : [];
+    const expAttempts = expDocData.attempts || 1;
+
+    console.log(`[Firestore] Firestore read result: Total experimentsPerformed: ${totalExperiments}, ${experimentId} attempts: ${expAttempts}`);
+    console.log(`[Firestore] Current activity count:`, totalExperiments);
+    console.log(`[Firestore] Existing unlocked badges:`, currentBadges);
+
+    return {
+      attempts: expAttempts,
+      experimentsPerformed: totalExperiments,
+      badges: currentBadges,
+      completed: expDocData.completed
+    };
   } catch (err) {
-    console.error("[Firestore] recordExperimentInFirestore error:", err);
+    console.error("[Firestore] recordExperimentActivity error:", err);
     return null;
   }
+}
+
+/**
+ * Record experiment activity in users/{uid}/experiments/{experimentId}
+ */
+export async function recordExperimentInFirestore(uid, experimentId, expData = {}) {
+  return recordExperimentActivity(uid, experimentId, expData);
 }
 
 /**
@@ -270,6 +336,10 @@ export async function fetchFullUserDataFromFirestore(uid) {
       });
     }
 
+    console.log(`[Firestore] Firestore read result: Full profile for users/${uid}`);
+    console.log(`[Firestore] Current activity count: ${userData.experimentsPerformed || 0}`);
+    console.log(`[Firestore] Existing unlocked badges:`, userData.badges || []);
+
     return {
       user: userData,
       experiments,
@@ -281,7 +351,7 @@ export async function fetchFullUserDataFromFirestore(uid) {
   }
 }
 
-function getExperimentNameById(id) {
+export function getExperimentNameById(id) {
   switch (id) {
     case "projectile":
     case "exp-projectile":
@@ -292,6 +362,9 @@ function getExperimentNameById(id) {
     case "colour-sensor":
     case "exp-colour-sensor":
       return "Study of Colour Sensor (TCS3200)";
+    case "sandbox":
+    case "exp-sandbox":
+      return "Physics Sandbox";
     default:
       return id;
   }

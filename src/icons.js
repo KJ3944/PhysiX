@@ -433,5 +433,10 @@ export const BADGE_SVGS = {
     <circle cx="10" cy="12" r="2.5" fill="#f97316"/>
     <circle cx="18" cy="19" r="2.5" fill="#fb923c"/>
     <circle cx="26" cy="24" r="2.5" fill="#fed7aa"/>
+  </svg>`,
+
+  "badge-lab-veteran": `<svg class="badge-vector-svg" viewBox="0 0 36 36" fill="none">
+    <circle cx="18" cy="18" r="16" fill="rgba(16,185,129,0.2)" stroke="#10b981" stroke-width="1.8"/>
+    <polygon points="18 7 21.5 14 29 15 23.5 20.5 25 28 18 24.5 11 28 12.5 20.5 7 15 14.5 14 18 7" fill="#34d399" stroke="#059669" stroke-width="1.2"/>
   </svg>`
 };

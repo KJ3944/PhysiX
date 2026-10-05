@@ -553,9 +553,10 @@
       "flightLogs": [],
       "observations": [],
       "challenges": {},
-      "bonusXp": 725,
+      "bonusXp": 1175,
       "badges": [
-        "badge-profile-saved"
+        "badge-profile-saved",
+        "badge-lab-veteran"
       ],
       "quizHighScore": 0
     }

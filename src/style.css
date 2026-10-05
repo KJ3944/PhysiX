@@ -1,23 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 :root {
-  --bg-main: #070a12;
-  --bg-gradient: radial-gradient(circle at 20% 0%, #171530 0%, #090d19 45%, #05070d 100%);
-  --card-bg: linear-gradient(145deg, rgba(18, 25, 42, 0.88), rgba(9, 14, 25, 0.95));
-  --card-border: #222d44;
-  --card-border-glow: rgba(139, 92, 246, 0.2);
+  --bg-main: #030611;
+  --bg-gradient: radial-gradient(ellipse at 15% 10%, #0d163a 0%, #06091f 40%, #02030b 100%);
+  --card-bg: linear-gradient(135deg, rgba(12, 19, 40, 0.85) 0%, rgba(5, 8, 20, 0.94) 100%);
+  --card-border: rgba(56, 189, 248, 0.22);
+  --card-border-glow: rgba(0, 240, 255, 0.35);
 
-  --accent-purple: #8b5cf6;
-  --accent-purple-glow: rgba(139, 92, 246, 0.4);
-  --accent-cyan: #06b6d4;
-  --accent-blue: #3b82f6;
-  --accent-green: #10b981;
-  --accent-coral: #ff4757;
-  --accent-amber: #f59e0b;
+  --accent-purple: #a855f7;
+  --accent-purple-glow: rgba(168, 85, 247, 0.45);
+  --accent-cyan: #00f0ff;
+  --accent-blue: #38bdf8;
+  --accent-green: #10e7a8;
+  --accent-coral: #ff3366;
+  --accent-amber: #ffaa00;
 
-  --text-main: #f1f5f9;
-  --text-muted: #8896b0;
-  --text-dim: #505c75;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #475569;
 
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-space: 'Orbitron', 'Space Grotesk', 'Outfit', sans-serif;
+  --font-sans: 'Space Grotesk', 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
@@ -199,21 +202,13 @@ textarea {
   filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.5));
 }
 
-.nav-orbit {
+.nav-orbit-plane {
   will-change: transform;
-  transform-origin: 50px 50px;
 }
 
-.nav-orbit.orbit-1 {
-  animation: spinOrbit1 8s linear infinite;
-}
-
-.nav-orbit.orbit-2 {
-  animation: spinOrbit2 9.5s linear infinite reverse;
-}
-
-.nav-orbit.orbit-3 {
-  animation: spinOrbit3 7s linear infinite;
+.nav-orbit-stroke {
+  will-change: stroke-dashoffset;
+  filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.45));
 }
 
 .nav-core-halo {
@@ -226,60 +221,11 @@ textarea {
   filter: drop-shadow(0 0 5px #38bdf8);
 }
 
-/* Navbar Orbiting Electrons */
-.nav-electron-track {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.nav-electron-track.track-1 { transform: rotate(30deg); }
-.nav-electron-track.track-2 { transform: rotate(-30deg); }
-.nav-electron-track.track-3 { transform: rotate(90deg); }
-
-.nav-electron {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 4.5px;
-  height: 4.5px;
-  margin: -2.25px 0 0 -2.25px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 0 6px #38bdf8, 0 0 10px #818cf8;
-  will-change: transform;
-}
-
-.nav-electron-track.track-1 .nav-electron {
-  animation: navElectronFly1 2.5s linear infinite;
-}
-
-.nav-electron-track.track-2 .nav-electron {
-  animation: navElectronFly2 3s linear infinite reverse;
-}
-
-.nav-electron-track.track-3 .nav-electron {
-  animation: navElectronFly3 2.2s linear infinite;
-}
-
-@keyframes navElectronFly1 {
-  0% { transform: rotate(0deg) translateX(18.5px) scale(1.1); }
-  50% { transform: rotate(180deg) translateX(18.5px) scale(0.85); }
-  100% { transform: rotate(360deg) translateX(18.5px) scale(1.1); }
-}
-
-@keyframes navElectronFly2 {
-  0% { transform: rotate(0deg) translateX(18.5px) scale(1.05); }
-  50% { transform: rotate(180deg) translateX(18.5px) scale(0.9); }
-  100% { transform: rotate(360deg) translateX(18.5px) scale(1.05); }
-}
-
-@keyframes navElectronFly3 {
-  0% { transform: rotate(0deg) translateX(18.5px) scale(1.15); }
-  50% { transform: rotate(180deg) translateX(18.5px) scale(0.85); }
-  100% { transform: rotate(360deg) translateX(18.5px) scale(1.15); }
+/* Mathematically computed SVG electrons staying strictly on elliptical orbits */
+.nav-svg-electron {
+  will-change: cx, cy;
+  filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 8px #00f0ff);
+  transition: opacity 0.2s ease;
 }
 
 .logo h1 {
@@ -7324,80 +7270,57 @@ button:active {
 /* ==========================================
    CINEMATIC INTRO SPLASH SCREEN & LOGO ANIMATION (GPU ACCELERATED)
 ========================================== */
+/* ==========================================================================
+   CINEMATIC PHYSIX PRODUCT INTRO & LOADING SCREEN (PREMIUM MINIMALIST)
+   ========================================================================== */
+body:not(.physix-loaded) {
+  overflow: hidden !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  height: 100vh !important;
+}
+
 .physix-splash {
   position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
   z-index: 999999;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: radial-gradient(circle at 50% 40%, #0d1527 0%, #060a14 55%, #020408 100%);
+  background: #030712;
   user-select: none;
-  cursor: pointer;
-  backface-visibility: hidden;
+  cursor: default;
+  margin: 0;
+  padding: 0;
   transform: translate3d(0, 0, 0);
-  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .physix-splash.splash-fade-out {
   opacity: 0;
   pointer-events: none;
-  transform: scale(1.04) translate3d(0, 0, 0);
+  transform: scale(1.02) translate3d(0, 0, 0);
 }
 
-.splash-backdrop {
+/* Subtle, Restrained Cosmic Atmosphere */
+.splash-cosmic-bg {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 50%, rgba(14, 28, 54, 0.6) 0%, rgba(3, 7, 18, 0.95) 70%, #030712 100%);
+  z-index: 1;
 }
 
-.splash-grid-bg {
-  position: absolute;
-  inset: 0;
-  background-image: 
-    linear-gradient(rgba(56, 189, 248, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
-  background-size: 40px 40px;
-  mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.85) 0%, transparent 75%);
-  -webkit-mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.85) 0%, transparent 75%);
-}
-
-.splash-glow-orb {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.splash-glow-orb.orb-1 {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.18) 0%, transparent 65%);
-  top: 15%;
-  left: 20%;
-}
-
-.splash-glow-orb.orb-2 {
-  width: 450px;
-  height: 450px;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 65%);
-  bottom: 12%;
-  right: 18%;
-}
-
-.splash-glow-orb.orb-3 {
-  width: 320px;
-  height: 320px;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 65%);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
+/* Canvas for soft, gentle drifting particles */
 .splash-canvas {
   position: absolute;
   inset: 0;
@@ -7407,440 +7330,439 @@ button:active {
   z-index: 2;
 }
 
-/* Central Content Container */
-.splash-content {
+/* Master Central Card: Strict Single-Axis Alignment */
+.splash-center-card {
   position: relative;
   z-index: 10;
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  max-width: 600px;
-  padding: 20px;
-  transform: translate3d(0, 0, 0);
-}
-
-/* 3D Quantum Atomic Logo */
-.splash-logo-container {
-  position: relative;
-  width: 140px;
-  height: 140px;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
-}
-
-.splash-pulse-wave {
-  position: absolute;
+  text-align: center;
   width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 1.5px solid rgba(56, 189, 248, 0.5);
-  opacity: 0;
-  pointer-events: none;
-  will-change: transform, opacity;
-  animation: splashPulse 2.4s cubic-bezier(0.1, 0.8, 0.2, 1) infinite;
+  max-width: 440px;
+  padding: 0 24px;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
-.splash-pulse-wave.wave-1 { animation-delay: 0s; }
-.splash-pulse-wave.wave-2 { animation-delay: 0.8s; }
-.splash-pulse-wave.wave-3 { animation-delay: 1.6s; }
-
-@keyframes splashPulse {
-  0% {
-    transform: scale(0.65) translate3d(0, 0, 0);
-    opacity: 0.85;
-    border-color: rgba(56, 189, 248, 0.7);
-  }
-  60% {
-    opacity: 0.35;
-    border-color: rgba(168, 85, 247, 0.4);
-  }
-  100% {
-    transform: scale(2.2) translate3d(0, 0, 0);
-    opacity: 0;
-    border-color: rgba(52, 211, 153, 0);
-  }
-}
-
+/* 1. Atom Centerpiece */
 .splash-atom-wrap {
-  position: relative;
   width: 120px;
   height: 120px;
+  margin: 0 auto 24px auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  will-change: transform, opacity;
-  animation: splashAtomEntrance 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  position: relative;
+  animation: atomGentleFloat 4s ease-in-out infinite;
 }
 
-@keyframes splashAtomEntrance {
-  0% {
-    opacity: 0;
-    transform: scale(0.4) rotate(-60deg) translate3d(0, 0, 0);
+@keyframes atomGentleFloat {
+  0%, 100% {
+    transform: translateY(0);
   }
-  100% {
-    opacity: 1;
-    transform: scale(1) rotate(0deg) translate3d(0, 0, 0);
+  50% {
+    transform: translateY(-5px);
   }
 }
 
-.splash-svg-atom {
+.splash-atom-svg {
   width: 100%;
   height: 100%;
   overflow: visible;
-  filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.45));
+  filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.35));
 }
 
-.splash-orbit {
-  will-change: transform;
-  transform-origin: 50px 50px;
+.atom-orbit ellipse {
+  fill: none;
+  stroke-linecap: round;
 }
 
-.splash-orbit.orbit-1 {
-  animation: spinOrbit1 8s linear infinite;
+.atom-electron {
+  filter: drop-shadow(0 0 6px #ffffff);
 }
 
-.splash-orbit.orbit-2 {
-  animation: spinOrbit2 9.5s linear infinite reverse;
+.electron-cyan {
+  fill: #ffffff;
 }
 
-.splash-orbit.orbit-3 {
-  animation: spinOrbit3 7s linear infinite;
+.electron-purple {
+  fill: #38bdf8;
 }
 
-@keyframes spinOrbit1 {
-  0% { transform: rotate(30deg); }
-  100% { transform: rotate(390deg); }
+.electron-emerald {
+  fill: #818cf8;
 }
 
-@keyframes spinOrbit2 {
-  0% { transform: rotate(-30deg); }
-  100% { transform: rotate(-390deg); }
-}
-
-@keyframes spinOrbit3 {
-  0% { transform: rotate(90deg); }
-  100% { transform: rotate(450deg); }
-}
-
-.splash-core-halo {
-  will-change: transform, opacity;
-  transform-origin: 50px 50px;
-  animation: coreGlowPulse 2s ease-in-out infinite alternate;
-}
-
-@keyframes coreGlowPulse {
-  0% { transform: scale(0.95); opacity: 0.2; }
-  100% { transform: scale(1.2); opacity: 0.45; }
-}
-
-.splash-core-center {
-  filter: drop-shadow(0 0 6px #38bdf8);
-}
-
-/* Orbiting Electrons */
-.splash-electron-track {
-  position: absolute;
-  inset: 0;
+/* 2. Typography: Clean Dominant Hierarchy */
+.splash-brand-header {
+  margin: 0 0 24px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
   width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.splash-electron-track.track-1 { transform: rotate(30deg); }
-.splash-electron-track.track-2 { transform: rotate(-30deg); }
-.splash-electron-track.track-3 { transform: rotate(90deg); }
-
-.splash-electron {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 7px;
-  height: 7px;
-  margin: -3.5px 0 0 -3.5px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 0 8px #38bdf8, 0 0 14px #818cf8;
-  will-change: transform;
-}
-
-.splash-electron-track.track-1 .splash-electron {
-  animation: electronFly1 2.5s linear infinite;
-}
-
-.splash-electron-track.track-2 .splash-electron {
-  animation: electronFly2 3s linear infinite reverse;
-}
-
-.splash-electron-track.track-3 .splash-electron {
-  animation: electronFly3 2.2s linear infinite;
-}
-
-@keyframes electronFly1 {
-  0% { transform: rotate(0deg) translateX(42px) scale(1.1); }
-  50% { transform: rotate(180deg) translateX(42px) scale(0.85); }
-  100% { transform: rotate(360deg) translateX(42px) scale(1.1); }
-}
-
-@keyframes electronFly2 {
-  0% { transform: rotate(0deg) translateX(42px) scale(1.05); }
-  50% { transform: rotate(180deg) translateX(42px) scale(0.9); }
-  100% { transform: rotate(360deg) translateX(42px) scale(1.05); }
-}
-
-@keyframes electronFly3 {
-  0% { transform: rotate(0deg) translateX(42px) scale(1.15); }
-  50% { transform: rotate(180deg) translateX(42px) scale(0.85); }
-  100% { transform: rotate(360deg) translateX(42px) scale(1.15); }
-}
-
-/* Typography Reveal */
-.splash-brand {
-  margin-bottom: 20px;
 }
 
 .splash-title {
-  font-family: 'Outfit', var(--font-sans);
-  font-size: 54px;
-  font-weight: 900;
-  letter-spacing: -0.01em;
-  margin: 0 0 10px 0;
-  display: flex;
-  justify-content: center;
+  margin: 0;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 48px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: #ffffff;
+  white-space: nowrap;
+  display: inline-flex;
   align-items: center;
-  gap: 2px;
+  justify-content: center;
 }
 
-.splash-letter {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(20px);
-  will-change: transform, opacity;
-  animation: letterReveal 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
-  animation-delay: calc(var(--i) * 0.06s + 0.1s);
-  background: linear-gradient(180deg, #ffffff 30%, #cbd5e1 70%, #94a3b8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.splash-letter.splash-x {
-  font-size: 60px;
-  font-weight: 950;
-  margin-left: 2px;
+.splash-title .splash-x {
   background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.7));
-  animation: letterRevealX 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  animation-delay: 0.5s;
+  text-shadow: 0 0 22px rgba(56, 189, 248, 0.45);
+  margin-left: 1px;
 }
 
-@keyframes letterReveal {
-  0% {
-    opacity: 0;
-    transform: translateY(20px) translate3d(0, 0, 0);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) translate3d(0, 0, 0);
-  }
-}
-
-@keyframes letterRevealX {
-  0% {
-    opacity: 0;
-    transform: translateY(24px) scale(0.5) rotate(-20deg) translate3d(0, 0, 0);
-  }
-  75% {
-    transform: translateY(-3px) scale(1.1) rotate(4deg) translate3d(0, 0, 0);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1) rotate(0deg) translate3d(0, 0, 0);
-  }
-}
-
-/* Badge Subtitle */
-.splash-badge-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 16px;
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(56, 189, 248, 0.25);
-  border-radius: 9999px;
-  opacity: 0;
-  transform: translateY(14px);
-  will-change: transform, opacity;
-  animation: fadeInPill 0.5s ease forwards;
-  animation-delay: 0.6s;
-}
-
-@keyframes fadeInPill {
-  0% { opacity: 0; transform: translateY(14px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
-.splash-badge-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #34d399;
-  box-shadow: 0 0 8px #34d399;
-  animation: blinkDot 1.6s infinite ease-in-out;
-}
-
-@keyframes blinkDot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.8); }
-}
-
-.splash-badge-text {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.22em;
+.splash-subtitle {
+  margin: 8px 0 0 0;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   color: #94a3b8;
-  text-transform: uppercase;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
-/* Loader & Telemetry Status */
-.splash-loader-area {
-  margin-top: 18px;
-  width: 320px;
-  max-width: 85vw;
-  opacity: 0;
-  will-change: opacity, transform;
-  animation: fadeInLoader 0.4s ease forwards;
-  animation-delay: 0.65s;
-}
-
-@keyframes fadeInLoader {
-  0% { opacity: 0; transform: translateY(10px); }
-  100% { opacity: 1; transform: translateY(0); }
+/* 3. Telemetry: High-Precision Minimal Progress & Status */
+.splash-telemetry-deck {
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto 20px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .splash-progress-track {
   width: 100%;
-  height: 4px;
+  height: 3px;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 9999px;
+  overflow: hidden;
   position: relative;
-  overflow: visible;
 }
 
 .splash-progress-bar {
   height: 100%;
   width: 0%;
+  background: linear-gradient(90deg, #38bdf8 0%, #818cf8 55%, #c084fc 100%);
   border-radius: 9999px;
-  background: linear-gradient(90deg, #10b981, #38bdf8, #818cf8, #c084fc);
-  position: relative;
   box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
-  transition: width 0.06s linear;
-}
-
-.progress-glow-head {
-  position: absolute;
-  right: -2px;
-  top: -3px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 0 8px #38bdf8, 0 0 14px #818cf8;
+  transition: width 0.05s linear;
 }
 
 .splash-status-line {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-top: 8px;
-  font-family: var(--font-mono);
-  font-size: 11px;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 10px;
+  font-family: 'JetBrains Mono', var(--font-mono, monospace);
+  font-size: 10px;
   color: #64748b;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  gap: 8px;
 }
 
 .status-msg {
   color: #94a3b8;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
+  font-weight: 500;
+  text-transform: uppercase;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  text-align: left;
 }
 
 .status-pct {
   color: #38bdf8;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  margin-left: 10px;
+  flex-shrink: 0;
+  text-align: right;
 }
 
-/* Skip Button */
+/* 4. Interactive Skip Hint */
 .splash-skip-btn {
-  margin-top: 22px;
   background: transparent;
   border: none;
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-family: 'JetBrains Mono', var(--font-mono, monospace);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   color: #475569;
-  letter-spacing: 0.04em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: color 0.2s ease;
-  opacity: 0;
-  animation: fadeInSkip 0.4s ease forwards;
-  animation-delay: 0.8s;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.splash-skip-btn span {
-  font-weight: 700;
-  color: #64748b;
+  padding: 4px 10px;
+  border-radius: 4px;
+  transition: color 0.2s ease, opacity 0.2s ease;
+  outline: none;
+  margin: 0 auto;
 }
 
 .splash-skip-btn:hover {
   color: #38bdf8;
 }
 
-.splash-skip-btn:hover span {
-  color: #38bdf8;
-}
-
-@keyframes fadeInSkip {
-  0% { opacity: 0; }
-  100% { opacity: 0.75; }
-}
-
+/* Responsive Optimizations for Tablets and Mobile */
 @media (max-width: 640px) {
-  .splash-title {
-    font-size: 42px;
-  }
-  .splash-letter.splash-x {
-    font-size: 48px;
-  }
-  .splash-logo-container {
-    width: 110px;
-    height: 110px;
+  .splash-center-card {
+    padding: 0 12px;
+    max-width: 310px;
   }
   .splash-atom-wrap {
     width: 90px;
     height: 90px;
+    margin-bottom: 16px;
   }
-  .splash-badge-text {
-    font-size: 9px;
-    letter-spacing: 0.16em;
+  .splash-brand-header {
+    margin-bottom: 18px;
   }
-  .splash-loader-area {
-    width: 260px;
+  .splash-title {
+    font-size: 34px;
+  }
+  .splash-subtitle {
+    font-size: 11.5px;
+    letter-spacing: 0.02em;
+  }
+  .splash-telemetry-deck {
+    max-width: 210px;
+    margin-bottom: 14px;
+  }
+  .splash-status-line {
+    font-size: 8.5px;
+  }
+  .splash-skip-btn {
+    font-size: 8.5px;
+  }
+}
+
+/* Reduced Motion Mode */
+@media (prefers-reduced-motion: reduce) {
+  .splash-atom-wrap {
+    animation: none !important;
+  }
+  .physix-splash {
+    transition: opacity 0.2s ease !important;
+  }
+}
+
+/* ====================================================
+   FIREBASE EMAIL VERIFICATION MODAL / SCREEN
+   ==================================================== */
+.email-verification-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99990 !important;
+  background: rgba(2, 6, 23, 0.94) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.email-verification-overlay.hidden {
+  display: none !important;
+}
+
+.email-verification-card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  padding: 32px 26px;
+  background: linear-gradient(165deg, rgba(15, 23, 42, 0.96) 0%, rgba(3, 7, 18, 0.98) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 20px;
+  box-shadow: 0 0 45px rgba(56, 189, 248, 0.15), 0 20px 50px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.verify-badge-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.2) 0%, rgba(129, 140, 248, 0.25) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.35);
+  margin-bottom: 16px;
+}
+
+.verify-badge-icon .svg-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.verify-title {
+  margin: 0 0 8px 0;
+  font-family: 'Outfit', var(--font-sans);
+  font-size: 23px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.verify-subtitle {
+  margin: 0 0 16px 0;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  color: #94a3b8;
+  line-height: 1.5;
+  max-width: 380px;
+}
+
+.verify-email-display-box {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 8px;
+  padding: 8px 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #38bdf8;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  word-break: break-all;
+  margin-bottom: 18px;
+  max-width: 100%;
+}
+
+.verify-feedback-banner {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  margin-bottom: 18px;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.verify-feedback-banner.feedback-info {
+  background: rgba(14, 165, 233, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #7dd3fc;
+}
+
+.verify-feedback-banner.feedback-success {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #6ee7b7;
+}
+
+.verify-feedback-banner.feedback-error {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}
+
+.verify-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.verify-actions .auth-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.verify-btn-resend {
+  background: rgba(15, 23, 42, 0.8) !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  color: #cbd5e1 !important;
+}
+
+.verify-btn-resend:hover:not(:disabled) {
+  background: rgba(30, 41, 59, 0.9) !important;
+  border-color: #38bdf8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.25) !important;
+}
+
+.verify-btn-resend:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.verify-btn-signout {
+  background: transparent;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: #64748b;
+  cursor: pointer;
+  padding: 8px 12px;
+  margin-top: 4px;
+  transition: color 0.2s ease;
+  align-self: center;
+}
+
+.verify-btn-signout:hover {
+  color: #f87171;
+}
+
+@media (max-width: 480px) {
+  .email-verification-card {
+    padding: 26px 18px;
+    border-radius: 16px;
+  }
+  .verify-title {
+    font-size: 20px;
+  }
+  .verify-subtitle {
+    font-size: 12.5px;
+  }
+  .verify-email-display-box {
+    font-size: 12px;
+    padding: 6px 12px;
   }
 }
 
 /* ====================================================
    LEVEL UP GAME CELEBRATION MODAL & CYBER GRAFFITI
-==================================================== */
+   ==================================================== */
 .levelup-modal-overlay {
   z-index: 100000 !important;
   background: rgba(3, 7, 18, 0.88) !important;
@@ -8693,4 +8615,2165 @@ button:active {
   transform: scale(1.1);
   box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
 }
+
+/* ==========================================================================
+   ==========================================================================
+   🌌 PHYSIX MASTER SPACE THEME (DEEP COSMOS // ORBITAL OBSERVATORY)
+   ==========================================================================
+   ========================================================================== */
+
+/* --------------------------------------------------
+   1. GLOBAL COSMIC BACKGROUND, STARFIELD & COMETS
+   -------------------------------------------------- */
+html,
+body {
+  background: radial-gradient(ellipse at 15% 10%, #0d163a 0%, #06091f 40%, #02030b 100%) fixed !important;
+  color: #f8fafc !important;
+  font-family: 'Space Grotesk', 'Outfit', sans-serif !important;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Multi-depth twinkling cosmic starfield and glowing nebulae */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    /* Glowing Nebulae */
+    radial-gradient(circle at 85% 15%, rgba(168, 85, 247, 0.18) 0%, transparent 45%),
+    radial-gradient(circle at 12% 80%, rgba(6, 182, 212, 0.16) 0%, transparent 40%),
+    radial-gradient(circle at 50% 30%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 75% 85%, rgba(244, 63, 94, 0.09) 0%, transparent 35%),
+    /* Dense Starfield Clusters Layer 1 */
+    radial-gradient(1.5px 1.5px at 30px 45px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 110px 160px, #7dd3fc, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 190px 80px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 280px 220px, #c084fc, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 370px 110px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 450px 270px, #38bdf8, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 540px 60px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 620px 200px, #fbcfe8, rgba(0,0,0,0)),
+    radial-gradient(2.2px 2.2px at 710px 120px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 800px 290px, #00f0ff, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 890px 50px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 970px 240px, #e0e7ff, rgba(0,0,0,0)),
+    /* Dense Starfield Clusters Layer 2 */
+    radial-gradient(1.2px 1.2px at 60px 330px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(1.8px 1.8px at 220px 400px, #38bdf8, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 320px 350px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 460px 430px, #c084fc, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 580px 370px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 680px 460px, #7dd3fc, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 830px 390px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 940px 470px, #fde047, rgba(0,0,0,0));
+  background-size:
+    100% 100%, 100% 100%, 100% 100%, 100% 100%,
+    520px 520px, 430px 430px, 580px 580px, 480px 480px, 390px 390px,
+    630px 630px, 470px 470px, 510px 510px, 560px 560px, 600px 600px,
+    440px 440px, 530px 530px, 490px 490px, 410px 410px, 460px 460px,
+    540px 540px, 590px 590px, 440px 440px, 500px 500px, 620px 620px;
+  animation: cosmicAtmosphereBreathe 18s ease-in-out infinite alternate;
+}
+
+/* Faint celestial grid lines & shooting meteor streaks */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(56, 189, 248, 0.05) 0%, transparent 65%),
+    linear-gradient(rgba(56, 189, 248, 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.018) 1px, transparent 1px);
+  background-size: 100% 100%, 80px 80px, 80px 80px;
+}
+
+@keyframes cosmicAtmosphereBreathe {
+  0% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.004);
+  }
+  100% {
+    opacity: 0.88;
+    transform: scale(1);
+  }
+}
+
+/* Ensure all page content floats gracefully above the cosmos */
+.header,
+.exp-switch-container,
+.exp-section-wrapper,
+.dashboard,
+.results-container,
+.lab-workstation-container,
+.modal-backdrop,
+.ai-chat-drawer {
+  position: relative;
+  z-index: 1;
+}
+
+/* --------------------------------------------------
+   2. STARSHIP COMMAND DOCK NAVBAR & BRAND LOGO
+   -------------------------------------------------- */
+.header {
+  background: rgba(4, 8, 22, 0.85) !important;
+  backdrop-filter: blur(24px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.28) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(56, 189, 248, 0.2) inset !important;
+}
+
+.logo h1 {
+  font-family: 'Orbitron', var(--font-space), sans-serif !important;
+  font-weight: 900 !important;
+  letter-spacing: 2.5px !important;
+  text-transform: uppercase !important;
+  background: linear-gradient(135deg, #ffffff 0%, #38bdf8 45%, #c084fc 80%, #ffffff 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.6)) !important;
+}
+
+.logo h1 span {
+  background: linear-gradient(135deg, #00f0ff 0%, #a855f7 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.8)) !important;
+}
+
+.logo p {
+  font-family: 'Space Grotesk', sans-serif !important;
+  letter-spacing: 1.6px !important;
+  text-transform: uppercase !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: #7dd3fc !important;
+  opacity: 0.9 !important;
+}
+
+.nav-atom-wrap {
+  filter: drop-shadow(0 0 14px rgba(0, 240, 255, 0.75)) !important;
+}
+
+.nav-btn {
+  background: rgba(10, 18, 38, 0.75) !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+  border-radius: 10px !important;
+  color: #e2e8f0 !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  backdrop-filter: blur(12px) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.nav-btn:hover {
+  background: rgba(18, 30, 62, 0.88) !important;
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.4) !important;
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+}
+
+.nav-btn-quiz .badge-count {
+  background: rgba(168, 85, 247, 0.25) !important;
+  border: 1px solid rgba(168, 85, 247, 0.6) !important;
+  color: #e9d5ff !important;
+  font-family: 'Orbitron', monospace !important;
+  font-size: 10px !important;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.4) !important;
+}
+
+.user-chip {
+  background: rgba(8, 14, 30, 0.8) !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.15) !important;
+  backdrop-filter: blur(12px) !important;
+  transition: all 0.25s ease !important;
+}
+
+.user-chip:hover {
+  border-color: #00f0ff !important;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.35) !important;
+  transform: translateY(-1px) !important;
+}
+
+.user-name {
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+}
+
+.user-status {
+  color: #10e7a8 !important;
+  text-shadow: 0 0 8px rgba(16, 231, 168, 0.6) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* --------------------------------------------------
+   3. EXPERIMENT SWITCHER MISSION DECK
+   -------------------------------------------------- */
+.exp-switch-container {
+  padding-top: 14px;
+}
+
+.exp-switch-bar {
+  background: rgba(6, 11, 26, 0.82) !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(18px) !important;
+}
+
+.exp-switch-btn {
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.4px !important;
+  color: #94a3b8 !important;
+  border-radius: 12px !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.exp-switch-btn:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+.exp-switch-btn.active {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.22), rgba(168, 85, 247, 0.25)) !important;
+  border: 1px solid rgba(56, 189, 248, 0.65) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 22px rgba(56, 189, 248, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+
+.exp-pill-badge {
+  background: linear-gradient(135deg, #06b6d4, #8b5cf6) !important;
+  color: #ffffff !important;
+  font-family: 'Orbitron', monospace !important;
+  font-size: 9px !important;
+  letter-spacing: 1px !important;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.5) !important;
+}
+
+/* --------------------------------------------------
+   4. SIMULATION VIEWPORT & STARSHIP OBSERVATION DOME
+   -------------------------------------------------- */
+.simulation-card,
+.controls-card,
+.result-box,
+.workstation-card {
+  background: linear-gradient(145deg, rgba(10, 16, 36, 0.85) 0%, rgba(4, 7, 20, 0.94) 100%) !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+  border-radius: 20px !important;
+  backdrop-filter: blur(18px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.65), 0 0 25px rgba(56, 189, 248, 0.1) !important;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease !important;
+}
+
+.simulation-card:hover,
+.controls-card:hover,
+.workstation-card:hover {
+  border-color: rgba(56, 189, 248, 0.55) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 35px rgba(56, 189, 248, 0.22) !important;
+}
+
+/* High-tech Viewport Corner HUD Brackets */
+.simulation-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  border-top: 3px solid #00f0ff;
+  border-left: 3px solid #00f0ff;
+  border-top-left-radius: 20px;
+  z-index: 15;
+  pointer-events: none;
+  box-shadow: -2px -2px 12px rgba(0, 240, 255, 0.6);
+}
+
+.simulation-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 24px;
+  height: 24px;
+  border-bottom: 3px solid #00f0ff;
+  border-right: 3px solid #00f0ff;
+  border-bottom-right-radius: 20px;
+  z-index: 15;
+  pointer-events: none;
+  box-shadow: 2px 2px 12px rgba(0, 240, 255, 0.6);
+}
+
+.current-lab-badge {
+  background: rgba(3, 7, 18, 0.92) !important;
+  border: 1px solid rgba(56, 189, 248, 0.4) !important;
+  color: #7dd3fc !important;
+  font-family: 'Orbitron', monospace !important;
+  font-size: 11px !important;
+  letter-spacing: 1.5px !important;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.25) !important;
+}
+
+.live-dot {
+  background: #10e7a8 !important;
+  box-shadow: 0 0 12px #10e7a8 !important;
+}
+
+.target-banner {
+  background: rgba(245, 158, 11, 0.18) !important;
+  border: 1px solid rgba(245, 158, 11, 0.6) !important;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.3) !important;
+  color: #fef08a !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 700 !important;
+}
+
+/* --------------------------------------------------
+   5. STARSHIP COCKPIT TELEMETRY HUD DISPLAY
+   -------------------------------------------------- */
+.telemetry-hud {
+  background: rgba(3, 7, 18, 0.88) !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+  border-radius: 14px !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.hud-item {
+  border-right: 1px solid rgba(56, 189, 248, 0.18) !important;
+}
+
+.hud-item:last-child {
+  border-right: none !important;
+}
+
+.hud-label {
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.4px !important;
+  color: #7dd3fc !important;
+  text-transform: uppercase !important;
+}
+
+.hud-value {
+  font-family: 'Orbitron', var(--font-mono) !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  color: #00f0ff !important;
+  text-shadow: 0 0 14px rgba(0, 240, 255, 0.75) !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* --------------------------------------------------
+   6. PROPULSION CONTROL DECK & PLASMA SLIDERS
+   -------------------------------------------------- */
+.controls-header h2 {
+  font-family: 'Orbitron', sans-serif !important;
+  font-size: 17px !important;
+  letter-spacing: 1.2px !important;
+  color: #ffffff !important;
+  text-shadow: 0 0 14px rgba(56, 189, 248, 0.5) !important;
+}
+
+.control-name {
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  color: #e2e8f0 !important;
+}
+
+.control-header strong {
+  font-family: 'Orbitron', var(--font-mono) !important;
+  letter-spacing: 0.5px !important;
+}
+
+.val-velocity {
+  color: #ff3b69 !important;
+  text-shadow: 0 0 12px rgba(255, 59, 105, 0.7) !important;
+}
+
+.val-angle {
+  color: #00f0ff !important;
+  text-shadow: 0 0 12px rgba(0, 240, 255, 0.7) !important;
+}
+
+.val-height {
+  color: #ffaa00 !important;
+  text-shadow: 0 0 12px rgba(255, 170, 0, 0.7) !important;
+}
+
+.val-gravity {
+  color: #10e7a8 !important;
+  text-shadow: 0 0 12px rgba(16, 231, 168, 0.7) !important;
+}
+
+/* Plasma Acceleration Slider Rails */
+input[type="range"] {
+  background: #080d20 !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 12px rgba(56, 189, 248, 0.12) !important;
+  height: 8px !important;
+  border-radius: 999px !important;
+}
+
+#velocity::-webkit-slider-thumb {
+  background: radial-gradient(circle, #ffffff 15%, #ff2a5f 70%, #b91c1c 100%) !important;
+  box-shadow: 0 0 18px rgba(255, 42, 95, 0.95), inset 0 1px 1px #fff !important;
+  border: 2px solid #ffffff !important;
+}
+
+#angle::-webkit-slider-thumb {
+  background: radial-gradient(circle, #ffffff 15%, #00f0ff 70%, #0369a1 100%) !important;
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.95), inset 0 1px 1px #fff !important;
+  border: 2px solid #ffffff !important;
+}
+
+#height::-webkit-slider-thumb {
+  background: radial-gradient(circle, #ffffff 15%, #ffaa00 70%, #b45309 100%) !important;
+  box-shadow: 0 0 18px rgba(255, 170, 0, 0.95), inset 0 1px 1px #fff !important;
+  border: 2px solid #ffffff !important;
+}
+
+#gravity::-webkit-slider-thumb {
+  background: radial-gradient(circle, #ffffff 15%, #10e7a8 70%, #047857 100%) !important;
+  box-shadow: 0 0 18px rgba(16, 231, 168, 0.95), inset 0 1px 1px #fff !important;
+  border: 2px solid #ffffff !important;
+}
+
+/* --------------------------------------------------
+   7. PLANETARY GRAVITY NAVIGATION BUTTONS
+   -------------------------------------------------- */
+.planetary-presets .planet-btn {
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 700 !important;
+  border-radius: 10px !important;
+  background: rgba(8, 14, 30, 0.8) !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+  color: #94a3b8 !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Moon Preset */
+.planet-btn[data-gravity="1.6"]:hover,
+.planet-btn[data-gravity="1.6"].active {
+  background: rgba(148, 163, 184, 0.25) !important;
+  border-color: #e2e8f0 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(226, 232, 240, 0.5) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Mars Preset */
+.planet-btn[data-gravity="3.7"]:hover,
+.planet-btn[data-gravity="3.7"].active {
+  background: rgba(239, 68, 68, 0.25) !important;
+  border-color: #ef4444 !important;
+  color: #fca5a5 !important;
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.55) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Earth Preset */
+.planet-btn[data-gravity="9.8"]:hover,
+.planet-btn[data-gravity="9.8"].active {
+  background: rgba(56, 189, 248, 0.25) !important;
+  border-color: #38bdf8 !important;
+  color: #7dd3fc !important;
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.55) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Jupiter Preset */
+.planet-btn[data-gravity="24.8"]:hover,
+.planet-btn[data-gravity="24.8"].active {
+  background: rgba(245, 158, 11, 0.25) !important;
+  border-color: #f59e0b !important;
+  color: #fde68a !important;
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.55) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Height Platform Presets */
+.height-btn {
+  background: rgba(8, 14, 30, 0.75) !important;
+  border: 1px solid rgba(56, 189, 248, 0.22) !important;
+  border-radius: 8px !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 600 !important;
+  color: #94a3b8 !important;
+}
+
+.height-btn:hover {
+  background: rgba(20, 32, 64, 0.85) !important;
+  border-color: #fbbf24 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+}
+
+.height-btn.active {
+  background: rgba(245, 158, 11, 0.25) !important;
+  border-color: #f59e0b !important;
+  color: #fbbf24 !important;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.4) !important;
+}
+
+/* --------------------------------------------------
+   8. STARSHIP THRUSTER IGNITION & ACTION BUTTONS
+   -------------------------------------------------- */
+.launch-btn {
+  background: linear-gradient(135deg, #ff2a5f 0%, #ff5e36 45%, #ffa600 100%) !important;
+  box-shadow: 0 0 25px rgba(255, 94, 54, 0.65), 0 6px 20px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.6) !important;
+  font-family: 'Orbitron', sans-serif !important;
+  font-size: 14px !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase !important;
+  font-weight: 800 !important;
+  border: none !important;
+  border-radius: 12px !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.launch-btn:hover {
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 0 35px rgba(255, 94, 54, 0.9), 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.8) !important;
+}
+
+.record-btn {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(168, 85, 247, 0.25)) !important;
+  border: 1px solid rgba(56, 189, 248, 0.5) !important;
+  color: #7dd3fc !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 16px rgba(6, 182, 212, 0.25) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.record-btn:hover {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(168, 85, 247, 0.4)) !important;
+  border-color: #38bdf8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 22px rgba(56, 189, 248, 0.5) !important;
+  transform: translateY(-2px) !important;
+}
+
+.reset-btn,
+.clear-btn {
+  background: rgba(12, 20, 42, 0.85) !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+  color: #cbd5e1 !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.reset-btn:hover,
+.clear-btn:hover {
+  background: rgba(22, 36, 74, 0.95) !important;
+  border-color: #38bdf8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.35) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* --------------------------------------------------
+   9. KINEMATIC RESULTS CARDS (4 SPACE METRIC PODS)
+   -------------------------------------------------- */
+.results-card {
+  gap: 20px;
+}
+
+.result-box {
+  border-radius: 18px !important;
+  padding: 22px 24px !important;
+  position: relative !important;
+}
+
+.result-box:hover {
+  transform: translateY(-4px) !important;
+  border-color: rgba(56, 189, 248, 0.55) !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6), 0 0 25px rgba(56, 189, 248, 0.2) !important;
+}
+
+.result-label {
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 1px !important;
+  color: #94a3b8 !important;
+  text-transform: uppercase !important;
+}
+
+.result-val {
+  font-family: 'Orbitron', var(--font-mono) !important;
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px !important;
+}
+
+.card-height .result-val {
+  color: #c084fc !important;
+  text-shadow: 0 0 14px rgba(192, 132, 252, 0.65) !important;
+}
+
+.card-range .result-val {
+  color: #00f0ff !important;
+  text-shadow: 0 0 14px rgba(0, 240, 255, 0.65) !important;
+}
+
+.card-time .result-val {
+  color: #10e7a8 !important;
+  text-shadow: 0 0 14px rgba(16, 231, 168, 0.65) !important;
+}
+
+.card-impact .result-val {
+  color: #ffaa00 !important;
+  text-shadow: 0 0 14px rgba(255, 170, 0, 0.65) !important;
+}
+
+.result-sub {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 11px !important;
+  color: #7dd3fc !important;
+  opacity: 0.85 !important;
+}
+
+/* --------------------------------------------------
+   10. MASTERY CHALLENGES & LOGBOOK WORKSTATION
+   -------------------------------------------------- */
+.workstation-header h3 {
+  font-family: 'Orbitron', sans-serif !important;
+  letter-spacing: 1px !important;
+  color: #ffffff !important;
+}
+
+.workstation-header p {
+  font-family: 'Space Grotesk', sans-serif !important;
+  color: #94a3b8 !important;
+}
+
+.obs-table th {
+  font-family: 'Orbitron', 'Space Grotesk', sans-serif !important;
+  background: rgba(6, 12, 28, 0.95) !important;
+  color: #7dd3fc !important;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.3) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.8px !important;
+}
+
+.obs-table td {
+  font-family: 'JetBrains Mono', monospace !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.obs-table tbody tr:hover {
+  background: rgba(56, 189, 248, 0.08) !important;
+}
+
+/* --------------------------------------------------
+   11. OPTICAL FIBRE & SPECTROMETER LAB STYLING
+   -------------------------------------------------- */
+.of-hw-switch,
+.cs-hw-switch {
+  background: rgba(8, 14, 32, 0.85) !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  color: #e2e8f0 !important;
+}
+
+.of-wl-chip {
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 700 !important;
+  border-radius: 10px !important;
+}
+
+.of-wl-chip[data-wavelength="650"].active {
+  background: rgba(239, 68, 68, 0.25) !important;
+  border-color: #ef4444 !important;
+  color: #fca5a5 !important;
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.6) !important;
+}
+
+.of-wl-chip[data-wavelength="532"].active {
+  background: rgba(16, 231, 168, 0.25) !important;
+  border-color: #10e7a8 !important;
+  color: #a7f3d0 !important;
+  box-shadow: 0 0 18px rgba(16, 231, 168, 0.6) !important;
+}
+
+.of-wl-chip[data-wavelength="405"].active {
+  background: rgba(168, 85, 247, 0.25) !important;
+  border-color: #a855f7 !important;
+  color: #e9d5ff !important;
+  box-shadow: 0 0 18px rgba(168, 85, 247, 0.6) !important;
+}
+
+/* --------------------------------------------------
+   12. COMMAND MODALS & COSMOS AI ASSISTANT
+   -------------------------------------------------- */
+.modal-box,
+.ai-chat-drawer {
+  background: linear-gradient(145deg, rgba(7, 12, 30, 0.96) 0%, rgba(3, 6, 16, 0.98) 100%) !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(56, 189, 248, 0.15) !important;
+}
+
+.modal-header h2,
+.ai-drawer-header h3 {
+  font-family: 'Orbitron', sans-serif !important;
+  letter-spacing: 1.5px !important;
+  color: #ffffff !important;
+  text-shadow: 0 0 14px rgba(56, 189, 248, 0.5) !important;
+}
+
+.modal-close-btn {
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  background: rgba(12, 20, 42, 0.8) !important;
+  color: #cbd5e1 !important;
+}
+
+.modal-close-btn:hover {
+  border-color: #ff3366 !important;
+  color: #ff3366 !important;
+  box-shadow: 0 0 12px rgba(255, 51, 102, 0.4) !important;
+}
+
+.quiz-option-card:hover {
+  border-color: rgba(56, 189, 248, 0.6) !important;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.3) !important;
+}
+
+/* --------------------------------------------------
+   13. CUSTOM SCI-FI GLOW SCROLLBAR & SELECTION
+   -------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #030611;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #38bdf8, #818cf8);
+  border-radius: 999px;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #00f0ff, #a855f7);
+}
+
+::selection {
+  background: rgba(56, 189, 248, 0.35);
+  color: #ffffff;
+}
+
+/* --------------------------------------------------
+   14. DYNAMIC SHOOTING STARS & METEOR SHOWER
+   -------------------------------------------------- */
+@keyframes shootingMeteor1 {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(-35deg);
+    opacity: 0;
+    width: 0;
+  }
+  2% {
+    opacity: 1;
+    width: 140px;
+  }
+  8% {
+    transform: translate3d(-700px, 490px, 0) rotate(-35deg);
+    opacity: 0;
+    width: 220px;
+  }
+  100% {
+    transform: translate3d(-700px, 490px, 0) rotate(-35deg);
+    opacity: 0;
+    width: 0;
+  }
+}
+
+@keyframes shootingMeteor2 {
+  0%, 35% {
+    transform: translate3d(0, 0, 0) rotate(-40deg);
+    opacity: 0;
+    width: 0;
+  }
+  37% {
+    opacity: 1;
+    width: 160px;
+  }
+  43% {
+    transform: translate3d(-800px, 670px, 0) rotate(-40deg);
+    opacity: 0;
+    width: 240px;
+  }
+  100% {
+    transform: translate3d(-800px, 670px, 0) rotate(-40deg);
+    opacity: 0;
+    width: 0;
+  }
+}
+
+.header::before {
+  content: '';
+  position: fixed;
+  top: 10%;
+  right: 15%;
+  height: 2px;
+  background: linear-gradient(90deg, #ffffff, rgba(0, 240, 255, 0.8), transparent);
+  border-radius: 999px;
+  box-shadow: 0 0 14px #00f0ff, 0 0 28px rgba(56, 189, 248, 0.6);
+  pointer-events: none;
+  z-index: 0;
+  animation: shootingMeteor1 12s infinite cubic-bezier(0.1, 0.5, 0.1, 1);
+}
+
+.header::after {
+  content: '';
+  position: fixed;
+  top: 30%;
+  right: 5%;
+  height: 2px;
+  background: linear-gradient(90deg, #ffffff, rgba(168, 85, 247, 0.8), transparent);
+  border-radius: 999px;
+  box-shadow: 0 0 14px #a855f7, 0 0 28px rgba(168, 85, 247, 0.6);
+  pointer-events: none;
+  z-index: 0;
+  animation: shootingMeteor2 17s infinite cubic-bezier(0.1, 0.5, 0.1, 1);
+}
+
+/* --------------------------------------------------
+   15. (Splash screen styles consolidated in core splash section)
+   -------------------------------------------------- */
+
+/* --------------------------------------------------
+   16. SIMULATION CANVAS CONTAINER
+   -------------------------------------------------- */
+#simulation {
+  background: radial-gradient(ellipse at 50% 30%, #09142f 0%, #040817 60%, #020309 100%) !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+}
+
+#simulation canvas {
+  border-radius: 16px !important;
+}
+
+/* --------------------------------------------------
+   17. SCI-FI PLASMA TOGGLE SWITCHES
+   -------------------------------------------------- */
+.toggles-group {
+  background: rgba(8, 14, 32, 0.75) !important;
+  border: 1px solid rgba(56, 189, 248, 0.22) !important;
+  border-radius: 14px !important;
+}
+
+.toggle-slider {
+  background: #141c30 !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+}
+
+.toggle-control input:checked+.toggle-slider {
+  background: linear-gradient(135deg, #00f0ff, #8b5cf6) !important;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.6) !important;
+  border-color: #00f0ff !important;
+}
+
+.toggle-slider::after {
+  background: #ffffff !important;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6) !important;
+}
+
+.toggle-text {
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-size: 13px !important;
+  color: #cbd5e1 !important;
+}
+
+/* --------------------------------------------------
+   18. COMPLEMENTARY KINEMATICS LAW CARD
+   -------------------------------------------------- */
+.complementary-card {
+  background: linear-gradient(135deg, rgba(20, 18, 54, 0.65), rgba(8, 14, 32, 0.85)) !important;
+  border: 1px solid rgba(168, 85, 247, 0.4) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4), 0 0 18px rgba(168, 85, 247, 0.15) !important;
+}
+
+.comp-title {
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 700 !important;
+  color: #f1f5f9 !important;
+}
+
+.comp-badge {
+  font-family: 'Orbitron', monospace !important;
+  letter-spacing: 0.5px !important;
+  background: rgba(16, 231, 168, 0.2) !important;
+  border-color: rgba(16, 231, 168, 0.5) !important;
+  color: #6ee7b7 !important;
+}
+
+.comp-pair-btn {
+  background: rgba(10, 16, 36, 0.85) !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  color: #94a3b8 !important;
+}
+
+.comp-pair-btn:hover {
+  background: rgba(22, 34, 68, 0.95) !important;
+  border-color: #38bdf8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3) !important;
+}
+
+.comp-pair-btn.active {
+  background: rgba(168, 85, 247, 0.25) !important;
+  border-color: #a855f7 !important;
+  color: #e9d5ff !important;
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.4) !important;
+}
+
+.comp-verify-action-btn {
+  font-family: 'Orbitron', sans-serif !important;
+  letter-spacing: 1px !important;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.85), rgba(56, 189, 248, 0.85)) !important;
+  border: 1px solid rgba(168, 85, 247, 0.6) !important;
+  box-shadow: 0 0 18px rgba(168, 85, 247, 0.4) !important;
+}
+
+.comp-verify-action-btn:hover {
+  background: linear-gradient(135deg, #a855f7, #38bdf8) !important;
+  box-shadow: 0 0 26px rgba(168, 85, 247, 0.6) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* --------------------------------------------------
+   19. COSMOS AI PHYSICS ASSISTANT BEACON & DRAWER
+   -------------------------------------------------- */
+.ai-fab-btn {
+  background: linear-gradient(135deg, #131238, #050a1e) !important;
+  border: 1.5px solid rgba(0, 240, 255, 0.6) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), 0 0 24px rgba(0, 240, 255, 0.4) !important;
+  font-family: 'Orbitron', sans-serif !important;
+  letter-spacing: 1px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+.ai-fab-btn:hover {
+  transform: translateY(-4px) scale(1.05) !important;
+  border-color: #00f0ff !important;
+  box-shadow: 0 12px 42px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 240, 255, 0.65) !important;
+}
+
+.ai-suggestion-chip {
+  background: rgba(10, 18, 40, 0.85) !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  color: #7dd3fc !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+}
+
+.ai-suggestion-chip:hover {
+  background: rgba(20, 34, 72, 0.95) !important;
+  border-color: #38bdf8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3) !important;
+}
+
+/* ==========================================================================
+   ==========================================================================
+   🪐 EXPERIMENT 4: PHYSICS SANDBOX STYLESHEET
+   ==========================================================================
+   ========================================================================== */
+
+/* --------------------------------------------------
+   1. TOP SANDBOX HEADER BANNER & PRESET BAR
+   -------------------------------------------------- */
+.sandbox-header-banner {
+  width: min(1680px, calc(100% - 48px));
+  margin: 16px auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, rgba(8, 14, 34, 0.85) 0%, rgba(4, 7, 20, 0.92) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+}
+
+.sandbox-title-wrap h2 {
+  margin: 4px 0 2px;
+  font-family: 'Orbitron', var(--font-space), sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  background: linear-gradient(135deg, #ffffff 0%, #00f0ff 50%, #c084fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 14px rgba(0, 240, 255, 0.5));
+}
+
+.sandbox-title-wrap p {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  color: #94a3b8;
+  max-width: 650px;
+  line-height: 1.4;
+}
+
+.sandbox-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 240, 255, 0.12);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: #7dd3fc;
+  margin-bottom: 2px;
+}
+
+.sandbox-pill-badge {
+  background: linear-gradient(135deg, #00f0ff, #38bdf8) !important;
+  color: #030712 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.6) !important;
+}
+
+.sandbox-presets-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.preset-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #7dd3fc;
+  text-transform: uppercase;
+}
+
+.sandbox-preset-pill {
+  height: 32px;
+  padding: 0 12px;
+  background: rgba(12, 20, 44, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 999px;
+  color: #e2e8f0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sandbox-preset-pill:hover {
+  background: rgba(20, 36, 76, 0.95);
+  border-color: #00f0ff;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.35);
+  transform: translateY(-1px);
+}
+
+/* --------------------------------------------------
+   2. MAIN 3-COLUMN RESPONSIVE LAYOUT
+   -------------------------------------------------- */
+.sandbox-dashboard {
+  width: min(1680px, calc(100% - 48px));
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr) 350px;
+  gap: 20px;
+  align-items: start;
+}
+
+.sandbox-controls-col,
+.sandbox-viewport-col,
+.sandbox-telemetry-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* --------------------------------------------------
+   3. SANDBOX BASE CARDS
+   -------------------------------------------------- */
+.sandbox-card {
+  background: linear-gradient(145deg, rgba(9, 15, 34, 0.88) 0%, rgba(4, 7, 20, 0.95) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 18px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.55), 0 0 20px rgba(56, 189, 248, 0.08);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.sandbox-card:hover {
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.65), 0 0 25px rgba(56, 189, 248, 0.15);
+}
+
+.sandbox-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 10px;
+}
+
+.sandbox-card-header h3 {
+  margin: 0;
+  font-family: 'Orbitron', var(--font-space), sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sandbox-label-sm {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: #7dd3fc;
+  text-transform: uppercase;
+}
+
+.sandbox-text-dim {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.sandbox-num-cyan {
+  font-family: 'Orbitron', var(--font-mono);
+  font-size: 15px;
+  color: #00f0ff;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+}
+
+/* --------------------------------------------------
+   4. SIMULATION CONTROLS & SPEED BUTTONS
+   -------------------------------------------------- */
+.sandbox-master-controls-card {
+  padding: 12px 18px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(8, 16, 38, 0.95) 0%, rgba(4, 9, 24, 0.98) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.1);
+}
+
+.sandbox-sim-master-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.sandbox-master-controls-card .sandbox-sim-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.sandbox-master-controls-card .sandbox-btn-run {
+  min-width: 105px;
+  height: 38px;
+  padding: 0 16px;
+  font-size: 13px;
+}
+
+.sandbox-master-controls-card .sandbox-btn-reset {
+  min-width: 90px;
+  height: 38px;
+  padding: 0 14px;
+  font-size: 12.5px;
+}
+
+.sandbox-viewport-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #34d399;
+}
+
+.sandbox-sim-actions {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 10px;
+}
+
+.sandbox-btn-run {
+  height: 44px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: 1px solid rgba(16, 185, 129, 0.6);
+  border-radius: 12px;
+  color: #ffffff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.45);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sandbox-btn-run:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(16, 185, 129, 0.65);
+}
+
+.sandbox-btn-run.btn-active-run {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border-color: rgba(245, 158, 11, 0.7);
+  box-shadow: 0 4px 18px rgba(245, 158, 11, 0.45);
+}
+
+.sandbox-btn-reset {
+  height: 44px;
+  background: rgba(14, 22, 46, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 12px;
+  color: #cbd5e1;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.sandbox-btn-reset:hover {
+  background: rgba(24, 38, 76, 0.95);
+  border-color: #38bdf8;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
+}
+
+.sandbox-speed-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.sandbox-speed-group {
+  display: flex;
+  gap: 5px;
+}
+
+.sandbox-speed-btn {
+  height: 28px;
+  padding: 0 8px;
+  background: rgba(10, 16, 36, 0.8);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 6px;
+  color: #94a3b8;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sandbox-speed-btn:hover {
+  color: #ffffff;
+  border-color: #38bdf8;
+}
+
+.sandbox-speed-btn.active {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: #00f0ff;
+  color: #7dd3fc;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+}
+
+/* --------------------------------------------------
+   5. OBJECT SPAWNER & PILLS SELECTOR
+   -------------------------------------------------- */
+.sandbox-spawn-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.sandbox-tool-btn {
+  height: 40px;
+  background: rgba(10, 18, 40, 0.8);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 10px;
+  color: #e2e8f0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.sandbox-tool-btn:hover {
+  background: rgba(18, 30, 66, 0.9);
+  border-color: #00f0ff;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.3);
+}
+
+.sandbox-pills-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 10px;
+}
+
+.sandbox-pills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.sandbox-obj-pill {
+  height: 28px;
+  padding: 0 10px;
+  background: rgba(10, 16, 36, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 999px;
+  color: #cbd5e1;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.sandbox-obj-pill:hover {
+  border-color: #38bdf8;
+  color: #ffffff;
+}
+
+.sandbox-obj-pill.active {
+  background: rgba(0, 240, 255, 0.18);
+  border-color: #00f0ff;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
+}
+
+.pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 6px currentColor;
+}
+
+/* --------------------------------------------------
+   6. GRAVITY SLIDER & PRESET BUTTONS
+   -------------------------------------------------- */
+.sandbox-slider {
+  width: 100%;
+  height: 8px;
+  appearance: none;
+  background: #080d20 !important;
+  border: 1px solid rgba(56, 189, 248, 0.25) !important;
+  border-radius: 999px !important;
+  outline: none;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+}
+
+.sandbox-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  background: radial-gradient(circle, #ffffff 15%, #00f0ff 70%, #0369a1 100%);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.95);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.sandbox-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.18);
+}
+
+.sandbox-slider.slider-rose::-webkit-slider-thumb {
+  background: radial-gradient(circle, #ffffff 15%, #ff3b69 70%, #b91c1c 100%);
+  box-shadow: 0 0 16px rgba(255, 59, 105, 0.95);
+}
+
+.sandbox-range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.sandbox-planet-presets {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.sandbox-planet-btn {
+  height: 32px;
+  background: rgba(10, 16, 36, 0.8);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-radius: 8px;
+  color: #94a3b8;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.sandbox-planet-btn:hover {
+  background: rgba(18, 30, 64, 0.9);
+  color: #ffffff;
+  border-color: #38bdf8;
+}
+
+.sandbox-planet-btn.active {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8;
+  color: #7dd3fc;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
+}
+
+/* --------------------------------------------------
+   7. INTERACTIVE SIMULATION VIEWPORT CARD
+   -------------------------------------------------- */
+.sandbox-viewport-card {
+  position: relative;
+  background: linear-gradient(145deg, rgba(8, 14, 32, 0.9) 0%, rgba(4, 7, 20, 0.96) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(56, 189, 248, 0.12);
+}
+
+/* Viewport Cybernetic Corner Brackets */
+.sandbox-viewport-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  border-top: 3px solid #00f0ff;
+  border-left: 3px solid #00f0ff;
+  border-top-left-radius: 20px;
+  z-index: 15;
+  pointer-events: none;
+  box-shadow: -2px -2px 12px rgba(0, 240, 255, 0.6);
+}
+
+.sandbox-viewport-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 24px;
+  height: 24px;
+  border-bottom: 3px solid #00f0ff;
+  border-right: 3px solid #00f0ff;
+  border-bottom-right-radius: 20px;
+  z-index: 15;
+  pointer-events: none;
+  box-shadow: 2px 2px 12px rgba(0, 240, 255, 0.6);
+}
+
+.sandbox-viewport-top {
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(4, 8, 22, 0.85);
+}
+
+.sandbox-live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: #7dd3fc;
+}
+
+.sandbox-viewport-tip {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.sandbox-canvas-wrap {
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  background: #020309;
+}
+
+#sandbox-canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
+}
+
+.sandbox-canvas-bar {
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: rgba(4, 8, 22, 0.85);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sandbox-origin-legend {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.coord-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.sandbox-legend-colors {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.legend-item {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  color: #cbd5e1;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 6px currentColor;
+}
+
+/* --------------------------------------------------
+   8. PROPERTY INSPECTOR FORM & METRIC CARDS
+   -------------------------------------------------- */
+.inspector-badge {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #00f0ff;
+}
+
+.btn-delete-obj {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  color: #f87171;
+  padding: 6px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-delete-obj:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.sandbox-props-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sandbox-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sandbox-field-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.sandbox-val-cyan {
+  font-family: 'Orbitron', var(--font-mono);
+  color: #00f0ff;
+}
+
+.sandbox-val-amber {
+  font-family: 'Orbitron', var(--font-mono);
+  color: #ffaa00;
+}
+
+.sandbox-val-purple {
+  font-family: 'Orbitron', var(--font-mono);
+  color: #c084fc;
+}
+
+.sandbox-val-rose {
+  font-family: 'Orbitron', var(--font-mono);
+  color: #ff3b69;
+}
+
+.sandbox-field-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sandbox-field-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sandbox-field-col label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sandbox-num-input {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  height: 34px;
+  background: #080d20;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 8px;
+  color: #ffffff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 0 10px;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.sandbox-num-input::-webkit-outer-spin-button,
+.sandbox-num-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.sandbox-num-input:focus {
+  border-color: #00f0ff;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.35);
+}
+
+.sandbox-notice {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.4;
+  padding: 10px;
+  background: rgba(15, 23, 42, 0.6);
+  border-left: 3px solid #64748b;
+  border-radius: 6px;
+}
+
+/* --------------------------------------------------
+   9. FORCE APPLICATION D-PAD & VECTOR FLOW
+   -------------------------------------------------- */
+.sandbox-dpad-container {
+  display: flex;
+  justify-content: center;
+  padding: 6px 0;
+}
+
+.sandbox-dpad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 48px);
+  grid-template-rows: repeat(3, 44px);
+  gap: 6px;
+}
+
+.dpad-up { grid-column: 2; grid-row: 1; }
+.dpad-left { grid-column: 1; grid-row: 2; }
+.dpad-center-btn { grid-column: 2; grid-row: 2; }
+.dpad-right { grid-column: 3; grid-row: 2; }
+.dpad-down { grid-column: 2; grid-row: 3; }
+
+.dpad-btn {
+  background: rgba(14, 22, 46, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 10px;
+  color: #7dd3fc;
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.dpad-btn:hover {
+  background: rgba(24, 38, 76, 0.95);
+  border-color: #00f0ff;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.4);
+}
+
+.dpad-btn.active-force {
+  background: linear-gradient(135deg, #ff3b69, #ff5e36);
+  border-color: #ff3b69;
+  color: #ffffff;
+  box-shadow: 0 0 18px rgba(255, 59, 105, 0.7);
+}
+
+.dpad-center-btn {
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  border: 1px solid rgba(139, 92, 246, 0.6);
+  border-radius: 10px;
+  color: #ffffff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 14px rgba(139, 92, 246, 0.4);
+  transition: all 0.15s ease;
+}
+
+.dpad-center-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.7);
+}
+
+.sandbox-force-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.sandbox-btn-outline {
+  height: 32px;
+  padding: 0 14px;
+  background: transparent;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 8px;
+  color: #94a3b8;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sandbox-btn-outline:hover {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: #38bdf8;
+  color: #ffffff;
+}
+
+.sandbox-force-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px;
+  background: rgba(4, 8, 22, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+}
+
+.flow-step {
+  color: #7dd3fc;
+  font-weight: 700;
+}
+
+.flow-arrow {
+  color: #ff3b69;
+}
+
+/* --------------------------------------------------
+   10. LIVE TELEMETRY INSTRUMENTATION GRID
+   -------------------------------------------------- */
+.sandbox-telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sandbox-tel-item {
+  background: rgba(6, 11, 26, 0.8);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.sandbox-tel-item.span-full {
+  grid-column: span 2;
+}
+
+.tel-lbl {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.tel-val {
+  font-family: 'Orbitron', var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.tel-cyan { color: #00f0ff !important; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+.tel-rose { color: #ff3b69 !important; text-shadow: 0 0 10px rgba(255, 59, 105, 0.5); }
+.tel-green { color: #10e7a8 !important; text-shadow: 0 0 10px rgba(16, 231, 168, 0.5); }
+
+/* --------------------------------------------------
+   11. REAL-TIME TELEMETRY GRAPHS
+   -------------------------------------------------- */
+.sandbox-graph-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.graph-tab-btn {
+  height: 26px;
+  padding: 0 8px;
+  background: rgba(10, 16, 36, 0.8);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 6px;
+  color: #94a3b8;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.graph-tab-btn:hover {
+  color: #ffffff;
+  border-color: #38bdf8;
+}
+
+.graph-tab-btn.active {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: #00f0ff;
+  color: #7dd3fc;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.35);
+}
+
+.sandbox-graph-wrap {
+  width: 100%;
+  height: 180px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  background: #030612;
+}
+
+#sandbox-graphs-canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* --------------------------------------------------
+   12. EDUCATIONAL FEEDBACK CARD
+   -------------------------------------------------- */
+.sandbox-edu-card {
+  border-left: 3px solid #00f0ff !important;
+}
+
+.edu-card-top {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.edu-badge {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #7dd3fc;
+}
+
+.edu-equation {
+  font-family: 'Orbitron', var(--font-mono);
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #ffffff;
+  padding: 8px 12px;
+  background: rgba(4, 8, 22, 0.8);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 8px;
+}
+
+.edu-desc {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12.5px;
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------
+   13. MOBILE & TABLET RESPONSIVE ADAPTATIONS
+   -------------------------------------------------- */
+@media (max-width: 1280px) {
+  .sandbox-dashboard {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+  .sandbox-controls-col {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 900px) {
+  .sandbox-dashboard {
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 24px);
+    gap: 16px;
+  }
+
+  .sandbox-viewport-col {
+    order: -1; /* Simulation canvas displays first on mobile */
+    width: 100%;
+  }
+
+  .sandbox-controls-col {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .sandbox-telemetry-col {
+    width: 100%;
+  }
+
+  .sandbox-header-banner {
+    width: calc(100% - 24px);
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sandbox-canvas-wrap {
+    min-height: 300px;
+  }
+
+  .sandbox-dpad-grid {
+    grid-template-columns: repeat(3, 50px);
+    grid-template-rows: repeat(3, 44px);
+  }
+}
+
+@media (max-width: 480px) {
+  .sandbox-dashboard {
+    width: calc(100% - 16px);
+    gap: 12px;
+  }
+
+  .sandbox-card {
+    padding: 14px 14px;
+    border-radius: 14px;
+  }
+
+  .sandbox-master-controls-card {
+    padding: 10px 12px;
+  }
+
+  .sandbox-sim-master-bar {
+    gap: 10px;
+  }
+
+  .sandbox-master-controls-card .sandbox-sim-actions {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+  }
+
+  .sandbox-master-controls-card .sandbox-btn-run,
+  .sandbox-master-controls-card .sandbox-btn-reset {
+    flex: 1;
+    min-width: 0;
+    height: 38px;
+    font-size: 12px;
+  }
+
+  .sandbox-speed-row {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .sandbox-canvas-wrap {
+    min-height: 260px;
+  }
+
+  .sandbox-spawn-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .sandbox-tool-btn {
+    height: 36px;
+    font-size: 11px;
+    padding: 0 4px;
+  }
+
+  .sandbox-planet-presets {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .sandbox-planet-btn {
+    height: 30px;
+    font-size: 10.5px;
+  }
+
+  .sandbox-telemetry-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .sandbox-tel-item.span-full {
+    grid-column: span 1;
+  }
+}
+
+
+
 
