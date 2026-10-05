@@ -1,4 +1,4 @@
-# ⚛️ PhysiX — Interactive STEM Physics Laboratory
+# ⚛️ PhysiX — Interactive Physics Simulator
 
 ![PhysiX Banner](src/assets/hero.png)
 
@@ -53,4 +53,4 @@ npm run build
 ---
 
 ## 📄 License
-MIT License © 2026 Ojas Joshi
+MIT License © 2026 Ojas Joshi, Jeshurun Selvakumar, Kshitij Jadhav

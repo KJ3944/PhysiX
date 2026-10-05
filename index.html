@@ -117,6 +117,1149 @@
   </div>
 
   <!-- =====================================
+       PHYSIX SCIENTIFIC SCROLLABLE LANDING PAGE
+  ===================================== -->
+  <div id="physix-home" class="physix-home" role="main" aria-label="PhysiX Scientific Simulation Homepage">
+    <!-- Fixed Interactive Deep-Space Physics Canvas (Follows scroll) -->
+    <canvas id="home-space-canvas" class="home-space-canvas"></canvas>
+
+    <!-- Deep Space Atmospheric Vignette & Subtle Coordinate Grid -->
+    <div class="home-ambient-overlay"></div>
+    <div class="home-coordinate-grid"></div>
+
+    <!-- ==========================================
+         HERO SECTION (Initial Viewport - 100vh)
+         ========================================== -->
+    <div class="home-hero-viewport" id="home-hero-viewport">
+      <!-- Precision Corner Reticles -->
+      <div class="home-reticle-corner home-reticle-tl"></div>
+      <div class="home-reticle-corner home-reticle-tr"></div>
+      <div class="home-reticle-corner home-reticle-bl"></div>
+      <div class="home-reticle-corner home-reticle-br"></div>
+
+      <!-- Telemetry Status Beacon -->
+      <div class="home-system-status">
+        <span class="status-beacon"></span>
+        <span>2D PHYSICS KINEMATICS ENGINE ONLINE</span>
+      </div>
+
+      <!-- Central Hero: Dominant Title, Subtitle, & Explore Control -->
+      <section class="home-hero">
+        <div class="home-title-container">
+          <h1 class="home-title" id="home-title">
+            <span class="home-letter">P</span><span class="home-letter">H</span><span class="home-letter">Y</span><span class="home-letter">S</span><span class="home-letter">I</span><span class="home-letter home-title-x">X</span>
+          </h1>
+        </div>
+
+        <p class="home-subtitle">An Interactive 2D Simulator</p>
+
+        <div class="home-action-container">
+          <button type="button" id="btn-explore-simulations" class="btn-explore-simulations" aria-label="Explore Simulations">
+            <span class="btn-reticle-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="2" x2="12" y2="6"></line>
+                <line x1="12" y1="18" x2="12" y2="22"></line>
+                <line x1="2" y1="12" x2="6" y2="12"></line>
+                <line x1="18" y1="12" x2="22" y2="12"></line>
+                <circle cx="12" cy="12" r="3" fill="#00f0ff"></circle>
+              </svg>
+            </span>
+            <span class="btn-label">Explore Simulations</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Scroll Invitation Indicator -->
+      <div class="home-scroll-hint" id="home-scroll-hint" role="button" aria-label="Scroll down to explore sections">
+        <div class="scroll-mouse-icon"></div>
+        <span>SCROLL TO EXPLORE</span>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         SECTION 1: WHAT IS PHYSIX?
+         ========================================== -->
+    <section class="home-section home-section-about reveal-on-scroll" id="home-about">
+      <div class="section-tag">
+        <span class="tag-dot"></span>
+        <span>01 // SYSTEM OVERVIEW</span>
+      </div>
+
+      <h2 class="section-heading">What is PhysiX?</h2>
+
+      <p class="section-lead">
+        <strong>PhysiX is an interactive 2D physics simulation platform designed to make physics more visual, intuitive, and engaging.</strong>
+        Instead of simply reading equations or looking at static diagrams, interact with physical variables in real time and observe direct cause-and-effect relationships.
+      </p>
+
+      <!-- Interactive Scientific Kinematics Diagram -->
+      <div class="about-interactive-viewport">
+        <div class="about-diagram-canvas-wrap">
+          <svg class="about-diagram-svg" viewBox="0 0 800 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="diag-traj-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#38bdf8" />
+                <stop offset="50%" stop-color="#818cf8" />
+                <stop offset="100%" stop-color="#ec4899" />
+              </linearGradient>
+              <linearGradient id="diag-area-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.25" />
+                <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0" />
+              </linearGradient>
+            </defs>
+
+            <!-- Coordinate Grid Lines -->
+            <line x1="60" y1="180" x2="740" y2="180" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1.5" />
+            <line x1="60" y1="30" x2="60" y2="180" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1.5" />
+
+            <!-- Axis Labels -->
+            <text x="745" y="184" fill="#94a3b8" font-family="monospace" font-size="11">X (Range)</text>
+            <text x="60" y="22" fill="#94a3b8" font-family="monospace" font-size="11" text-anchor="middle">Y (Altitude)</text>
+
+            <!-- Shaded Area Under Trajectory -->
+            <path d="M 60 180 Q 280 40 500 40 T 700 180 Z" fill="url(#diag-area-grad)" />
+
+            <!-- Parabolic Ballistic Trajectory Curve -->
+            <path id="svg-traj-curve" d="M 60 180 Q 280 40 500 40 T 700 180" stroke="url(#diag-traj-grad)" stroke-width="3" stroke-linecap="round" fill="none" stroke-dasharray="6 3" />
+
+            <!-- Apex Point -->
+            <circle cx="500" cy="40" r="5" fill="#38bdf8" filter="drop-shadow(0 0 8px #38bdf8)" />
+            <text x="500" y="24" fill="#38bdf8" font-family="monospace" font-size="11" font-weight="700" text-anchor="middle">APEX: H_max = (v₀·sin θ)² / (2g)</text>
+
+            <!-- Launch Vector Arrows at Origin -->
+            <line x1="60" y1="180" x2="160" y2="105" stroke="#00f0ff" stroke-width="2.5" stroke-linecap="round" />
+            <polygon points="163,102 150,105 158,114" fill="#00f0ff" />
+            <text x="175" y="100" fill="#00f0ff" font-family="monospace" font-size="11" font-weight="700">v₀ = 25.0 m/s (θ = 45°)</text>
+
+            <!-- Horizontal & Vertical Component Vectors -->
+            <line x1="60" y1="180" x2="160" y2="180" stroke="#34d399" stroke-width="1.5" stroke-dasharray="3 3" />
+            <text x="110" y="196" fill="#34d399" font-family="monospace" font-size="10">v_x = v₀ cos θ</text>
+
+            <line x1="160" y1="180" x2="160" y2="105" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="3 3" />
+            <text x="168" y="145" fill="#f43f5e" font-family="monospace" font-size="10">v_y</text>
+
+            <!-- Target Impact Point -->
+            <circle cx="700" cy="180" r="6" fill="#ec4899" filter="drop-shadow(0 0 10px #ec4899)" />
+            <text x="700" y="202" fill="#ec4899" font-family="monospace" font-size="11" font-weight="700" text-anchor="middle">R = (v₀²·sin 2θ)/g</text>
+          </svg>
+        </div>
+
+        <div class="about-features-bar">
+          <div class="about-feature-item">
+            <span class="feat-label">Live Vector Deconstruction</span>
+            <p class="feat-text">Real-time dynamic breakdown into instantaneous velocity, height, time, and gravity.</p>
+          </div>
+          <div class="about-feature-item">
+            <span class="feat-label">Zero-Latency Variable Tuning</span>
+            <p class="feat-text">Adjust sliders and switches with instantaneous frame-accurate numerical rendering.</p>
+          </div>
+          <div class="about-feature-item">
+            <span class="feat-label">Empirical Telemetry Logs</span>
+            <p class="feat-text">Record real data points into structured observation tables and export PDF reports.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 2: LEARN BY INTERACTING
+         ========================================== -->
+    <section class="home-section home-section-learn reveal-on-scroll" id="home-learn">
+      <div class="section-tag">
+        <span class="tag-dot"></span>
+        <span>02 // LABORATORY SYSTEMS</span>
+      </div>
+
+      <h2 class="section-heading">Learn by Interacting</h2>
+
+      <p class="section-lead">
+        Physics isn't abstract formulas on a chalkboard. PhysiX allows you to modify parameters and directly observe real-world physical behavior across mechanics, wave optics, and optoelectronics.
+      </p>
+
+      <!-- Supported Real Experiments Grid -->
+      <div class="concepts-grid">
+        <!-- 1. Projectile Motion -->
+        <div class="concept-card active-lab" data-exp-target="projectile" data-name="2D Projectile Motion">
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 19l4-4"></path>
+                  <path d="M15 4l5 5L9 20l-5-1 1-5L15 4z"></path>
+                  <circle cx="17.5" cy="6.5" r="1.5"></circle>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <line x1="30" y1="90" x2="250" y2="90" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1.2"></line>
+              <line x1="30" y1="20" x2="30" y2="90" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1.2"></line>
+              <line x1="85" y1="88" x2="85" y2="92" stroke="rgba(148, 163, 184, 0.3)"></line>
+              <line x1="140" y1="88" x2="140" y2="92" stroke="rgba(148, 163, 184, 0.3)"></line>
+              <line x1="195" y1="88" x2="195" y2="92" stroke="rgba(148, 163, 184, 0.3)"></line>
+              <line x1="30" y1="55" x2="250" y2="55" stroke="rgba(255,255,255,0.04)" stroke-dasharray="2,3"></line>
+              <path d="M 45 90 Q 135 15 225 90" fill="none" stroke="#f43f5e" stroke-width="2.2" filter="drop-shadow(0 0 6px rgba(244, 63, 94, 0.6))"></path>
+              <circle cx="45" cy="90" r="3.5" fill="#38bdf8" filter="drop-shadow(0 0 5px #38bdf8)"></circle>
+              <circle cx="225" cy="90" r="3.5" fill="#f43f5e" filter="drop-shadow(0 0 5px #f43f5e)"></circle>
+              <text x="50" y="103" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8">0.0m</text>
+              <text x="135" y="103" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="middle">50.0m</text>
+              <text x="225" y="103" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="end">100.0m</text>
+            </svg>
+          </div>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Projectile</span>
+              <span class="title-main">Motion</span>
+            </h3>
+            <p class="card-desc">Analyze the 2D trajectory of a launched object in the presence of variable gravitational scenario</p>
+          </div>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Perform 2D Projectile Motion experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
+        </div>
+
+        <!-- 2. Optical Fibre NA -->
+        <div class="concept-card active-lab" data-exp-target="optical" data-name="Determination of Numerical Aperture of an Optical Fibre">
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #38bdf8; filter: drop-shadow(0 0 5px #38bdf8);"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <circle cx="12" cy="12" r="6"></circle>
+                  <circle cx="12" cy="12" r="2"></circle>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <!-- Fiber cladding & core -->
+              <rect x="20" y="38" width="130" height="34" rx="4" fill="rgba(56, 189, 248, 0.08)" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1"></rect>
+              <line x1="20" y1="55" x2="150" y2="55" stroke="rgba(56, 189, 248, 0.4)" stroke-dasharray="3,3"></line>
+              <!-- Total internal reflection zigzag ray -->
+              <polyline points="20,62 55,42 95,68 135,42 150,55" fill="none" stroke="#f43f5e" stroke-width="2" filter="drop-shadow(0 0 5px #f43f5e)"></polyline>
+              <!-- Diverging cone to screen -->
+              <polygon points="150,55 240,25 240,85" fill="rgba(244, 63, 94, 0.12)" stroke="rgba(244, 63, 94, 0.35)" stroke-dasharray="2,2"></polygon>
+              <!-- Measurement screen -->
+              <line x1="240" y1="15" x2="240" y2="95" stroke="#38bdf8" stroke-width="2"></line>
+              <!-- Spot circles -->
+              <ellipse cx="240" cy="55" rx="4" ry="24" fill="#f43f5e" filter="drop-shadow(0 0 8px #f43f5e)"></ellipse>
+              <text x="248" y="58" fill="#cbd5e1" font-family="monospace" font-size="8">Spot W</text>
+              <text x="195" y="98" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8">Screen L</text>
+            </svg>
+          </div>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Optical</span>
+              <span class="title-main">Fibre NA</span>
+            </h3>
+            <p class="card-desc">Measure laser spot divergence W at screen distance L, compute acceptance angle, and determine mean Numerical Aperture</p>
+          </div>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Perform Optical Fibre experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
+        </div>
+
+        <!-- 3. Colour Sensor -->
+        <div class="concept-card active-lab" data-exp-target="colour-sensor" data-name="Study of Colour Sensor">
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #ec4899; filter: drop-shadow(0 0 5px #ec4899);"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M12 2a10 10 0 0 1 10 10" stroke="#f43f5e" stroke-width="2"></path>
+                  <path d="M22 12a10 10 0 0 1-10 10" stroke="#10b981" stroke-width="2"></path>
+                  <path d="M12 22a10 10 0 0 1-10-10" stroke="#3b82f6" stroke-width="2"></path>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <!-- TCS3200 8x8 filter matrix representation -->
+              <rect x="35" y="25" width="60" height="60" rx="8" fill="rgba(15, 23, 42, 0.8)" stroke="rgba(255, 255, 255, 0.15)"></rect>
+              <circle cx="50" cy="40" r="5" fill="#f43f5e"></circle>
+              <circle cx="65" cy="40" r="5" fill="#10b981"></circle>
+              <circle cx="80" cy="40" r="5" fill="#3b82f6"></circle>
+              <circle cx="50" cy="55" r="5" fill="#3b82f6"></circle>
+              <circle cx="65" cy="55" r="5" fill="#ffffff"></circle>
+              <circle cx="80" cy="55" r="5" fill="#f43f5e"></circle>
+              <circle cx="50" cy="70" r="5" fill="#10b981"></circle>
+              <circle cx="65" cy="70" r="5" fill="#f43f5e"></circle>
+              <circle cx="80" cy="70" r="5" fill="#3b82f6"></circle>
+              <!-- Signal arrow -->
+              <path d="M110 55 L145 55" stroke="rgba(148, 163, 184, 0.4)" stroke-width="1.5" stroke-dasharray="3,3"></path>
+              <polygon points="145,52 152,55 145,58" fill="rgba(148, 163, 184, 0.6)"></polygon>
+              <!-- Frequency pulse output wave -->
+              <polyline points="160,55 175,55 175,35 190,35 190,75 205,75 205,35 220,35 220,75 235,75 235,55 255,55" fill="none" stroke="#a855f7" stroke-width="2" filter="drop-shadow(0 0 5px #a855f7)"></polyline>
+              <text x="207" y="93" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="middle">f_out ∝ I_ph</text>
+            </svg>
+          </div>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Colour</span>
+              <span class="title-main">Sensor TCS3200</span>
+            </h3>
+            <p class="card-desc">Examine photodiode array spectral response, configure hardware frequency scaling, and analyze RGB wavelengths</p>
+          </div>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Perform Colour Sensor experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
+        </div>
+
+        <!-- 4. Physics Sandbox -->
+        <div class="concept-card active-lab" data-exp-target="sandbox" data-name="Physics Sandbox Playground">
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #00f0ff; filter: drop-shadow(0 0 5px #00f0ff);"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+                  <circle cx="8.5" cy="8.5" r="2" fill="#00f0ff"></circle>
+                  <path d="m21 15-5-5L5 21"></path>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <!-- Grid bounds -->
+              <rect x="25" y="15" width="230" height="80" rx="8" fill="rgba(3, 7, 18, 0.4)" stroke="rgba(0, 240, 255, 0.15)"></rect>
+              <!-- Kinetic rigid bodies -->
+              <circle cx="70" cy="55" r="14" fill="rgba(0, 240, 255, 0.2)" stroke="#00f0ff" stroke-width="2" filter="drop-shadow(0 0 6px #00f0ff)"></circle>
+              <path d="M 70 55 L 110 40" stroke="#00f0ff" stroke-width="2"></path>
+              <polygon points="110,37 118,40 111,45" fill="#00f0ff"></polygon>
+              <!-- Rigid crate -->
+              <rect x="155" y="45" width="28" height="28" rx="4" fill="rgba(168, 85, 247, 0.2)" stroke="#a855f7" stroke-width="2"></rect>
+              <!-- Collision impact wave -->
+              <circle cx="140" cy="55" r="8" fill="none" stroke="rgba(255, 255, 255, 0.5)" stroke-dasharray="2,2"></circle>
+              <circle cx="215" cy="65" r="10" fill="rgba(244, 63, 94, 0.2)" stroke="#f43f5e" stroke-width="2"></circle>
+              <text x="140" y="90" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="middle">Matter.js Newtonian 2D</text>
+            </svg>
+          </div>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Physics</span>
+              <span class="title-main">Sandbox</span>
+            </h3>
+            <p class="card-desc">Interactive 2D playground: spawn balls, crates, static walls, apply live force vectors, and test collision kinematics</p>
+          </div>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Perform Physics Sandbox experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 3: HOW IT WORKS (Connected 3-Step Flow)
+         ========================================== -->
+    <section class="home-section home-section-workflow reveal-on-scroll" id="home-workflow">
+      <div class="section-tag">
+        <span class="tag-dot"></span>
+        <span>03 // METHODOLOGY</span>
+      </div>
+
+      <h2 class="section-heading">How It Works</h2>
+
+      <p class="section-lead">
+        A unified three-phase workflow designed to transform abstract equations into intuitive physical comprehension.
+      </p>
+
+      <div class="workflow-deck">
+        <!-- Step 1 -->
+        <div class="workflow-card">
+          <span class="workflow-step-num">PHASE 01</span>
+          <h3>Choose</h3>
+          <p>Select any simulation from the curated laboratory library, spanning Classical Kinematics, Fibre Optics, Sensor Electronics, or the 2D Sandbox.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="workflow-card">
+          <span class="workflow-step-num">PHASE 02</span>
+          <h3>Experiment</h3>
+          <p>Adjust launch velocity, platform altitude, optical distance, or gravity fields. Fire trajectories and interact directly with objects on canvas.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="workflow-card">
+          <span class="workflow-step-num">PHASE 03</span>
+          <h3>Understand</h3>
+          <p>Observe the immediate visual response, review live telemetry breakdowns, compare experimental logs with theoretical predictions, and master the physics.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 4: EXPLORE SIMULATIONS CALLOUT
+         ========================================== -->
+    <section class="home-section home-section-explore reveal-on-scroll" id="home-explore">
+      <div class="explore-physics-card">
+        <div class="section-tag" style="margin-bottom: 0;">
+          <span class="tag-dot"></span>
+          <span>04 // SIMULATION HUB</span>
+        </div>
+
+        <h3>Explore Physics</h3>
+
+        <p>Explore interactive simulations and experiment with physics concepts in real time. Test your skills, solve target challenges, and earn student mastery XP.</p>
+
+        <div class="explore-btn-wrap">
+          <button type="button" class="btn-explore-simulations btn-explore-simulations-action" aria-label="Explore Simulations">
+            <span class="btn-reticle-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="2" x2="12" y2="6"></line>
+                <line x1="12" y1="18" x2="12" y2="22"></line>
+                <line x1="2" y1="12" x2="6" y2="12"></line>
+                <line x1="18" y1="12" x2="22" y2="12"></line>
+                <circle cx="12" cy="12" r="3" fill="#00f0ff"></circle>
+              </svg>
+            </span>
+            <span class="btn-label">Explore Simulations</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SECTION 5: WHY PHYSIX?
+         ========================================== -->
+    <section class="home-section home-section-why reveal-on-scroll" id="home-why">
+      <div class="section-tag">
+        <span class="tag-dot"></span>
+        <span>05 // CORE PHILOSOPHY</span>
+      </div>
+
+      <h2 class="section-heading">Why PhysiX?</h2>
+
+      <p class="section-lead">
+        Engineered specifically to solve the gap between static textbook formulas and dynamic physical intuition.
+      </p>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span class="why-card-kicker">01 // ENGAGEMENT</span>
+          <h4>Interactive</h4>
+          <p>Physics isn't just something you read. You interact with variables, spawn physical bodies, and observe live kinetics in motion.</p>
+        </div>
+
+        <div class="why-card">
+          <span class="why-card-kicker">02 // CLARITY</span>
+          <h4>Visual</h4>
+          <p>See real-time vector components ($v_x, v_y$), ghost trail comparisons, and light refraction instead of relying solely on equations.</p>
+        </div>
+
+        <div class="why-card">
+          <span class="why-card-kicker">03 // INQUIRY</span>
+          <h4>Experimental</h4>
+          <p>Change parameters, test hypothesis boundary cases, and observe emergent physical outcomes in real time.</p>
+        </div>
+
+        <div class="why-card">
+          <span class="why-card-kicker">04 // ACCESS</span>
+          <h4>Accessible</h4>
+          <p>Zero software installation. High-precision numerical computing running smoothly inside any modern web browser.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         FULL LANDING PAGE FOOTER
+         ========================================== -->
+    <footer class="home-footer-full">
+      <h2 class="footer-brand-title">PhysiX</h2>
+      <p class="footer-brand-subtitle">An Interactive 2D Simulator</p>
+
+      <div class="footer-legal-links">
+        <button type="button" id="home-link-terms" class="home-footer-link">Terms of Service</button>
+        <span class="home-footer-divider"></span>
+        <button type="button" id="home-link-privacy" class="home-footer-link">Privacy Policy</button>
+      </div>
+
+      <p class="footer-credit-note">Designed for scientific inquiry & intuitive physics exploration.</p>
+    </footer>
+  </div>
+
+  <!-- =====================================
+       DEDICATED TERMS OF SERVICE PAGE (/terms)
+  ===================================== -->
+  <div id="physix-terms-page" class="physix-standalone-page hidden" role="main" aria-label="PhysiX Terms of Service">
+    <!-- Standalone Sticky Navbar -->
+    <header class="standalone-navbar">
+      <div class="standalone-nav-brand" role="button" tabindex="0" title="Return to PhysiX Homepage" data-route="/">
+        <div class="standalone-atom-icon">
+          <svg viewBox="0 0 100 100" fill="none">
+            <ellipse cx="50" cy="50" rx="42" ry="16" stroke="#00f0ff" stroke-width="2.5" transform="rotate(-30 50 50)"/>
+            <ellipse cx="50" cy="50" rx="42" ry="16" stroke="#7928ca" stroke-width="2.5" transform="rotate(30 50 50)"/>
+            <circle cx="50" cy="50" r="7" fill="#00f0ff"/>
+          </svg>
+        </div>
+        <span class="standalone-brand-title">PhysiX</span>
+        <span class="standalone-brand-badge">TERMS</span>
+      </div>
+      <nav class="standalone-nav-links">
+        <button type="button" class="standalone-link-btn" data-route="/experiments">Explore Simulations</button>
+        <button type="button" class="standalone-link-btn" data-route="/privacy">Privacy Policy</button>
+        <button type="button" class="standalone-btn-back" data-route="/">
+          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          <span>Back to Home</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Page Content Container -->
+    <main class="standalone-container">
+      <!-- Hero Section -->
+      <section class="standalone-hero">
+        <div class="standalone-kicker-badge">
+          <span class="kicker-pulse"></span>
+          <span>LEGAL PROTOCOLS &amp; GOVERNANCE</span>
+        </div>
+        <h1 class="standalone-title">Terms of Service</h1>
+        <p class="standalone-lead">Governing standards of academic usage, computational simulation accuracy, user telemetry, and ethical scientific experimentation on the PhysiX platform.</p>
+        <div class="standalone-meta-chips">
+          <span class="meta-chip"><strong>Effective Date:</strong> October 2026</span>
+          <span class="meta-chip"><strong>Revision:</strong> 2.4.0 (STEM Release)</span>
+          <span class="meta-chip"><strong>Jurisdiction:</strong> Global Academic &amp; Research</span>
+        </div>
+      </section>
+
+      <!-- Quick Navigation Index -->
+      <div class="standalone-quick-index">
+        <span class="index-label">Table of Contents:</span>
+        <div class="index-tags">
+          <a href="#terms-section-1" class="index-tag">1. Acceptance</a>
+          <a href="#terms-section-2" class="index-tag">2. Academic License</a>
+          <a href="#terms-section-3" class="index-tag">3. Simulation Accuracy</a>
+          <a href="#terms-section-4" class="index-tag">4. Student Accounts</a>
+          <a href="#terms-section-5" class="index-tag">5. Experimental Telemetry</a>
+          <a href="#terms-section-6" class="index-tag">6. Intellectual Property</a>
+          <a href="#terms-section-7" class="index-tag">7. Laboratory Safety</a>
+          <a href="#terms-section-8" class="index-tag">8. Academic Contact</a>
+        </div>
+      </div>
+
+      <!-- Legal Body Cards -->
+      <div class="standalone-articles">
+        <article id="terms-section-1" class="standalone-card">
+          <div class="card-num-badge">01</div>
+          <div class="card-article-body">
+            <h2>Acceptance of Protocol Terms</h2>
+            <p>By accessing, browsing, or executing computational models on the PhysiX platform ("PhysiX", "the Platform", or "we"), you agree to be legally bound by these Terms of Service. If you are using the platform on behalf of a school, university, research laboratory, or STEM institution, you represent and warrant that you possess the authority to bind such entity to these provisions.</p>
+            <p>These terms govern all access modes, including guest simulation sessions, registered student accounts, classroom assignments, and data export features.</p>
+          </div>
+        </article>
+
+        <article id="terms-section-2" class="standalone-card">
+          <div class="card-num-badge">02</div>
+          <div class="card-article-body">
+            <h2>Academic &amp; Pedagogical Licensing</h2>
+            <p>PhysiX is designed to democratize high-fidelity virtual STEM education. Users are granted a worldwide, royalty-free, non-exclusive license to utilize the simulation suite for:</p>
+            <ul class="standalone-styled-list">
+              <li>Individual self-paced physics inquiry, problem sets, and laboratory coursework.</li>
+              <li>Classroom lectures, demonstration screens, and academic laboratory sessions.</li>
+              <li>Academic science fairs, student projects, and non-commercial educational research.</li>
+            </ul>
+            <div class="standalone-callout">
+              <strong>Notice:</strong> Commercial redistribution, white-labeling, or re-selling of the PhysiX simulation engine without prior written consent from the PhysiX development team is strictly prohibited.
+            </div>
+          </div>
+        </article>
+
+        <article id="terms-section-3" class="standalone-card">
+          <div class="card-num-badge">03</div>
+          <div class="card-article-body">
+            <h2>Physics Simulation Engine &amp; Numerical Accuracy</h2>
+            <p>PhysiX utilizes high-precision Newtonian rigid-body physics (Matter.js 2D), discrete integration algorithms, numerical kinematic solvers, and optoelectronic transfer equations. While simulations are calibrated against experimental textbook physics:</p>
+            <ul class="standalone-styled-list">
+              <li><strong>Discrete Time-Step Limits:</strong> High-velocity ballistic trajectories and collision events depend on discrete delta-time ($\Delta t$) stepping and the browser rendering frame rate. Minor integration drift or floating-point variations may occur under extreme boundary parameters.</li>
+              <li><strong>Simplified Models:</strong> Certain real-world non-linear perturbations (such as atmospheric turbulence, humidity-dependent air resistance, or non-uniform laser speckle patterns) may be idealized for clarity of foundational physics concepts.</li>
+              <li><strong>No Critical Infrastructure Use:</strong> PhysiX models are calibrated for educational and pedagogical training; they must not be used as the sole safety-critical calculations for physical aerospace, structural engineering, or life-critical designs.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article id="terms-section-4" class="standalone-card">
+          <div class="card-num-badge">04</div>
+          <div class="card-article-body">
+            <h2>Student Accounts, XP &amp; Anti-Tampering</h2>
+            <p>To preserve competitive fairness across student XP leaderboards, physicist rank advancement, and streak maintenance:</p>
+            <ul class="standalone-styled-list">
+              <li>Users must provide accurate account information via Google Firebase authentication.</li>
+              <li>Attempting to artificially inject fabricated XP, spoof daily streak timestamps, or reverse-engineer client verification tokens violates platform integrity standards.</li>
+              <li>PhysiX reserves the right to reset telemetry and credentials of accounts engaging in malicious script injection.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article id="terms-section-5" class="standalone-card">
+          <div class="card-num-badge">05</div>
+          <div class="card-article-body">
+            <h2>Experimental Telemetry &amp; Data Logging</h2>
+            <p>Observations collected in laboratories (launch velocities, trajectory heights, numerical aperture measurements, spectral frequencies) belong to the conducting student or researcher. You retain full ownership of generated data logs and may export them freely in CSV or PDF laboratory report formats.</p>
+          </div>
+        </article>
+
+        <article id="terms-section-6" class="standalone-card">
+          <div class="card-num-badge">06</div>
+          <div class="card-article-body">
+            <h2>Intellectual Property &amp; Simulation Logic</h2>
+            <p>All graphical assets, SVG laboratory equipment schematics, procedural cosmic starfield shaders, Vectra AI prompts, and interactive laboratory layouts are protected by international copyright and intellectual property treaties. Open-source dependencies (such as Matter.js and KaTeX) remain under their respective permissive licenses.</p>
+          </div>
+        </article>
+
+        <article id="terms-section-7" class="standalone-card">
+          <div class="card-num-badge">07</div>
+          <div class="card-article-body">
+            <h2>Laboratory Safety Notice</h2>
+            <p>PhysiX virtual experiments provide an intuitive, risk-free environment for exploring lasers, projectile launches, and sensors. However, when performing physical real-world counterpart experiments in a physical laboratory, students and educators must strictly follow institutional safety guidelines, including laser eye protection (OD goggles), electrical hazard containment, and projectile safety barriers.</p>
+          </div>
+        </article>
+
+        <article id="terms-section-8" class="standalone-card">
+          <div class="card-num-badge">08</div>
+          <div class="card-article-body">
+            <h2>Academic Contact &amp; Institution Inquiries</h2>
+            <p>For questions regarding institutional curriculum licensing, bug reports in numerical physics solvers, or academic research collaborations, contact the PhysiX laboratory team at <code>support@physix.lab</code>.</p>
+          </div>
+        </article>
+      </div>
+
+      <!-- Bottom Navigation Footer -->
+      <footer class="standalone-page-footer">
+        <div class="footer-nav-group">
+          <button type="button" class="footer-link-btn" data-route="/">PhysiX Home</button>
+          <span class="sep">•</span>
+          <button type="button" class="footer-link-btn" data-route="/experiments">Explore Simulations</button>
+          <span class="sep">•</span>
+          <button type="button" class="footer-link-btn" data-route="/privacy">Privacy Policy</button>
+        </div>
+        <p class="footer-copy">&copy; 2026 PhysiX Interactive 2D Simulator • All rights reserved.</p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- =====================================
+       DEDICATED PRIVACY POLICY PAGE (/privacy)
+  ===================================== -->
+  <div id="physix-privacy-page" class="physix-standalone-page hidden" role="main" aria-label="PhysiX Privacy Policy">
+    <!-- Standalone Sticky Navbar -->
+    <header class="standalone-navbar">
+      <div class="standalone-nav-brand" role="button" tabindex="0" title="Return to PhysiX Homepage" data-route="/">
+        <div class="standalone-atom-icon">
+          <svg viewBox="0 0 100 100" fill="none">
+            <ellipse cx="50" cy="50" rx="42" ry="16" stroke="#10b981" stroke-width="2.5" transform="rotate(-30 50 50)"/>
+            <ellipse cx="50" cy="50" rx="42" ry="16" stroke="#00f0ff" stroke-width="2.5" transform="rotate(30 50 50)"/>
+            <circle cx="50" cy="50" r="7" fill="#10b981"/>
+          </svg>
+        </div>
+        <span class="standalone-brand-title">PhysiX</span>
+        <span class="standalone-brand-badge badge-privacy">PRIVACY</span>
+      </div>
+      <nav class="standalone-nav-links">
+        <button type="button" class="standalone-link-btn" data-route="/experiments">Explore Simulations</button>
+        <button type="button" class="standalone-link-btn" data-route="/terms">Terms of Service</button>
+        <button type="button" class="standalone-btn-back" data-route="/">
+          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          <span>Back to Home</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Page Content Container -->
+    <main class="standalone-container">
+      <!-- Hero Section -->
+      <section class="standalone-hero">
+        <div class="standalone-kicker-badge kicker-emerald">
+          <span class="kicker-pulse pulse-emerald"></span>
+          <span>DATA INTEGRITY &amp; PRIVACY PROTOCOL</span>
+        </div>
+        <h1 class="standalone-title">Privacy Policy</h1>
+        <p class="standalone-lead">Our unwavering commitment to student data privacy: zero commercial advertising, strict isolation of experimental telemetry, and transparent cryptographic protection.</p>
+        <div class="standalone-meta-chips">
+          <span class="meta-chip"><strong>Effective Date:</strong> October 2026</span>
+          <span class="meta-chip"><strong>Advertising:</strong> Strictly 0%</span>
+          <span class="meta-chip"><strong>Data Monetization:</strong> Never Sold or Rented</span>
+          <span class="meta-chip"><strong>Storage:</strong> Encrypted Google Firebase &amp; Local Storage</span>
+        </div>
+      </section>
+
+      <!-- 4 Core Privacy Guarantees Grid -->
+      <div class="privacy-pillars-grid">
+        <div class="pillar-card">
+          <div class="pillar-icon">🛡️</div>
+          <h3>Zero Advertising &amp; Tracking</h3>
+          <p>We do not display commercial ads, embed marketing pixels, or profile students across the web.</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon">🔒</div>
+          <h3>No Data Selling</h3>
+          <p>Your research telemetry, quiz results, and email are never sold, rented, or brokered to third parties.</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon">⚡</div>
+          <h3>Full Data Portability</h3>
+          <p>Export your experiment logs to CSV or PDF instantly, and delete your profile anytime with 1 click.</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon">🌐</div>
+          <h3>100% Guest Mode</h3>
+          <p>Simulate fully without an account. All lab data stays strictly within your browser's localStorage.</p>
+        </div>
+      </div>
+
+      <!-- Quick Navigation Index -->
+      <div class="standalone-quick-index">
+        <span class="index-label">Table of Contents:</span>
+        <div class="index-tags">
+          <a href="#priv-section-1" class="index-tag">1. What We Collect</a>
+          <a href="#priv-section-2" class="index-tag">2. Telemetry Usage</a>
+          <a href="#priv-section-3" class="index-tag">3. Local Storage vs Cloud</a>
+          <a href="#priv-section-4" class="index-tag">4. Security Standards</a>
+          <a href="#priv-section-5" class="index-tag">5. Infrastructure &amp; Firebase</a>
+          <a href="#priv-section-6" class="index-tag">6. Student Rights</a>
+          <a href="#priv-section-7" class="index-tag">7. FERPA &amp; COPPA</a>
+          <a href="#priv-section-8" class="index-tag">8. Privacy Officer Contact</a>
+        </div>
+      </div>
+
+      <!-- Privacy Body Cards -->
+      <div class="standalone-articles">
+        <article id="priv-section-1" class="standalone-card">
+          <div class="card-num-badge">01</div>
+          <div class="card-article-body">
+            <h2>Information We Collect</h2>
+            <p>PhysiX adheres to a strict principle of data minimization. We only collect the bare minimum telemetry necessary to support student laboratory progression:</p>
+            <ul class="standalone-styled-list">
+              <li><strong>Account Credentials:</strong> If you create an account, we record your verified email address, display name, and avatar index through Google Firebase Authentication.</li>
+              <li><strong>Mastery &amp; XP Progression:</strong> Cumulative physics XP, unlocked achievements, daily login streaks, and quiz performance metrics.</li>
+              <li><strong>Observation Records:</strong> Laboratory trial values (e.g. projectile launch angle $\theta$, initial velocity $v_0$, fiber distance $L$, optical ring diameter $W$, color sensor channel frequencies).</li>
+            </ul>
+          </div>
+        </article>
+
+        <article id="priv-section-2" class="standalone-card">
+          <div class="card-num-badge">02</div>
+          <div class="card-article-body">
+            <h2>How Laboratory Telemetry is Utilized</h2>
+            <p>Your simulation measurements and experiment notes are used exclusively to:</p>
+            <ul class="standalone-styled-list">
+              <li>Calculate percentage error between theoretical formulas and virtual experimental runs.</li>
+              <li>Automatically generate printable PDF and CSV lab reports for classroom submissions.</li>
+              <li>Provide personalized feedback and contextual scientific hints through the Vectra AI assistant.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article id="priv-section-3" class="standalone-card">
+          <div class="card-num-badge">03</div>
+          <div class="card-article-body">
+            <h2>Local Browser Storage vs Cloud Synchronization</h2>
+            <p>PhysiX provides a seamless dual-storage architecture:</p>
+            <ul class="standalone-styled-list">
+              <li><strong>Guest Mode:</strong> If you use PhysiX without signing in, all simulation settings, observation tables, and bookmarks are written solely to your device's <code>localStorage</code>. No telemetry leaves your machine.</li>
+              <li><strong>Authenticated Mode:</strong> When signed in, your telemetry syncs via Google Firestore so you can access your experiments across classroom computers, tablets, and personal laptops.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article id="priv-section-4" class="standalone-card">
+          <div class="card-num-badge">04</div>
+          <div class="card-article-body">
+            <h2>Infrastructure &amp; Security Practices</h2>
+            <p>All network communications between the PhysiX client and backend services are encrypted in transit using industry-standard TLS 1.3 (HTTPS). Data stored in Google Firestore is protected by strict granular security rules ensuring that only authenticated users can read or write their own laboratory records.</p>
+          </div>
+        </article>
+
+        <article id="priv-section-5" class="standalone-card">
+          <div class="card-num-badge">05</div>
+          <div class="card-article-body">
+            <h2>Third-Party Sub-Processors</h2>
+            <p>PhysiX engages a minimal set of enterprise-grade cloud sub-processors strictly for authentication and data storage:</p>
+            <ul class="standalone-styled-list">
+              <li><strong>Google Firebase:</strong> Authentication, user profile verification, and real-time Firestore database synchronization.</li>
+              <li><strong>Cloudflare / GitHub Pages / Vite:</strong> Content delivery network and static asset serving.</li>
+            </ul>
+            <p>We do not integrate any advertising SDKs, behavioral telemetry trackers, or social media tracking pixels.</p>
+          </div>
+        </article>
+
+        <article id="priv-section-6" class="standalone-card">
+          <div class="card-num-badge">06</div>
+          <div class="card-article-body">
+            <h2>Student Rights &amp; Permanent Data Erasure</h2>
+            <p>You have full autonomy over your personal data. At any time, you may:</p>
+            <ul class="standalone-styled-list">
+              <li>Export a complete copy of all your laboratory observation records in structured CSV or PDF format.</li>
+              <li>Request complete, permanent deletion of your Firebase account and associated Firestore records by contacting support or clearing your student profile.</li>
+            </ul>
+          </div>
+        </article>
+
+        <article id="priv-section-7" class="standalone-card">
+          <div class="card-num-badge">07</div>
+          <div class="card-article-body">
+            <h2>FERPA &amp; COPPA Educational Compliance</h2>
+            <p>PhysiX is engineered to support student privacy compliance frameworks (including FERPA and COPPA). We do not collect student birthdates, home addresses, phone numbers, or biometric information. Students under 13 may use the platform safely in guest mode or under verified educator supervision.</p>
+          </div>
+        </article>
+
+        <article id="priv-section-8" class="standalone-card">
+          <div class="card-num-badge">08</div>
+          <div class="card-article-body">
+            <h2>Contact the Data Privacy Officer</h2>
+            <p>If you have any questions or data requests regarding this Privacy Policy, please reach out directly to our scientific privacy team at <code>privacy@physix.lab</code>.</p>
+          </div>
+        </article>
+      </div>
+
+      <!-- Bottom Navigation Footer -->
+      <footer class="standalone-page-footer">
+        <div class="footer-nav-group">
+          <button type="button" class="footer-link-btn" data-route="/">PhysiX Home</button>
+          <span class="sep">•</span>
+          <button type="button" class="footer-link-btn" data-route="/experiments">Explore Simulations</button>
+          <span class="sep">•</span>
+          <button type="button" class="footer-link-btn" data-route="/terms">Terms of Service</button>
+        </div>
+        <p class="footer-copy">&copy; 2026 PhysiX Interactive 2D Simulator • All rights reserved.</p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- =====================================
+       DEDICATED EXPERIMENTS HUB PAGE (/experiments)
+  ===================================== -->
+  <div id="physix-experiments-page" class="physix-standalone-page hidden" role="main" aria-label="PhysiX Virtual Physics Laboratories Catalog">
+    <!-- Standalone Sticky Navbar -->
+    <header class="standalone-navbar">
+      <div class="standalone-nav-brand" role="button" tabindex="0" title="Return to PhysiX Homepage" data-route="/">
+        <div class="standalone-atom-icon">
+          <svg viewBox="0 0 100 100" fill="none">
+            <ellipse cx="50" cy="50" rx="42" ry="16" stroke="#06b6d4" stroke-width="2.5" transform="rotate(-30 50 50)"/>
+            <ellipse cx="50" cy="50" rx="42" ry="16" stroke="#3b82f6" stroke-width="2.5" transform="rotate(30 50 50)"/>
+            <circle cx="50" cy="50" r="7" fill="#06b6d4"/>
+          </svg>
+        </div>
+        <span class="standalone-brand-title">PhysiX</span>
+        <span class="standalone-brand-badge badge-labs">LABORATORIES</span>
+      </div>
+      <nav class="standalone-nav-links">
+        <button type="button" class="standalone-link-btn" data-route="/terms">Terms</button>
+        <button type="button" class="standalone-link-btn" data-route="/privacy">Privacy</button>
+        <button type="button" class="standalone-btn-back" data-route="/">
+          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          <span>Back to Home</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Page Content Container -->
+    <main class="standalone-container exp-page-container">
+      <!-- Hero Section -->
+      <section class="standalone-hero exp-page-hero">
+        <div class="standalone-kicker-badge kicker-cyan">
+          <span class="kicker-pulse pulse-cyan"></span>
+          <span>VIRTUAL SIMULATION SUITE</span>
+        </div>
+        <h1 class="standalone-title">Explore Physics Simulations</h1>
+        <p class="standalone-lead">High-fidelity 2D computational laboratories across Classical Mechanics, Fiber Optics, Wave Optics, Quantum Solid-State Physics, and Nanotechnology Sensors.</p>
+        
+        <!-- High-Tech Metrics Strip -->
+        <div class="exp-metrics-strip">
+          <div class="metric-box">
+            <span class="metric-val">14</span>
+            <span class="metric-lbl">Virtual Labs</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-val">2D</span>
+            <span class="metric-lbl">Physics Engine</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-val">60 FPS</span>
+            <span class="metric-lbl">Kinematic Solvers</span>
+          </div>
+          <div class="metric-box">
+            <span class="metric-val">100%</span>
+            <span class="metric-lbl">Data Telemetry</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Search & Category Filters Bar -->
+      <div class="exp-filter-toolbar">
+        <div class="exp-search-box">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="search" id="exp-page-search-input" class="exp-search-input" placeholder="Search 14 laboratories by title, topic, or keyword (e.g. projectile, optical fibre, colour sensor, sandbox)..." aria-label="Search laboratories">
+        </div>
+
+        <div class="exp-cat-pills" id="exp-page-cat-pills">
+          <button type="button" class="exp-cat-pill active" data-category="all">All Labs (14)</button>
+          <button type="button" class="exp-cat-pill" data-category="optics">Fiber Optics &amp; Lasers</button>
+          <button type="button" class="exp-cat-pill" data-category="wave">Wave Optics &amp; Interference</button>
+          <button type="button" class="exp-cat-pill" data-category="quantum">Quantum &amp; Solid State</button>
+          <button type="button" class="exp-cat-pill" data-category="sensors">Sensors, Devices &amp; Nano</button>
+        </div>
+      </div>
+
+      <!-- Laboratory Cards Grid -->
+      <div id="exp-page-labs-grid" class="labs-grid exp-page-grid">
+        <!-- Populated automatically and synchronized with explorer cards -->
+      </div>
+
+      <!-- Bottom Navigation Footer -->
+      <footer class="standalone-page-footer">
+        <div class="footer-nav-group">
+          <button type="button" class="footer-link-btn" data-route="/">PhysiX Home</button>
+          <span class="sep">•</span>
+          <button type="button" class="footer-link-btn" data-route="/terms">Terms of Service</button>
+          <span class="sep">•</span>
+          <button type="button" class="footer-link-btn" data-route="/privacy">Privacy Policy</button>
+        </div>
+        <p class="footer-copy">&copy; 2026 PhysiX Interactive 2D Simulator • All rights reserved.</p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- =====================================
+       DEDICATED EXPERIMENT DETAILS & LAB MANUAL PAGE (/experiment/:id)
+  ===================================== -->
+  <div id="physix-experiment-detail-page" class="physix-standalone-page hidden" role="main" aria-label="Experiment Details & Physics Laboratory Manual">
+    <!-- Standalone Sticky Navbar -->
+    <header class="standalone-navbar">
+      <div class="standalone-nav-brand" role="button" tabindex="0" title="Return to PhysiX Homepage" data-route="/">
+        <div class="standalone-atom-icon">
+          <svg viewBox="0 0 100 100" fill="none">
+            <ellipse cx="50" cy="50" rx="42" ry="16" stroke="#00f0ff" stroke-width="2.5" transform="rotate(-30 50 50)"/>
+            <ellipse cx="50" cy="50" rx="42" ry="16" stroke="#7928ca" stroke-width="2.5" transform="rotate(30 50 50)"/>
+            <circle cx="50" cy="50" r="7" fill="#00f0ff"/>
+          </svg>
+        </div>
+        <span class="standalone-brand-title">PhysiX</span>
+        <span class="standalone-brand-badge badge-labs">LAB MANUAL</span>
+      </div>
+      <nav class="standalone-nav-links">
+        <button type="button" class="standalone-link-btn" data-route="/experiments">All Experiments</button>
+        <button type="button" class="standalone-btn-back" id="exp-detail-back-btn" data-route="/experiments">
+          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          <span>Back to Experiments</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="standalone-container exp-detail-container">
+      <!-- TOP SECTION -->
+      <section class="exp-detail-header-card">
+        <div class="exp-detail-header-badge" id="exp-detail-category-badge">CLASSICAL MECHANICS</div>
+        <h1 class="exp-detail-title" id="exp-detail-title">Experiment Title</h1>
+        <p class="exp-detail-desc" id="exp-detail-desc">Short one-line description of the experiment.</p>
+        
+        <!-- Prominent Primary Action Button -->
+        <div class="exp-detail-cta-bar">
+          <button type="button" id="btn-start-simulator" class="btn-start-simulator" aria-label="Start Simulator">
+            <span class="btn-play-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            </span>
+            <span class="btn-start-text">Start Simulator</span>
+          </button>
+          <button type="button" class="btn-secondary-back" data-route="/experiments" aria-label="Back to experiments list">
+            <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <span>Back to Experiments</span>
+          </button>
+        </div>
+
+        <!-- Meta Information Strip -->
+        <div class="exp-detail-meta-strip" id="exp-detail-meta-strip">
+          <span class="detail-meta-tag"><strong id="exp-meta-difficulty-lbl">Difficulty:</strong> <span id="exp-meta-difficulty">Intermediate</span></span>
+          <span class="detail-meta-tag"><strong id="exp-meta-duration-lbl">Standard Lab Duration:</strong> <span id="exp-meta-duration">45 Mins</span></span>
+          <span class="detail-meta-tag"><strong id="exp-meta-engine-lbl">Simulation Engine:</strong> <span id="exp-meta-engine">Matter.js 2D Newtonian</span></span>
+        </div>
+      </section>
+
+      <!-- CONTENT SECTIONS (IN EXACT REQUIRED ORDER) -->
+      <div class="exp-manual-body" id="exp-manual-body">
+        <!-- 1. AIM -->
+        <section class="manual-section" id="manual-sec-aim">
+          <div class="manual-sec-header">
+            <span class="sec-number">01</span>
+            <h2>AIM</h2>
+          </div>
+          <div class="manual-sec-content" id="manual-content-aim"></div>
+        </section>
+
+        <!-- 2. THEORY -->
+        <section class="manual-section" id="manual-sec-theory">
+          <div class="manual-sec-header">
+            <span class="sec-number">02</span>
+            <h2>THEORY</h2>
+          </div>
+          <div class="manual-sec-content" id="manual-content-theory"></div>
+        </section>
+
+        <!-- 3. HOW TO PERFORM THE EXPERIMENT -->
+        <section class="manual-section" id="manual-sec-how-to">
+          <div class="manual-sec-header">
+            <span class="sec-number">03</span>
+            <h2>HOW TO PERFORM THE EXPERIMENT</h2>
+          </div>
+          <div class="manual-sec-content" id="manual-content-how-to"></div>
+        </section>
+
+        <!-- 4. PROCEDURE -->
+        <section class="manual-section" id="manual-sec-procedure">
+          <div class="manual-sec-header">
+            <span class="sec-number">04</span>
+            <h2>PROCEDURE</h2>
+          </div>
+          <div class="manual-sec-content" id="manual-content-procedure"></div>
+        </section>
+
+        <!-- 5. FORMULAS / EQUATIONS -->
+        <section class="manual-section" id="manual-sec-formulas">
+          <div class="manual-sec-header">
+            <span class="sec-number">05</span>
+            <h2>FORMULAS / EQUATIONS</h2>
+          </div>
+          <div class="manual-sec-content" id="manual-content-formulas"></div>
+        </section>
+
+        <!-- 6. OBSERVATIONS -->
+        <section class="manual-section" id="manual-sec-observations">
+          <div class="manual-sec-header">
+            <span class="sec-number">06</span>
+            <h2>OBSERVATIONS</h2>
+          </div>
+          <div class="manual-sec-content" id="manual-content-observations"></div>
+        </section>
+
+        <!-- 7. RESULT / CONCLUSION -->
+        <section class="manual-section" id="manual-sec-result">
+          <div class="manual-sec-header">
+            <span class="sec-number">07</span>
+            <h2>RESULT / CONCLUSION</h2>
+          </div>
+          <div class="manual-sec-content" id="manual-content-result"></div>
+        </section>
+      </div>
+
+      <!-- Bottom Launch CTA Bar -->
+      <div class="manual-bottom-cta">
+        <div class="bottom-cta-text">
+          <h3>Ready to start your laboratory session?</h3>
+          <p>Launch the interactive 2D simulation to test the theoretical concepts with real-time physics computing.</p>
+        </div>
+        <div class="bottom-cta-actions">
+          <button type="button" class="btn-start-simulator btn-start-simulator-bottom" aria-label="Start Simulator">
+            <span class="btn-play-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            </span>
+            <span>Start Simulator</span>
+          </button>
+          <button type="button" class="btn-secondary-back" data-route="/experiments">
+            <span>Back to Experiments</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="standalone-page-footer">
+        <div class="footer-nav-group">
+          <button type="button" class="footer-link-btn" data-route="/">PhysiX Home</button>
+          <span class="sep">•</span>
+          <button type="button" class="footer-link-btn" data-route="/experiments">All Experiments</button>
+          <span class="sep">•</span>
+          <button type="button" class="footer-link-btn" data-route="/terms">Terms</button>
+          <span class="sep">•</span>
+          <button type="button" class="footer-link-btn" data-route="/privacy">Privacy</button>
+        </div>
+        <p class="footer-copy">&copy; 2026 PhysiX Interactive 2D Simulator • All rights reserved.</p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- =====================================
        TOP NAVIGATION BAR
   ===================================== -->
   <header class="header">
@@ -1756,68 +2899,121 @@
           </div>
         </div>
 
-        <!-- 4. Force Application System Deck -->
-        <div class="sandbox-card">
-          <div class="sandbox-card-header">
-            <h3>
-              <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="#ff3b69" stroke-width="2">
-                <path d="M5 12h14"></path>
-                <path d="m12 5 7 7-7 7"></path>
-              </svg>
-              Apply Force (Newton's 2nd Law)
-            </h3>
+        <!-- 4. Force Application & Challenges Deck -->
+        <div class="sandbox-card" id="sandbox-forces-deck-card">
+          <div class="sandbox-card-header sandbox-tabbed-header">
+            <div class="sandbox-deck-tabs">
+              <button type="button" id="tab-sandbox-forces" class="sandbox-deck-tab-btn active" title="Apply External Forces & Impulses">
+                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="#ff3b69" stroke-width="2">
+                  <path d="M5 12h14"></path>
+                  <path d="m12 5 7 7-7 7"></path>
+                </svg>
+                <span>Apply Forces</span>
+              </button>
+              <button type="button" id="tab-sandbox-challenges" class="sandbox-deck-tab-btn" title="Newtonian Kinematics Challenges">
+                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                <span>Challenges</span>
+                <span class="sandbox-deck-tab-badge" id="sb-tab-badge-count">0/3</span>
+              </button>
+            </div>
             <strong id="val-force-magnitude" class="sandbox-val-rose">30 N</strong>
           </div>
 
-          <!-- Magnitude Slider -->
-          <div class="sandbox-field-group">
-            <div class="sandbox-field-header">
-              <label for="input-force-magnitude">Force Magnitude (F)</label>
-              <span class="sandbox-text-dim">1N — 150N</span>
+          <!-- PANE 1: APPLY FORCES (Active by default) -->
+          <div id="pane-sandbox-forces" class="sandbox-tab-pane">
+            <!-- Magnitude Slider -->
+            <div class="sandbox-field-group">
+              <div class="sandbox-field-header">
+                <label for="input-force-magnitude">Force Magnitude (F)</label>
+                <span class="sandbox-text-dim">1N — 150N</span>
+              </div>
+              <input type="range" id="input-force-magnitude" min="5" max="150" step="5" value="30" class="sandbox-slider slider-rose" />
             </div>
-            <input type="range" id="input-force-magnitude" min="5" max="150" step="5" value="30" class="sandbox-slider slider-rose" />
-          </div>
 
-          <!-- Directional Control Grid: ←, →, ↑, ↓ -->
-          <div class="sandbox-dpad-container">
-            <div class="sandbox-dpad-grid">
-              <button type="button" id="btn-force-up" class="dpad-btn dpad-up" title="Apply Upward Force (Thrust)">
-                <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                <span>↑</span>
+            <!-- Directional Control Grid: ←, →, ↑, ↓ -->
+            <div class="sandbox-dpad-container">
+              <div class="sandbox-dpad-grid">
+                <button type="button" id="btn-force-up" class="dpad-btn dpad-up" title="Apply Upward Force (Thrust)">
+                  <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                  <span>↑</span>
+                </button>
+                <button type="button" id="btn-force-left" class="dpad-btn dpad-left" title="Apply Leftward Force">
+                  <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                  <span>←</span>
+                </button>
+                <button type="button" id="btn-apply-impulse" class="dpad-center-btn" title="Apply Quick Impulse Kick">
+                  <span>KICK</span>
+                </button>
+                <button type="button" id="btn-force-right" class="dpad-btn dpad-right" title="Apply Rightward Force">
+                  <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  <span>→</span>
+                </button>
+                <button type="button" id="btn-force-down" class="dpad-btn dpad-down" title="Apply Downward Force">
+                  <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  <span>↓</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="sandbox-force-actions">
+              <button type="button" id="btn-clear-forces" class="sandbox-btn-outline" title="Clear all active external forces">
+                Zero Forces
               </button>
-              <button type="button" id="btn-force-left" class="dpad-btn dpad-left" title="Apply Leftward Force">
-                <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                <span>←</span>
-              </button>
-              <button type="button" id="btn-apply-impulse" class="dpad-center-btn" title="Apply Quick Impulse Kick">
-                <span>KICK</span>
-              </button>
-              <button type="button" id="btn-force-right" class="dpad-btn dpad-right" title="Apply Rightward Force">
-                <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                <span>→</span>
-              </button>
-              <button type="button" id="btn-force-down" class="dpad-btn dpad-down" title="Apply Downward Force">
-                <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                <span>↓</span>
-              </button>
+            </div>
+
+            <!-- Educational flow banner: Force -> Acceleration -> Velocity -> Position -->
+            <div class="sandbox-force-flow">
+              <span class="flow-step">F</span>
+              <span class="flow-arrow">→</span>
+              <span class="flow-step">a = F/m</span>
+              <span class="flow-arrow">→</span>
+              <span class="flow-step">v = v + a·dt</span>
+              <span class="flow-arrow">→</span>
+              <span class="flow-step">x, y</span>
             </div>
           </div>
 
-          <div class="sandbox-force-actions">
-            <button type="button" id="btn-clear-forces" class="sandbox-btn-outline" title="Clear all active external forces">
-              Zero Forces
-            </button>
-          </div>
+          <!-- PANE 2: CHALLENGES (Hidden by default) -->
+          <div id="pane-sandbox-challenges" class="sandbox-tab-pane hidden">
+            <div class="sandbox-deck-challenges-list">
+              <!-- Challenge 1 Mini -->
+              <div class="sandbox-mini-challenge-item" id="sb-deck-ch-1">
+                <div class="mini-ch-header">
+                  <span class="mini-ch-title">1. Newton's Thrust</span>
+                  <span class="challenge-reward-pill">+100 XP</span>
+                </div>
+                <p class="mini-ch-desc">Apply continuous force (F ≥ 50N) to accelerate an object to speed |v| ≥ 12.0 m/s.</p>
+                <div class="mini-ch-footer">
+                  <span class="challenge-status-tag pending" id="sb-deck-tag-1">Target: |v| ≥ 12.0 m/s</span>
+                </div>
+              </div>
 
-          <!-- Educational flow banner: Force -> Acceleration -> Velocity -> Position -->
-          <div class="sandbox-force-flow">
-            <span class="flow-step">F</span>
-            <span class="flow-arrow">→</span>
-            <span class="flow-step">a = F/m</span>
-            <span class="flow-arrow">→</span>
-            <span class="flow-step">v = v + a·dt</span>
-            <span class="flow-arrow">→</span>
-            <span class="flow-step">x, y</span>
+              <!-- Challenge 2 Mini -->
+              <div class="sandbox-mini-challenge-item" id="sb-deck-ch-2">
+                <div class="mini-ch-header">
+                  <span class="mini-ch-title">2. Ballistic Kick</span>
+                  <span class="challenge-reward-pill">+125 XP</span>
+                </div>
+                <p class="mini-ch-desc">Deliver a high-force KICK impulse (F ≥ 80N) to impart kinetic energy KE ≥ 100.0 J.</p>
+                <div class="mini-ch-footer">
+                  <span class="challenge-status-tag pending" id="sb-deck-tag-2">Target: KE ≥ 100.0 J</span>
+                </div>
+              </div>
+
+              <!-- Challenge 3 Mini -->
+              <div class="sandbox-mini-challenge-item" id="sb-deck-ch-3">
+                <div class="mini-ch-header">
+                  <span class="mini-ch-title">3. Zero-G Drift</span>
+                  <span class="challenge-reward-pill">+150 XP</span>
+                </div>
+                <p class="mini-ch-desc">Set Zero-G (g = 0) and cruise unhindered at |v| ≥ 5.0 m/s for 3 continuous seconds.</p>
+                <div class="mini-ch-footer">
+                  <span class="challenge-status-tag pending" id="sb-deck-tag-3">0.0s / 3.0s</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1981,6 +3177,98 @@
 
     </div><!-- /.sandbox-dashboard -->
 
+    <!-- =====================================
+         CHALLENGES WORKSTATION
+    ===================================== -->
+    <section class="lab-workstation-container" id="sandbox-workstation-container">
+      
+      <!-- NEWTONIAN MECHANICS MASTERY CHALLENGES BOX -->
+      <div class="workstation-card challenges-card" id="sandbox-challenges-card">
+        <div class="workstation-header">
+          <div class="workstation-title-group">
+            <div class="workstation-icon-glow challenge-icon-glow">
+              <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+            </div>
+            <div>
+              <h3>Newtonian Mechanics Mastery Challenges</h3>
+              <p>Accomplish interactive rigid-body kinematics challenges to earn XP and level up your Student Dossier</p>
+            </div>
+          </div>
+          <div class="challenge-xp-badge">
+            <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span id="sb-challenges-completed-count">0 / 3 Complete</span>
+            <span class="xp-separator">•</span>
+            <span id="sb-user-total-challenge-xp" class="xp-highlight">+0 XP</span>
+          </div>
+        </div>
+
+        <!-- 3 Challenges Grid -->
+        <div class="challenges-grid" id="sandbox-challenges-grid">
+          <!-- Challenge 1: Newton's Thrust -->
+          <div class="challenge-item" id="sb-ch-card-1" data-challenge-id="thrust">
+            <div class="challenge-badge-icon">
+              <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
+            </div>
+            <div class="challenge-info">
+              <div class="challenge-title-row">
+                <h4>1. Newton's Dynamic Thrust</h4>
+                <span class="challenge-reward-pill">+100 XP</span>
+              </div>
+              <p>Configure Force magnitude F ≥ 50 N, apply directional thrust (← or →), and accelerate the object until speed reaches <strong>|v| ≥ 12.0 m/s</strong>.</p>
+              <div class="challenge-footer">
+                <span class="challenge-status-tag pending" id="sb-ch-tag-1">Target: |v| ≥ 12.0 m/s</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Challenge 2: Ballistic Kick -->
+          <div class="challenge-item" id="sb-ch-card-2" data-challenge-id="kick">
+            <div class="challenge-badge-icon">
+              <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+            </div>
+            <div class="challenge-info">
+              <div class="challenge-title-row">
+                <h4>2. High-Impulse Ballistic Kick</h4>
+                <span class="challenge-reward-pill">+125 XP</span>
+              </div>
+              <p>Set Force magnitude F ≥ 80 N and hit <strong>KICK</strong> (0.15s impulse) to instantaneously impart kinetic energy <strong>KE ≥ 100.0 J</strong>.</p>
+              <div class="challenge-footer">
+                <span class="challenge-status-tag pending" id="sb-ch-tag-2">Target: KE ≥ 100.0 J</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Challenge 3: Zero-G Inertial Cruise -->
+          <div class="challenge-item" id="sb-ch-card-3" data-challenge-id="zerog">
+            <div class="challenge-badge-icon">
+              <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+              </svg>
+            </div>
+            <div class="challenge-info">
+              <div class="challenge-title-row">
+                <h4>3. Zero-G Inertial Cruise</h4>
+                <span class="challenge-reward-pill">+150 XP</span>
+              </div>
+              <p>Select the <strong>Zero-G</strong> planet preset (g = 0 m/s²), propel an object to |v| ≥ 5.0 m/s, and let it drift unhindered for 3 continuous seconds.</p>
+              <div class="challenge-footer">
+                <span class="challenge-status-tag pending" id="sb-ch-tag-3">0.0s / 3.0s</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </div><!-- /#exp-sandbox-section -->
 
   <!-- =====================================
@@ -2016,250 +3304,814 @@
       <div class="labs-grid">
         <!-- 1. PROJECTILE (ACTIVE) -->
         <div class="lab-card active-lab" data-category="all" data-name="2D Projectile Motion">
-          <div class="lab-status-badge status-active">● ACTIVE SIMULATION</div>
-          <div class="lab-icon">
-            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path></svg>
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 19l4-4"></path>
+                  <path d="M15 4l5 5L9 20l-5-1 1-5L15 4z"></path>
+                  <circle cx="17.5" cy="6.5" r="1.5"></circle>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
           </div>
-          <h3>2D Projectile Motion Lab</h3>
-          <p>Explore launch angle, initial velocity, platform height $h_0$, and planetary gravity with Matter.js.</p>
-          <div class="lab-tags">
-            <span>Kinematics</span>
-            <span>Vectors</span>
-            <span>Target Challenge</span>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <line x1="30" y1="90" x2="250" y2="90" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1.2"></line>
+              <line x1="30" y1="20" x2="30" y2="90" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1.2"></line>
+              <line x1="85" y1="88" x2="85" y2="92" stroke="rgba(148, 163, 184, 0.3)"></line>
+              <line x1="140" y1="88" x2="140" y2="92" stroke="rgba(148, 163, 184, 0.3)"></line>
+              <line x1="195" y1="88" x2="195" y2="92" stroke="rgba(148, 163, 184, 0.3)"></line>
+              <line x1="30" y1="55" x2="250" y2="55" stroke="rgba(255,255,255,0.04)" stroke-dasharray="2,3"></line>
+              <path d="M 45 90 Q 135 15 225 90" fill="none" stroke="#f43f5e" stroke-width="2.2" filter="drop-shadow(0 0 6px rgba(244, 63, 94, 0.6))"></path>
+              <circle cx="45" cy="90" r="3.5" fill="#38bdf8" filter="drop-shadow(0 0 5px #38bdf8)"></circle>
+              <circle cx="225" cy="90" r="3.5" fill="#f43f5e" filter="drop-shadow(0 0 5px #f43f5e)"></circle>
+              <text x="50" y="103" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8">0.0m</text>
+              <text x="135" y="103" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="middle">50.0m</text>
+              <text x="225" y="103" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="end">100.0m</text>
+            </svg>
           </div>
-          <button class="lab-card-btn btn-active-lab">Launch Exp 1</button>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Projectile</span>
+              <span class="title-main">Motion</span>
+            </h3>
+            <p class="card-desc">Analyze the 2D trajectory of a launched object in the presence of variable gravitational scenario</p>
+          </div>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Perform 2D Projectile Motion experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
         </div>
 
-        <!-- PHYSICS SANDBOX (ACTIVE PLAYGROUND) -->
+        <!-- 2. PHYSICS SANDBOX (ACTIVE) -->
         <div class="lab-card active-lab" data-category="all" data-exp-target="sandbox" data-name="Physics Sandbox Playground">
-          <div class="lab-status-badge status-active" style="background:rgba(0,240,255,0.18); border-color:#00f0ff; color:#7dd3fc;">● ACTIVE PLAYGROUND</div>
-          <div class="lab-icon">
-            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#00f0ff" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="3"></rect>
-              <circle cx="8.5" cy="8.5" r="2" fill="#00f0ff"></circle>
-              <path d="m21 15-5-5L5 21"></path>
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #00f0ff; filter: drop-shadow(0 0 5px #00f0ff);"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+                  <circle cx="8.5" cy="8.5" r="2" fill="#00f0ff"></circle>
+                  <path d="m21 15-5-5L5 21"></path>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <rect x="25" y="15" width="230" height="80" rx="8" fill="rgba(3, 7, 18, 0.4)" stroke="rgba(0, 240, 255, 0.15)"></rect>
+              <circle cx="70" cy="55" r="14" fill="rgba(0, 240, 255, 0.2)" stroke="#00f0ff" stroke-width="2" filter="drop-shadow(0 0 6px #00f0ff)"></circle>
+              <path d="M 70 55 L 110 40" stroke="#00f0ff" stroke-width="2"></path>
+              <polygon points="110,37 118,40 111,45" fill="#00f0ff"></polygon>
+              <rect x="155" y="45" width="28" height="28" rx="4" fill="rgba(168, 85, 247, 0.2)" stroke="#a855f7" stroke-width="2"></rect>
+              <circle cx="140" cy="55" r="8" fill="none" stroke="rgba(255, 255, 255, 0.5)" stroke-dasharray="2,2"></circle>
+              <circle cx="215" cy="65" r="10" fill="rgba(244, 63, 94, 0.2)" stroke="#f43f5e" stroke-width="2"></circle>
+              <text x="140" y="90" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="middle">Matter.js Newtonian 2D</text>
             </svg>
           </div>
-          <h3>Exp 4: Physics Sandbox</h3>
-          <p>Interactive 2D playground: spawn balls, crates, and static walls, apply live force vectors, adjust gravity, and analyze real-time graphs.</p>
-          <div class="lab-tags">
-            <span>Newtonian Mechanics</span>
-            <span>Force Vectors</span>
-            <span>Real-time Graphs</span>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Physics</span>
+              <span class="title-main">Sandbox</span>
+            </h3>
+            <p class="card-desc">Interactive 2D playground: spawn balls, crates, static walls, apply live force vectors, and test collision kinematics</p>
           </div>
-          <button class="lab-card-btn btn-active-lab" style="background:linear-gradient(135deg, #00f0ff, #38bdf8); color:#030712; font-weight:800;">Launch Sandbox</button>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Launch Physics Sandbox">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
         </div>
 
-        <!-- 2. OPTICAL FIBRE NA (ACTIVE LAB - EXP 1 IN LIST) -->
+        <!-- 3. OPTICAL FIBRE NA (ACTIVE) -->
         <div class="lab-card active-lab" data-category="optics" data-exp-target="optical" data-name="Determination of Numerical Aperture of an Optical Fibre">
-          <div class="lab-status-badge status-active">● ACTIVE SIMULATION</div>
-          <div class="lab-icon">
-            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <circle cx="12" cy="12" r="6"></circle>
-              <circle cx="12" cy="12" r="2"></circle>
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #38bdf8; filter: drop-shadow(0 0 5px #38bdf8);"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <circle cx="12" cy="12" r="6"></circle>
+                  <circle cx="12" cy="12" r="2"></circle>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <rect x="20" y="38" width="130" height="34" rx="4" fill="rgba(56, 189, 248, 0.08)" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1"></rect>
+              <line x1="20" y1="55" x2="150" y2="55" stroke="rgba(56, 189, 248, 0.4)" stroke-dasharray="3,3"></line>
+              <polyline points="20,62 55,42 95,68 135,42 150,55" fill="none" stroke="#f43f5e" stroke-width="2" filter="drop-shadow(0 0 5px #f43f5e)"></polyline>
+              <polygon points="150,55 240,25 240,85" fill="rgba(244, 63, 94, 0.12)" stroke="rgba(244, 63, 94, 0.35)" stroke-dasharray="2,2"></polygon>
+              <line x1="240" y1="15" x2="240" y2="95" stroke="#38bdf8" stroke-width="2"></line>
+              <ellipse cx="240" cy="55" rx="4" ry="24" fill="#f43f5e" filter="drop-shadow(0 0 8px #f43f5e)"></ellipse>
+              <text x="248" y="58" fill="#cbd5e1" font-family="monospace" font-size="8">Spot W</text>
+              <text x="195" y="98" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8">Screen L</text>
             </svg>
           </div>
-          <h3>1. Determination of Numerical Aperture of an Optical Fibre</h3>
-          <p>Measure laser light spot divergence W at screen distance L, verify acceptance angle, and compute Mean NA.</p>
-          <div class="lab-tags">
-            <span>Optics</span>
-            <span>Laser Divergence</span>
-            <span>NA = W/√(4L²+W²)</span>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Optical</span>
+              <span class="title-main">Fibre NA</span>
+            </h3>
+            <p class="card-desc">Measure laser spot divergence W at screen distance L, compute acceptance angle, and determine mean Numerical Aperture</p>
           </div>
-          <button class="lab-card-btn btn-active-lab">Launch Exp 2</button>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Perform Optical Fibre experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
         </div>
 
-        <!-- 3. DIVERGENCE OF LASER BEAM (EXP 2) -->
-        <div class="lab-card coming-lab" data-category="optics" data-name="Determine the Divergence of Laser Beam">
-          <div class="lab-status-badge status-coming">● COMING SOON</div>
-          <div class="lab-icon">
-            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2"><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="22" y2="12"></line><line x1="12" y1="22" x2="22" y2="12"></line></svg>
-          </div>
-          <h3>2. Determine the Divergence of Laser Beam</h3>
-          <p>Determine the divergence angle $\theta$ and propagation characteristics of a Gaussian laser beam.</p>
-          <div class="lab-tags">
-            <span>Laser Optics</span>
-            <span>Gaussian Beam</span>
-            <span>θ = λ/(π w₀)</span>
-          </div>
-          <button class="lab-card-btn btn-preview">Preview & Formulas</button>
-        </div>
-
-        <!-- 4. NEWTON'S RINGS (EXP 3) -->
-        <div class="lab-card coming-lab" data-category="wave" data-name="Determination of Radius of Curvature of a Lens using Newton’s Ring Setup">
-          <div class="lab-status-badge status-coming">● COMING SOON</div>
-          <div class="lab-icon">
-            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="7"></circle><circle cx="12" cy="12" r="4"></circle><circle cx="12" cy="12" r="1.5"></circle></svg>
-          </div>
-          <h3>3. Radius of Curvature of Lens (Newton's Rings)</h3>
-          <p>Interference pattern produced by thin air film between plano-convex lens and optical flat.</p>
-          <div class="lab-tags">
-            <span>Interference</span>
-            <span>Plano-Convex Lens</span>
-            <span>R = (Dₘ²-Dₙ²)/(4(m-n)λ)</span>
-          </div>
-          <button class="lab-card-btn btn-preview">Preview & Formulas</button>
-        </div>
-
-        <!-- 5. WEDGE SHAPED FILM (EXP 4) -->
-        <div class="lab-card coming-lab" data-category="wave" data-name="Determination of Diameter of Wire/Hair or Thickness of Paper using Wedge Shape Film Method">
-          <div class="lab-status-badge status-coming">● COMING SOON</div>
-          <div class="lab-icon">
-            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><polygon points="3 20 21 20 21 8 3 20"></polygon></svg>
-          </div>
-          <h3>4. Diameter of Wire / Thickness (Wedge Film)</h3>
-          <p>Determine microscopic wire thickness and paper gauge by observing straight, equispaced interference fringes.</p>
-          <div class="lab-tags">
-            <span>Air Wedge</span>
-            <span>Fringe Width β</span>
-            <span>t = λ L / (2 β)</span>
-          </div>
-          <button class="lab-card-btn btn-preview">Preview & Formulas</button>
-        </div>
-
-        <!-- 6. HALL EFFECT (EXP 5) -->
-        <div class="lab-card coming-lab" data-category="quantum" data-name="Determination of Hall Coefficient using Hall Effect Phenomenon">
-          <div class="lab-status-badge status-coming">● COMING SOON</div>
-          <div class="lab-icon">
-            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="2"></rect><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="1" y1="12" x2="4" y2="12"></line><line x1="20" y1="12" x2="23" y2="12"></line></svg>
-          </div>
-          <h3>5. Determination of Hall Coefficient (Hall Effect)</h3>
-          <p>Measure transverse Hall voltage under magnetic field to calculate charge carrier density and mobility.</p>
-          <div class="lab-tags">
-            <span>Solid State</span>
-            <span>Lorentz Force</span>
-            <span>R_H = V_H t / (I B)</span>
-          </div>
-          <button class="lab-card-btn btn-preview">Preview & Formulas</button>
-        </div>
-
-        <!-- 7. DIFFRACTION GRATING (EXP 6) -->
-        <div class="lab-card coming-lab" data-category="wave" data-name="Determination of Wavelength using Diffraction Grating (Laser Source)">
-          <div class="lab-status-badge status-coming">● COMING SOON</div>
-          <div class="lab-icon">
-            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><line x1="4" y1="4" x2="4" y2="20"></line><line x1="8" y1="4" x2="8" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line><line x1="16" y1="4" x2="16" y2="20"></line><line x1="20" y1="4" x2="20" y2="20"></line></svg>
-          </div>
-          <h3>6. Wavelength using Diffraction Grating (Laser)</h3>
-          <p>Determine monochromatic laser wavelength using transmission grating and angular spectral maxima.</p>
-          <div class="lab-tags">
-            <span>Diffraction</span>
-            <span>Laser Spectrometry</span>
-            <span>(a+b) sinθ = m λ</span>
-          </div>
-          <button class="lab-card-btn btn-preview">Preview & Formulas</button>
-        </div>
-
-        <!-- 8. PLANCK'S CONSTANT (EXP 7) -->
-        <div class="lab-card coming-lab" data-category="quantum" data-name="Determination of Planck’s Constant using Photocell">
-          <div class="lab-status-badge status-coming">● COMING SOON</div>
-          <div class="lab-icon">
-            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path><circle cx="12" cy="12" r="3" fill="#fbbf24"></circle></svg>
-          </div>
-          <h3>7. Determination of Planck's Constant (Photocell)</h3>
-          <p>Investigate photoelectric effect and determine Planck's constant $h$ via frequency-stopping potential curves.</p>
-          <div class="lab-tags">
-            <span>Quantum Physics</span>
-            <span>Stopping Potential</span>
-            <span>h = e (ΔV / Δν)</span>
-          </div>
-          <button class="lab-card-btn btn-preview">Preview & Formulas</button>
-        </div>
-
-        <!-- 9. UDM PARAMETERS (EXP 8) -->
-        <div class="lab-card coming-lab" data-category="sensors" data-name="Determine UDM Parameters">
-          <div class="lab-status-badge status-coming">● COMING SOON</div>
-          <div class="lab-icon">
-            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2"><path d="M2 12h2a8 8 0 0 1 8 8v2"></path><path d="M2 6h2a14 14 0 0 1 14 14v2"></path><circle cx="4" cy="20" r="2"></circle></svg>
-          </div>
-          <h3>8. Determine UDM Parameters</h3>
-          <p>Ultrasonic Distance Measurement (UDM) transducer time-of-flight acoustic wave propagation analysis.</p>
-          <div class="lab-tags">
-            <span>Ultrasonics</span>
-            <span>Acoustic Sensor</span>
-            <span>d = v × t / 2</span>
-          </div>
-          <button class="lab-card-btn btn-preview">Preview & Formulas</button>
-        </div>
-
-        <!-- 10. COLOUR SENSOR (ACTIVE LAB - EXP 3) -->
+        <!-- 4. COLOUR SENSOR (ACTIVE) -->
         <div class="lab-card active-lab" data-category="sensors" data-exp-target="colour-sensor" data-name="Study of Colour Sensor">
-          <div class="lab-status-badge status-active">● ACTIVE SIMULATION</div>
-          <div class="lab-icon">
-            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 1 10 10" stroke="#f43f5e" stroke-width="3"></path><path d="M22 12a10 10 0 0 1-10 10" stroke="#10b981" stroke-width="3"></path><path d="M12 22a10 10 0 0 1-10-10" stroke="#3b82f6" stroke-width="3"></path></svg>
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #ec4899; filter: drop-shadow(0 0 5px #ec4899);"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M12 2a10 10 0 0 1 10 10" stroke="#f43f5e" stroke-width="2"></path>
+                  <path d="M22 12a10 10 0 0 1-10 10" stroke="#10b981" stroke-width="2"></path>
+                  <path d="M12 22a10 10 0 0 1-10-10" stroke="#3b82f6" stroke-width="2"></path>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
           </div>
-          <h3>9. Study of Colour Sensor</h3>
-          <p>Examine RGB spectral photodiode responses, colorimetry filters, and chromatic frequency output with TCS3200.</p>
-          <div class="lab-tags">
-            <span>Optoelectronics</span>
-            <span>RGB Sensor</span>
-            <span>f_out ∝ I_ph</span>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <rect x="35" y="25" width="60" height="60" rx="8" fill="rgba(15, 23, 42, 0.8)" stroke="rgba(255, 255, 255, 0.15)"></rect>
+              <circle cx="50" cy="40" r="5" fill="#f43f5e"></circle>
+              <circle cx="65" cy="40" r="5" fill="#10b981"></circle>
+              <circle cx="80" cy="40" r="5" fill="#3b82f6"></circle>
+              <circle cx="50" cy="55" r="5" fill="#3b82f6"></circle>
+              <circle cx="65" cy="55" r="5" fill="#ffffff"></circle>
+              <circle cx="80" cy="55" r="5" fill="#f43f5e"></circle>
+              <circle cx="50" cy="70" r="5" fill="#10b981"></circle>
+              <circle cx="65" cy="70" r="5" fill="#f43f5e"></circle>
+              <circle cx="80" cy="70" r="5" fill="#3b82f6"></circle>
+              <path d="M110 55 L145 55" stroke="rgba(148, 163, 184, 0.4)" stroke-width="1.5" stroke-dasharray="3,3"></path>
+              <polygon points="145,52 152,55 145,58" fill="rgba(148, 163, 184, 0.6)"></polygon>
+              <polyline points="160,55 175,55 175,35 190,35 190,75 205,75 205,35 220,35 220,75 235,75 235,55 255,55" fill="none" stroke="#a855f7" stroke-width="2" filter="drop-shadow(0 0 5px #a855f7)"></polyline>
+              <text x="207" y="93" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="middle">f_out ∝ I_ph</text>
+            </svg>
           </div>
-          <button class="lab-card-btn btn-active-lab">Launch Exp 3</button>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Colour</span>
+              <span class="title-main">Sensor TCS3200</span>
+            </h3>
+            <p class="card-desc">Examine photodiode array spectral response, configure hardware frequency scaling, and analyze RGB wavelengths</p>
+          </div>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Perform Colour Sensor experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
         </div>
 
-        <!-- 11. NANOTECHNOLOGY SIMULATION (EXP 10) -->
+        <!-- 5. DIVERGENCE OF LASER BEAM (EXP 2) -->
+        <div class="lab-card coming-lab" data-category="optics" data-name="Determine the Divergence of Laser Beam">
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #f43f5e; stroke-dashoffset: 70;"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <line x1="12" y1="2" x2="22" y2="12"></line>
+                  <line x1="12" y1="22" x2="22" y2="12"></line>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <line x1="20" y1="55" x2="260" y2="55" stroke="rgba(255,255,255,0.1)" stroke-dasharray="2,3"></line>
+              <path d="M 30 52 Q 140 50 250 20" fill="none" stroke="#f43f5e" stroke-width="2" filter="drop-shadow(0 0 6px #f43f5e)"></path>
+              <path d="M 30 58 Q 140 60 250 90" fill="none" stroke="#f43f5e" stroke-width="2" filter="drop-shadow(0 0 6px #f43f5e)"></path>
+              <ellipse cx="250" cy="55" rx="5" ry="35" fill="none" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="2,2"></ellipse>
+              <text x="140" y="80" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="middle">θ = λ / (π·w₀)</text>
+            </svg>
+          </div>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Laser</span>
+              <span class="title-main">Divergence</span>
+            </h3>
+            <p class="card-desc">Determine divergence half-angle θ and Gaussian beam propagation characteristics across propagation distance</p>
+          </div>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Perform Laser Divergence experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
+        </div>
+
+        <!-- 6. NEWTON'S RINGS (EXP 3) -->
+        <div class="lab-card coming-lab" data-category="wave" data-name="Determination of Radius of Curvature of a Lens using Newton’s Ring Setup">
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #06b6d4; stroke-dashoffset: 65;"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <circle cx="12" cy="12" r="7"></circle>
+                  <circle cx="12" cy="12" r="4"></circle>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <circle cx="140" cy="55" r="44" fill="none" stroke="rgba(6, 182, 212, 0.25)" stroke-width="2.5"></circle>
+              <circle cx="140" cy="55" r="34" fill="none" stroke="rgba(6, 182, 212, 0.45)" stroke-width="2"></circle>
+              <circle cx="140" cy="55" r="24" fill="none" stroke="rgba(6, 182, 212, 0.65)" stroke-width="2"></circle>
+              <circle cx="140" cy="55" r="14" fill="none" stroke="#06b6d4" stroke-width="2.5" filter="drop-shadow(0 0 5px #06b6d4)"></circle>
+              <circle cx="140" cy="55" r="4" fill="#06b6d4"></circle>
+              <text x="140" y="104" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="middle">R = (D_m² - D_n²) / 4(m-n)λ</text>
+            </svg>
+          </div>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Newton's</span>
+              <span class="title-main">Rings</span>
+            </h3>
+            <p class="card-desc">Interference fringes produced by a thin air film between a plano-convex lens and optical flat</p>
+          </div>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Perform Newton's Rings experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
+        </div>
+
+        <!-- 7. WEDGE SHAPED FILM (EXP 4) -->
+        <div class="lab-card coming-lab" data-category="wave" data-name="Determination of Diameter of Wire/Hair or Thickness of Paper using Wedge Shape Film Method">
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #3b82f6; stroke-dashoffset: 75;"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="3 20 21 20 21 8 3 20"></polygon>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <line x1="30" y1="80" x2="250" y2="80" stroke="#3b82f6" stroke-width="2"></line>
+              <line x1="30" y1="80" x2="250" y2="35" stroke="#38bdf8" stroke-width="2"></line>
+              <circle cx="245" cy="57" r="12" fill="none" stroke="#f43f5e" stroke-width="2"></circle>
+              <line x1="70" y1="72" x2="70" y2="80" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"></line>
+              <line x1="110" y1="63" x2="110" y2="80" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"></line>
+              <line x1="150" y1="54" x2="150" y2="80" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"></line>
+              <line x1="190" y1="46" x2="190" y2="80" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"></line>
+              <text x="140" y="98" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="middle">t = λ·L / (2β)</text>
+            </svg>
+          </div>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Wedge</span>
+              <span class="title-main">Shaped Film</span>
+            </h3>
+            <p class="card-desc">Determine microscopic wire diameter and thin sheet gauge via straight, equispaced interference fringes</p>
+          </div>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Perform Wedge Film experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
+        </div>
+
+        <!-- 8. HALL EFFECT (EXP 5) -->
+        <div class="lab-card coming-lab" data-category="quantum" data-name="Determination of Hall Coefficient using Hall Effect Phenomenon">
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #8b5cf6; stroke-dashoffset: 70;"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="4" y="6" width="16" height="12" rx="2"></rect>
+                  <line x1="12" y1="2" x2="12" y2="6"></line>
+                  <line x1="12" y1="18" x2="12" y2="22"></line>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <polygon points="60,40 180,25 220,55 100,70" fill="rgba(139, 92, 246, 0.2)" stroke="#8b5cf6" stroke-width="1.8"></polygon>
+              <line x1="140" y1="85" x2="140" y2="20" stroke="#00f0ff" stroke-width="2"></line>
+              <polygon points="137,22 140,15 143,22" fill="#00f0ff"></polygon>
+              <text x="146" y="24" fill="#00f0ff" font-family="monospace" font-size="8">B</text>
+              <text x="140" y="100" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="middle">R_H = V_H·t / (I·B)</text>
+            </svg>
+          </div>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Hall</span>
+              <span class="title-main">Effect</span>
+            </h3>
+            <p class="card-desc">Measure transverse Hall voltage under perpendicular magnetic field to evaluate charge carrier density and mobility</p>
+          </div>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Perform Hall Effect experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
+        </div>
+
+        <!-- 9. DIFFRACTION GRATING (EXP 6) -->
+        <div class="lab-card coming-lab" data-category="wave" data-name="Determination of Wavelength using Diffraction Grating (Laser Source)">
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #10b981; stroke-dashoffset: 60;"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="4" y1="4" x2="4" y2="20"></line>
+                  <line x1="8" y1="4" x2="8" y2="20"></line>
+                  <line x1="12" y1="4" x2="12" y2="20"></line>
+                  <line x1="16" y1="4" x2="16" y2="20"></line>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <line x1="90" y1="20" x2="90" y2="90" stroke="rgba(255,255,255,0.4)" stroke-width="3"></line>
+              <line x1="20" y1="55" x2="90" y2="55" stroke="#f43f5e" stroke-width="2"></line>
+              <line x1="90" y1="55" x2="250" y2="55" stroke="#f43f5e" stroke-width="1.8"></line>
+              <line x1="90" y1="55" x2="250" y2="25" stroke="#f43f5e" stroke-width="1.8"></line>
+              <line x1="90" y1="55" x2="250" y2="85" stroke="#f43f5e" stroke-width="1.8"></line>
+              <circle cx="250" cy="55" r="4" fill="#f43f5e" filter="drop-shadow(0 0 6px #f43f5e)"></circle>
+              <circle cx="250" cy="25" r="3.5" fill="#f43f5e" filter="drop-shadow(0 0 5px #f43f5e)"></circle>
+              <circle cx="250" cy="85" r="3.5" fill="#f43f5e" filter="drop-shadow(0 0 5px #f43f5e)"></circle>
+              <text x="170" y="102" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8">(a+b) sinθ = mλ</text>
+            </svg>
+          </div>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Diffraction</span>
+              <span class="title-main">Grating</span>
+            </h3>
+            <p class="card-desc">Calculate monochromatic laser wavelength from diffraction grating line density and angular spectral maxima</p>
+          </div>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Perform Diffraction Grating experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
+        </div>
+
+        <!-- 10. PLANCK'S CONSTANT (EXP 7) -->
+        <div class="lab-card coming-lab" data-category="quantum" data-name="Determination of Planck’s Constant using Photocell">
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #f59e0b; stroke-dashoffset: 65;"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <path d="M12 7v5l3 3"></path>
+                  <circle cx="12" cy="12" r="3" fill="#fbbf24"></circle>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <line x1="40" y1="85" x2="240" y2="85" stroke="rgba(255,255,255,0.2)" stroke-width="1.2"></line>
+              <line x1="40" y1="20" x2="40" y2="85" stroke="rgba(255,255,255,0.2)" stroke-width="1.2"></line>
+              <line x1="70" y1="85" x2="220" y2="30" stroke="#f59e0b" stroke-width="2.2" filter="drop-shadow(0 0 6px #f59e0b)"></line>
+              <circle cx="70" cy="85" r="3" fill="#f59e0b"></circle>
+              <circle cx="120" cy="67" r="3" fill="#f59e0b"></circle>
+              <circle cx="170" cy="49" r="3" fill="#f59e0b"></circle>
+              <circle cx="220" cy="30" r="3" fill="#f59e0b"></circle>
+              <text x="140" y="100" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="middle">h = e · (ΔV / Δν)</text>
+            </svg>
+          </div>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Planck's</span>
+              <span class="title-main">Constant</span>
+            </h3>
+            <p class="card-desc">Investigate photoelectric emission stopping potentials across light frequencies to deduce Planck's constant h</p>
+          </div>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Perform Planck's Constant experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
+        </div>
+
+        <!-- 11. UDM PARAMETERS (EXP 8) -->
+        <div class="lab-card coming-lab" data-category="sensors" data-name="Determine UDM Parameters">
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #ec4899; stroke-dashoffset: 75;"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M2 12h2a8 8 0 0 1 8 8v2"></path>
+                  <path d="M2 6h2a14 14 0 0 1 14 14v2"></path>
+                  <circle cx="4" cy="20" r="2"></circle>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <rect x="40" y="35" width="30" height="40" rx="4" fill="rgba(236, 72, 153, 0.2)" stroke="#ec4899" stroke-width="1.5"></rect>
+              <path d="M 80 40 A 20 20 0 0 1 80 70" fill="none" stroke="#ec4899" stroke-width="2" stroke-dasharray="2,2"></path>
+              <path d="M 95 32 A 30 30 0 0 1 95 78" fill="none" stroke="#ec4899" stroke-width="2" stroke-dasharray="2,2"></path>
+              <path d="M 110 24 A 40 40 0 0 1 110 86" fill="none" stroke="#ec4899" stroke-width="2" stroke-dasharray="2,2"></path>
+              <line x1="210" y1="20" x2="210" y2="90" stroke="#38bdf8" stroke-width="3"></line>
+              <text x="145" y="100" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="middle">d = v × t / 2</text>
+            </svg>
+          </div>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Ultrasonic</span>
+              <span class="title-main">Sensor (UDM)</span>
+            </h3>
+            <p class="card-desc">Analyze acoustic transducer time-of-flight wave propagation and pulse distance calibration</p>
+          </div>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Perform Ultrasonic Sensor experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
+        </div>
+
+        <!-- 12. NANOTECHNOLOGY SIMULATION (EXP 10) -->
         <div class="lab-card coming-lab" data-category="sensors" data-name="Simulation Experiments based on Nanotechnology using Open-Source Simulation">
-          <div class="lab-status-badge status-coming">● COMING SOON</div>
-          <div class="lab-icon">
-            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><circle cx="6" cy="6" r="2"></circle><circle cx="18" cy="6" r="2"></circle><circle cx="6" cy="18" r="2"></circle><circle cx="18" cy="18" r="2"></circle><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg>
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #06b6d4; stroke-dashoffset: 80;"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <circle cx="6" cy="6" r="2"></circle>
+                  <circle cx="18" cy="6" r="2"></circle>
+                  <circle cx="6" cy="18" r="2"></circle>
+                  <circle cx="18" cy="18" r="2"></circle>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
           </div>
-          <h3>10. Nanotechnology Simulation Experiments</h3>
-          <p>Quantum dots, density of states, electron confinement, and nanoscale molecular surface interactions.</p>
-          <div class="lab-tags">
-            <span>Nanotechnology</span>
-            <span>Quantum Dots</span>
-            <span>Confinement</span>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <polygon points="140,25 200,55 140,85 80,55" fill="none" stroke="rgba(6, 182, 212, 0.4)" stroke-width="1.5"></polygon>
+              <circle cx="140" cy="55" r="10" fill="rgba(6, 182, 212, 0.3)" stroke="#06b6d4" stroke-width="2" filter="drop-shadow(0 0 8px #06b6d4)"></circle>
+              <circle cx="140" cy="55" r="3" fill="#ffffff"></circle>
+              <text x="140" y="100" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="middle">Quantum Confinement E_n ∝ 1/L²</text>
+            </svg>
           </div>
-          <button class="lab-card-btn btn-preview">Preview & Formulas</button>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Nanotech</span>
+              <span class="title-main">Simulation</span>
+            </h3>
+            <p class="card-desc">Simulate electron quantum confinement, density of states, and nanoscale semiconductor bandgaps</p>
+          </div>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Perform Nanotech experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
         </div>
 
-        <!-- 12. OPTICAL ATTENUATION (EXP 11) -->
+        <!-- 13. OPTICAL ATTENUATION (EXP 11) -->
         <div class="lab-card coming-lab" data-category="optics" data-name="Measuring Optical Power Attenuation in Plastic Optical Fiber">
-          <div class="lab-status-badge status-coming">● COMING SOON</div>
-          <div class="lab-icon">
-            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #eab308; stroke-dashoffset: 70;"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
           </div>
-          <h3>11. Optical Power Attenuation in Plastic Optical Fiber</h3>
-          <p>Measure dB/km power attenuation, cut-back losses, Rayleigh scattering, and absorption in POF.</p>
-          <div class="lab-tags">
-            <span>Fiber Attenuation</span>
-            <span>Loss in dB/km</span>
-            <span>α = (10/L) log(P₁/P₂)</span>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <line x1="30" y1="85" x2="250" y2="85" stroke="rgba(255,255,255,0.2)" stroke-width="1.2"></line>
+              <line x1="30" y1="20" x2="30" y2="85" stroke="rgba(255,255,255,0.2)" stroke-width="1.2"></line>
+              <path d="M 40 30 Q 110 65 240 80" fill="none" stroke="#eab308" stroke-width="2.2" filter="drop-shadow(0 0 6px #eab308)"></path>
+              <text x="140" y="100" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="middle">α = (10/L) · log(P₁ / P₂)</text>
+            </svg>
           </div>
-          <button class="lab-card-btn btn-preview">Preview & Formulas</button>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Fiber</span>
+              <span class="title-main">Attenuation</span>
+            </h3>
+            <p class="card-desc">Evaluate transmission loss in dB/km, Rayleigh scattering, and absorption across plastic optical fibre</p>
+          </div>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Perform Optical Attenuation experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
         </div>
 
-        <!-- 13. I-V CHARACTERISTICS (EXP 12) -->
+        <!-- 14. I-V CHARACTERISTICS (EXP 12) -->
         <div class="lab-card coming-lab" data-category="quantum" data-name="I-V Characteristics of PN Junction Diode / Zener Diode / Photo Diode">
-          <div class="lab-status-badge status-coming">● COMING SOON</div>
-          <div class="lab-icon">
-            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><polygon points="6 4 18 12 6 20 6 4"></polygon><line x1="18" y1="4" x2="18" y2="20"></line></svg>
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #6366f1; stroke-dashoffset: 65;"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="6 4 18 12 6 20 6 4"></polygon>
+                  <line x1="18" y1="4" x2="18" y2="20"></line>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
           </div>
-          <h3>12. I-V Characteristics of PN / Zener / Photo Diode</h3>
-          <p>Forward barrier knee potential, reverse breakdown threshold, dark current, and photovoltaic response.</p>
-          <div class="lab-tags">
-            <span>Semiconductors</span>
-            <span>Zener Breakdown</span>
-            <span>Photodiode</span>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <line x1="20" y1="55" x2="260" y2="55" stroke="rgba(255,255,255,0.2)" stroke-width="1.2"></line>
+              <line x1="140" y1="15" x2="140" y2="95" stroke="rgba(255,255,255,0.2)" stroke-width="1.2"></line>
+              <!-- Diode knee curve -->
+              <path d="M 40 65 L 140 55 Q 180 55 210 20" fill="none" stroke="#6366f1" stroke-width="2.2" filter="drop-shadow(0 0 6px #6366f1)"></path>
+              <text x="140" y="104" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="middle">I = I_0 · (e^(qV/ηkT) - 1)</text>
+            </svg>
           </div>
-          <button class="lab-card-btn btn-preview">Preview & Formulas</button>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Diode</span>
+              <span class="title-main">I-V Curve</span>
+            </h3>
+            <p class="card-desc">Analyze forward knee potential, reverse Zener breakdown, dark current, and photovoltaic response</p>
+          </div>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Perform Diode I-V experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
         </div>
 
-        <!-- 14. RTD / OPTICAL SENSORS (EXP 13) -->
+        <!-- 15. RTD / OPTICAL SENSORS (EXP 13) -->
         <div class="lab-card coming-lab" data-category="sensors" data-name="Study of the Characteristics of Resistance Temperature Detector (RTD) / Optical Sensors">
-          <div class="lab-status-badge status-coming">● COMING SOON</div>
-          <div class="lab-icon">
-            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path></svg>
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #14b8a6; stroke-dashoffset: 70;"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
           </div>
-          <h3>13. Characteristics of RTD / Optical Sensors</h3>
-          <p>Study temperature coefficient of resistance ($\alpha$) of Pt100 RTD sensor and optoelectronic detectors.</p>
-          <div class="lab-tags">
-            <span>Sensors & RTD</span>
-            <span>Pt100 Thermoresistor</span>
-            <span>R_T = R_0(1 + αT)</span>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <line x1="30" y1="85" x2="250" y2="85" stroke="rgba(255,255,255,0.2)" stroke-width="1.2"></line>
+              <line x1="30" y1="20" x2="30" y2="85" stroke="rgba(255,255,255,0.2)" stroke-width="1.2"></line>
+              <line x1="40" y1="70" x2="230" y2="25" stroke="#14b8a6" stroke-width="2.2" filter="drop-shadow(0 0 6px #14b8a6)"></line>
+              <circle cx="80" cy="60" r="3" fill="#14b8a6"></circle>
+              <circle cx="135" cy="47" r="3" fill="#14b8a6"></circle>
+              <circle cx="190" cy="34" r="3" fill="#14b8a6"></circle>
+              <text x="140" y="100" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="middle">R_T = R_0 · (1 + αT)</text>
+            </svg>
           </div>
-          <button class="lab-card-btn btn-preview">Preview & Formulas</button>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">RTD</span>
+              <span class="title-main">Sensors</span>
+            </h3>
+            <p class="card-desc">Study temperature coefficient of resistance α of Pt100 RTD sensor and optoelectronic detectors</p>
+          </div>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Perform RTD Sensors experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
         </div>
 
       </div>
@@ -2972,6 +4824,7 @@
 
         <div class="quiz-progress-track">
           <div id="quiz-progress-bar" class="quiz-progress-fill" style="width: 10%;"></div>
+          <span id="quiz-progress-percent" class="quiz-progress-percent">10%</span>
         </div>
 
         <div class="quiz-question-container">
@@ -4273,6 +6126,61 @@
           <span>KEEP THE FIRE BURNING 🔥</span>
           <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================
+       LEGAL MODAL (TERMS & PRIVACY POLICY)
+  ===================================== -->
+  <div id="legal-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="legal-modal-title">
+    <div class="modal-card legal-modal-card">
+      <div class="modal-header">
+        <div>
+          <h2 id="legal-modal-title">
+            <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#38bdf8;">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <span id="legal-modal-heading">Legal Documentation</span>
+          </h2>
+          <p id="legal-modal-subheading">PhysiX Scientific Simulation Platform</p>
+        </div>
+        <button id="btn-close-legal" class="modal-close-btn" title="Close Legal Window">
+          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="legal-tab-bar">
+        <button type="button" id="btn-legal-tab-terms" class="legal-tab-btn active">Terms of Service</button>
+        <button type="button" id="btn-legal-tab-privacy" class="legal-tab-btn">Privacy Policy</button>
+      </div>
+
+      <div id="legal-terms-content" class="legal-content-body">
+        <h3>1. Acceptance of Terms</h3>
+        <p>By accessing and utilizing PhysiX ("the Platform"), you agree to abide by these Terms of Service. PhysiX provides high-precision interactive 2D physics simulations, numerical evaluation tools, and educational laboratory environments.</p>
+        
+        <h3>2. Academic & Educational Use</h3>
+        <p>All laboratory simulations, mathematical models, formulas, and telemetry data provided within PhysiX are engineered for STEM educational purposes, physics research, and interactive pedagogical demonstration.</p>
+        
+        <h3>3. Platform Availability & Simulation Accuracy</h3>
+        <p>While PhysiX implements high-precision Newtonian and relativistic numerical approximations (via Matter.js and custom kinematic solvers), calculations are subject to digital floating-point limits and discrete numerical integration time-steps (dt).</p>
+        
+        <h3>4. Student Accounts & Authentication</h3>
+        <p>Access to personal XP progress, mastery badges, and experiment histories requires account authentication via Firebase. Users agree not to misuse access tokens or compromise laboratory infrastructure.</p>
+      </div>
+
+      <div id="legal-privacy-content" class="legal-content-body hidden">
+        <h3>1. Information We Collect</h3>
+        <p>PhysiX collects minimal telemetry essential to provide student laboratory tracking, XP progression, and badge verification. When you create an account, your verified email, display name, and avatar preference are securely registered in Google Firebase.</p>
+        
+        <h3>2. Simulation Telemetry & Storage</h3>
+        <p>Laboratory data (such as projectile launch angles, numerical aperture measurements, and colour sensor readings) is recorded in Firestore solely to generate your laboratory reports and track milestone achievements.</p>
+        
+        <h3>3. Zero Advertising & No Data Selling</h3>
+        <p>PhysiX does not serve commercial advertisements, utilize tracking cookies for marketing, or sell user telemetry to third parties.</p>
+        
+        <h3>4. Local Data & Offline Play</h3>
+        <p>Guest users maintain laboratory records exclusively in local browser storage (localStorage), which can be erased at any time via browser settings.</p>
       </div>
     </div>
   </div>

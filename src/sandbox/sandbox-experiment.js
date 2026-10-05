@@ -8,7 +8,7 @@ import { PhysicsWorld, PhysicsObject } from "./physics-engine.js";
 import { SandboxGraphs } from "./sandbox-graphs.js";
 
 export function createPhysicsSandboxExperiment(callbacks = {}) {
-  const { showToast, onXpAwarded } = callbacks;
+  const { showToast, onXpAwarded, unlockBadge, isUserAuthenticated, openLoginModal, onChallengeCompleted } = callbacks;
 
   // Sandbox State
   const state = {
@@ -22,7 +22,29 @@ export function createPhysicsSandboxExperiment(callbacks = {}) {
     gravityValue: 9.81,
     scale: 48, // pixels per meter
     worldWidthMeters: 20.0,
-    worldHeightMeters: 11.66
+    worldHeightMeters: 11.66,
+    activeDeckTab: "forces", // "forces" | "challenges"
+    challenges: {
+      thrust: {
+        id: "sb-ch-thrust",
+        title: "Newton's Dynamic Thrust",
+        xp: 100,
+        completed: false
+      },
+      kick: {
+        id: "sb-ch-kick",
+        title: "High-Impulse Ballistic Kick",
+        xp: 125,
+        completed: false
+      },
+      zerog: {
+        id: "sb-ch-zerog",
+        title: "Zero-G Inertial Cruise",
+        xp: 150,
+        completed: false,
+        timerSec: 0
+      }
+    }
   };
 
   // Instantiate Core Physics World
@@ -63,6 +85,11 @@ export function createPhysicsSandboxExperiment(callbacks = {}) {
     setupGravityControls();
     setupPresetControls();
     setupGraphTabControls();
+    setupDeckTabControls();
+
+    // Load gamified challenges state
+    loadChallengesFromStorage();
+    renderChallengesDom();
 
     // Resize handling
     window.addEventListener("resize", handleResize, { passive: true });
@@ -359,6 +386,9 @@ export function createPhysicsSandboxExperiment(callbacks = {}) {
       // Step physics world
       world.step(dt);
 
+      // Evaluate gamified challenges
+      checkSandboxChallenges(dt);
+
       // Record sample in real-time telemetry graph
       if (graphs && state.selectedObjectId) {
         const selObj = world.getObject(state.selectedObjectId);
@@ -595,8 +625,10 @@ export function createPhysicsSandboxExperiment(callbacks = {}) {
       else if (state.continuousForceDir === "down") fy = -mag;
       else fx = mag; // Default rightwards
 
+      obj._lastKickMag = mag;
       obj.applyImpulse(fx * pulseDuration, fy * pulseDuration);
       if (showToast) showToast(`Impulse ${(mag * pulseDuration).toFixed(1)} N·s applied!`);
+      evaluateKickChallenge(obj, mag);
       renderCanvas();
       updateUI();
     });
@@ -1422,6 +1454,365 @@ export function createPhysicsSandboxExperiment(callbacks = {}) {
     }
   }
 
+  // ==========================================
+  // SANDBOX DECK TABS (APPLY FORCES | CHALLENGES)
+  // ==========================================
+  function setupDeckTabControls() {
+    const tabForces = document.getElementById("tab-sandbox-forces");
+    const tabChallenges = document.getElementById("tab-sandbox-challenges");
+    const paneForces = document.getElementById("pane-sandbox-forces");
+    const paneChallenges = document.getElementById("pane-sandbox-challenges");
+
+    function switchDeckTab(target) {
+      state.activeDeckTab = target;
+      if (target === "forces") {
+        tabForces?.classList.add("active");
+        tabChallenges?.classList.remove("active");
+        paneForces?.classList.remove("hidden");
+        paneChallenges?.classList.add("hidden");
+      } else {
+        tabChallenges?.classList.add("active");
+        tabForces?.classList.remove("active");
+        paneChallenges?.classList.remove("hidden");
+        paneForces?.classList.add("hidden");
+        renderChallengesDom();
+      }
+    }
+
+    tabForces?.addEventListener("click", () => switchDeckTab("forces"));
+    tabChallenges?.addEventListener("click", () => switchDeckTab("challenges"));
+
+    // Intercept clicks on mini deck challenges if locked
+    paneChallenges?.addEventListener("click", (e) => {
+      const isAuth = typeof isUserAuthenticated === "function" ? isUserAuthenticated() : true;
+      if (!isAuth && typeof openLoginModal === "function") {
+        openLoginModal("Please sign in to unlock laboratory challenges and earn student XP!");
+      }
+    });
+  }
+
+  // ==========================================
+  // GAMIFIED CHALLENGES SYSTEM
+  // ==========================================
+  function saveChallengesToStorage() {
+    try {
+      localStorage.setItem("physix_sb_challenges", JSON.stringify(state.challenges));
+    } catch (e) {
+      console.warn("Could not save Sandbox challenges to storage", e);
+    }
+  }
+
+  function loadChallengesFromStorage() {
+    try {
+      const saved = localStorage.getItem("physix_sb_challenges");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.thrust) state.challenges.thrust.completed = !!parsed.thrust.completed;
+        if (parsed.kick) state.challenges.kick.completed = !!parsed.kick.completed;
+        if (parsed.zerog) state.challenges.zerog.completed = !!parsed.zerog.completed;
+      }
+    } catch (e) {
+      console.warn("Could not load Sandbox challenges from storage", e);
+    }
+  }
+
+  function evaluateKickChallenge(obj, mag) {
+    if (state.challenges.kick.completed) return;
+    const isAuth = typeof isUserAuthenticated === "function" ? isUserAuthenticated() : true;
+    if (!isAuth) return;
+
+    const ke = obj.getKineticEnergy();
+    if (mag >= 80 && ke >= 100.0) {
+      state.challenges.kick.completed = true;
+      saveChallengesToStorage();
+      renderChallengesDom();
+      if (onChallengeCompleted) {
+        onChallengeCompleted({
+          challengeId: "sandbox.kick",
+          xp: state.challenges.kick.xp,
+          badgeId: "badge-sb-kick",
+          badgeTitle: "Momentum Master (High-Impulse Kick)",
+          title: "Physics Sandbox: High-Impulse Ballistic Kick"
+        });
+      } else {
+        if (onXpAwarded) onXpAwarded(state.challenges.kick.xp, "Physics Sandbox: High-Impulse Ballistic Kick");
+        if (unlockBadge) unlockBadge("badge-sb-kick", "Momentum Master (High-Impulse Kick)");
+        if (showToast) showToast(`Challenge Accomplished: Ballistic Kick (KE ≥ 100 J) +${state.challenges.kick.xp} XP!`);
+      }
+    }
+  }
+
+  function checkSandboxChallenges(dt) {
+    const isAuth = typeof isUserAuthenticated === "function" ? isUserAuthenticated() : true;
+    if (!isAuth) return;
+
+    let updated = false;
+    const selObj = state.selectedObjectId ? world.getObject(state.selectedObjectId) : null;
+
+    // Challenge 1: Dynamic Thrust (continuous force F >= 50 N accelerating object to |v| >= 12.0 m/s)
+    if (!state.challenges.thrust.completed && selObj && !selObj.isStatic) {
+      const speed = selObj.getSpeed();
+      const isThrustActive = state.continuousForceDir !== null && state.appliedForceMagnitude >= 50;
+      if (isThrustActive && speed >= 12.0) {
+        state.challenges.thrust.completed = true;
+        updated = true;
+        if (onChallengeCompleted) {
+          onChallengeCompleted({
+            challengeId: "sandbox.thrust",
+            xp: state.challenges.thrust.xp,
+            badgeId: "badge-sb-thrust",
+            badgeTitle: "Newtonian Dynamicist (Thrust Acceleration)",
+            title: "Physics Sandbox: Newton's Dynamic Thrust"
+          });
+        } else {
+          if (onXpAwarded) onXpAwarded(state.challenges.thrust.xp, "Physics Sandbox: Newton's Dynamic Thrust");
+          if (unlockBadge) unlockBadge("badge-sb-thrust", "Newtonian Dynamicist (Thrust Acceleration)");
+          if (showToast) showToast(`Challenge Accomplished: Newton's Thrust (|v| ≥ 12 m/s) +${state.challenges.thrust.xp} XP!`);
+        }
+      }
+    }
+
+    // Challenge 2: Ballistic Kick (Kick impulse with F >= 80 N imparting KE >= 100.0 J)
+    if (!state.challenges.kick.completed && selObj && !selObj.isStatic) {
+      const ke = selObj.getKineticEnergy();
+      if (selObj._lastKickMag >= 80 && ke >= 100.0) {
+        state.challenges.kick.completed = true;
+        updated = true;
+        if (onChallengeCompleted) {
+          onChallengeCompleted({
+            challengeId: "sandbox.kick",
+            xp: state.challenges.kick.xp,
+            badgeId: "badge-sb-kick",
+            badgeTitle: "Momentum Master (High-Impulse Kick)",
+            title: "Physics Sandbox: High-Impulse Ballistic Kick"
+          });
+        } else {
+          if (onXpAwarded) onXpAwarded(state.challenges.kick.xp, "Physics Sandbox: High-Impulse Ballistic Kick");
+          if (unlockBadge) unlockBadge("badge-sb-kick", "Momentum Master (High-Impulse Kick)");
+          if (showToast) showToast(`Challenge Accomplished: Ballistic Kick (KE ≥ 100 J) +${state.challenges.kick.xp} XP!`);
+        }
+      }
+    }
+
+    // Challenge 3: Zero-G Inertial Cruise (g <= 0.05, object speed >= 5.0 m/s maintained for >= 3.0 seconds)
+    if (!state.challenges.zerog.completed) {
+      const isZeroG = world.gravity <= 0.05;
+      const cruisingObj = world.objects.find(o => !o.isStatic && o.getSpeed() >= 5.0);
+      if (isZeroG && cruisingObj) {
+        state.challenges.zerog.timerSec = (state.challenges.zerog.timerSec || 0) + dt;
+        if (state.challenges.zerog.timerSec >= 3.0) {
+          state.challenges.zerog.completed = true;
+          updated = true;
+          if (onChallengeCompleted) {
+            onChallengeCompleted({
+              challengeId: "sandbox.zerog",
+              xp: state.challenges.zerog.xp,
+              badgeId: "badge-sb-zerog",
+              badgeTitle: "Gravity Defier (Zero-G Drift)",
+              title: "Physics Sandbox: Zero-G Inertial Cruise"
+            });
+          } else {
+            if (onXpAwarded) onXpAwarded(state.challenges.zerog.xp, "Physics Sandbox: Zero-G Inertial Cruise");
+            if (unlockBadge) unlockBadge("badge-sb-zerog", "Gravity Defier (Zero-G Drift)");
+            if (showToast) showToast(`Challenge Accomplished: Zero-G Inertial Cruise (3s drift) +${state.challenges.zerog.xp} XP!`);
+          }
+        }
+      } else {
+        state.challenges.zerog.timerSec = Math.max(0, (state.challenges.zerog.timerSec || 0) - dt * 0.5);
+      }
+    }
+
+    if (updated) {
+      saveChallengesToStorage();
+      renderChallengesDom();
+    } else {
+      updateChallengeProgressTags();
+    }
+  }
+
+  function hydrateChallenges(completedIds) {
+    if (!Array.isArray(completedIds)) return;
+    const set = new Set(completedIds);
+    let changed = false;
+    if (set.has("sandbox.thrust") && !state.challenges.thrust.completed) {
+      state.challenges.thrust.completed = true;
+      changed = true;
+    }
+    if (set.has("sandbox.kick") && !state.challenges.kick.completed) {
+      state.challenges.kick.completed = true;
+      changed = true;
+    }
+    if (set.has("sandbox.zerog") && !state.challenges.zerog.completed) {
+      state.challenges.zerog.completed = true;
+      changed = true;
+    }
+    if (changed) {
+      saveChallengesToStorage();
+      renderChallengesDom();
+    }
+  }
+
+  function updateChallengeProgressTags() {
+    const ch = state.challenges;
+    const selObj = state.selectedObjectId ? world.getObject(state.selectedObjectId) : null;
+
+    // Challenge 1 tag
+    if (!ch.thrust.completed) {
+      const tagDeck = document.getElementById("sb-deck-tag-1");
+      const tagMain = document.getElementById("sb-ch-tag-1");
+      const speed = (selObj && !selObj.isStatic) ? selObj.getSpeed().toFixed(1) : "0.0";
+      const txt = selObj && !selObj.isStatic && selObj.getSpeed() > 1.0 ? `Current: ${speed} / 12.0 m/s` : "Target: |v| ≥ 12.0 m/s";
+      if (tagDeck) tagDeck.textContent = txt;
+      if (tagMain) tagMain.textContent = txt;
+    }
+
+    // Challenge 2 tag
+    if (!ch.kick.completed) {
+      const tagDeck = document.getElementById("sb-deck-tag-2");
+      const tagMain = document.getElementById("sb-ch-tag-2");
+      const ke = (selObj && !selObj.isStatic) ? selObj.getKineticEnergy().toFixed(1) : "0.0";
+      const txt = selObj && !selObj.isStatic && selObj.getKineticEnergy() > 1.0 ? `Current: ${ke} / 100.0 J` : "Target: KE ≥ 100.0 J";
+      if (tagDeck) tagDeck.textContent = txt;
+      if (tagMain) tagMain.textContent = txt;
+    }
+
+    // Challenge 3 tag
+    if (!ch.zerog.completed) {
+      const tagDeck = document.getElementById("sb-deck-tag-3");
+      const tagMain = document.getElementById("sb-ch-tag-3");
+      const sec = (ch.zerog.timerSec || 0).toFixed(1);
+      const txt = `${sec}s / 3.0s`;
+      if (tagDeck) tagDeck.textContent = txt;
+      if (tagMain) tagMain.textContent = txt;
+    }
+  }
+
+  function renderChallengesDom() {
+    const isAuth = typeof isUserAuthenticated === "function" ? isUserAuthenticated() : true;
+    const challengesCard = document.getElementById("sandbox-challenges-card");
+    const paneDeck = document.getElementById("pane-sandbox-challenges");
+
+    if (!isAuth) {
+      challengesCard?.classList.add("challenges-locked");
+      paneDeck?.classList.add("challenges-locked");
+      const xpBadge = document.getElementById("sb-user-total-challenge-xp");
+      const countBadge = document.getElementById("sb-challenges-completed-count");
+      const tabBadge = document.getElementById("sb-tab-badge-count");
+
+      if (xpBadge) xpBadge.textContent = "+375 XP Available";
+      if (countBadge) countBadge.innerHTML = `<span class="lock-indicator-badge"><svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Sign In Required</span>`;
+      if (tabBadge) tabBadge.textContent = "0/3";
+
+      const tags = [
+        document.getElementById("sb-ch-tag-1"),
+        document.getElementById("sb-ch-tag-2"),
+        document.getElementById("sb-ch-tag-3"),
+        document.getElementById("sb-deck-tag-1"),
+        document.getElementById("sb-deck-tag-2"),
+        document.getElementById("sb-deck-tag-3")
+      ];
+      tags.forEach(t => {
+        if (t) {
+          t.className = "challenge-status-tag locked";
+          t.innerHTML = `<svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Locked`;
+        }
+      });
+      return;
+    }
+
+    challengesCard?.classList.remove("challenges-locked");
+    paneDeck?.classList.remove("challenges-locked");
+    const ch = state.challenges;
+    let doneCount = 0;
+    let totalXp = 0;
+    if (ch.thrust.completed) { doneCount++; totalXp += ch.thrust.xp; }
+    if (ch.kick.completed) { doneCount++; totalXp += ch.kick.xp; }
+    if (ch.zerog.completed) { doneCount++; totalXp += ch.zerog.xp; }
+
+    const xpBadge = document.getElementById("sb-user-total-challenge-xp");
+    const countBadge = document.getElementById("sb-challenges-completed-count");
+    const tabBadge = document.getElementById("sb-tab-badge-count");
+
+    if (countBadge) countBadge.textContent = `${doneCount} / 3 Complete`;
+    if (xpBadge) xpBadge.textContent = `+${totalXp} XP`;
+    if (tabBadge) tabBadge.textContent = `${doneCount}/3`;
+
+    // Challenge 1
+    const card1 = document.getElementById("sb-ch-card-1");
+    const deckCard1 = document.getElementById("sb-deck-ch-1");
+    const tag1 = document.getElementById("sb-ch-tag-1");
+    const deckTag1 = document.getElementById("sb-deck-tag-1");
+    if (ch.thrust.completed) {
+      card1?.classList.add("completed");
+      deckCard1?.classList.add("completed");
+      [tag1, deckTag1].forEach(t => {
+        if (t) {
+          t.className = "challenge-status-tag completed";
+          t.innerHTML = `<svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> Complete (+${ch.thrust.xp} XP)`;
+        }
+      });
+    } else {
+      card1?.classList.remove("completed");
+      deckCard1?.classList.remove("completed");
+      [tag1, deckTag1].forEach(t => {
+        if (t) {
+          t.className = "challenge-status-tag pending";
+          t.textContent = "Target: |v| ≥ 12.0 m/s";
+        }
+      });
+    }
+
+    // Challenge 2
+    const card2 = document.getElementById("sb-ch-card-2");
+    const deckCard2 = document.getElementById("sb-deck-ch-2");
+    const tag2 = document.getElementById("sb-ch-tag-2");
+    const deckTag2 = document.getElementById("sb-deck-tag-2");
+    if (ch.kick.completed) {
+      card2?.classList.add("completed");
+      deckCard2?.classList.add("completed");
+      [tag2, deckTag2].forEach(t => {
+        if (t) {
+          t.className = "challenge-status-tag completed";
+          t.innerHTML = `<svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> Complete (+${ch.kick.xp} XP)`;
+        }
+      });
+    } else {
+      card2?.classList.remove("completed");
+      deckCard2?.classList.remove("completed");
+      [tag2, deckTag2].forEach(t => {
+        if (t) {
+          t.className = "challenge-status-tag pending";
+          t.textContent = "Target: KE ≥ 100.0 J";
+        }
+      });
+    }
+
+    // Challenge 3
+    const card3 = document.getElementById("sb-ch-card-3");
+    const deckCard3 = document.getElementById("sb-deck-ch-3");
+    const tag3 = document.getElementById("sb-ch-tag-3");
+    const deckTag3 = document.getElementById("sb-deck-tag-3");
+    if (ch.zerog.completed) {
+      card3?.classList.add("completed");
+      deckCard3?.classList.add("completed");
+      [tag3, deckTag3].forEach(t => {
+        if (t) {
+          t.className = "challenge-status-tag completed";
+          t.innerHTML = `<svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> Complete (+${ch.zerog.xp} XP)`;
+        }
+      });
+    } else {
+      card3?.classList.remove("completed");
+      deckCard3?.classList.remove("completed");
+      [tag3, deckTag3].forEach(t => {
+        if (t) {
+          t.className = "challenge-status-tag pending";
+          t.textContent = `${(ch.zerog.timerSec || 0).toFixed(1)}s / 3.0s`;
+        }
+      });
+    }
+  }
+
   /**
    * Cleanup
    */
@@ -1436,7 +1827,10 @@ export function createPhysicsSandboxExperiment(callbacks = {}) {
       handleResize();
       renderCanvas();
       updateUI();
+      renderChallengesDom();
     },
+    renderChallengesDom,
+    hydrateChallenges,
     destroy
   };
 }

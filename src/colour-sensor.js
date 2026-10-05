@@ -11,7 +11,7 @@ import { api } from "./api.js";
 import { generateLabReportPdf } from "./pdf-export.js";
 
 export function createColourSensorExperiment(callbacks = {}) {
-  const { onXpAwarded, onExperimentRecorded, showToast, getActiveUserId, loadUserProfile, getStoredUserProfile, unlockBadge, isUserAuthenticated, openLoginModal } = callbacks;
+  const { onXpAwarded, onExperimentRecorded, showToast, getActiveUserId, loadUserProfile, getStoredUserProfile, unlockBadge, isUserAuthenticated, openLoginModal, onChallengeCompleted } = callbacks;
 
   // Preset Calibrated Swatches
   const PRESET_SWATCHES = {
@@ -1426,13 +1426,24 @@ export function createColourSensorExperiment(callbacks = {}) {
 
       if (count === 4) {
         state.challenges.primaryCalib.completed = true;
+        saveChallengesToStorage();
         if (tag1) {
           tag1.className = "challenge-status-tag completed";
           tag1.textContent = "COMPLETED (+100 XP)";
         }
-        if (onXpAwarded) onXpAwarded(100, "Colour Sensor: Primary Triplet Calibration Complete");
-        if (unlockBadge) unlockBadge("badge-cs-tristimulus", "Tristimulus Virtuoso (Primary RGB Calibration)");
-        if (showToast) showToast("Challenge 1 Completed! +100 XP awarded");
+        if (onChallengeCompleted) {
+          onChallengeCompleted({
+            challengeId: "colour-sensor.primaryCalib",
+            xp: 100,
+            badgeId: "badge-cs-tristimulus",
+            badgeTitle: "Tristimulus Virtuoso (Primary RGB Calibration)",
+            title: "Colour Sensor: Primary Triplet Calibration Complete"
+          });
+        } else {
+          if (onXpAwarded) onXpAwarded(100, "Colour Sensor: Primary Triplet Calibration Complete");
+          if (unlockBadge) unlockBadge("badge-cs-tristimulus", "Tristimulus Virtuoso (Primary RGB Calibration)");
+          if (showToast) showToast("Challenge 1 Completed! +100 XP awarded");
+        }
         updateChallengeCounters();
       }
     }
@@ -1451,6 +1462,7 @@ export function createColourSensorExperiment(callbacks = {}) {
     if (selectedGuessId === state.mysteryId) {
       state.challenges.mysteryDetective.completed = true;
       state.challenges.mysteryDetective.solved = true;
+      saveChallengesToStorage();
 
       const tag2 = document.getElementById("cs-ch-tag-2");
       if (tag2) {
@@ -1458,9 +1470,19 @@ export function createColourSensorExperiment(callbacks = {}) {
         tag2.textContent = "SOLVED (+125 XP)";
       }
 
-      if (onXpAwarded) onXpAwarded(125, "Colour Sensor: Mystery Pigment Identified");
-      if (unlockBadge) unlockBadge("badge-cs-mystery-detective", "Spectroscopic Detective (Mystery Compound Unmasked)");
-      if (showToast) showToast(`Correct! Solved ${MYSTERY_SPECIMENS[state.mysteryId].chemicalName} (+125 XP)`);
+      if (onChallengeCompleted) {
+        onChallengeCompleted({
+          challengeId: "colour-sensor.mysteryDetective",
+          xp: 125,
+          badgeId: "badge-cs-mystery-detective",
+          badgeTitle: "Spectroscopic Detective (Mystery Compound Unmasked)",
+          title: "Colour Sensor: Mystery Pigment Identified"
+        });
+      } else {
+        if (onXpAwarded) onXpAwarded(125, "Colour Sensor: Mystery Pigment Identified");
+        if (unlockBadge) unlockBadge("badge-cs-mystery-detective", "Spectroscopic Detective (Mystery Compound Unmasked)");
+        if (showToast) showToast(`Correct! Solved ${MYSTERY_SPECIMENS[state.mysteryId].chemicalName} (+125 XP)`);
+      }
       updateChallengeCounters();
     } else {
       if (showToast) showToast("Incorrect spectral match! Compare R, G, B peak frequencies.");
@@ -1486,13 +1508,74 @@ export function createColourSensorExperiment(callbacks = {}) {
 
     if (completedZones === 3) {
       state.challenges.distanceSweep.completed = true;
+      saveChallengesToStorage();
       if (tag3) {
         tag3.className = "challenge-status-tag completed";
         tag3.textContent = "COMPLETED (+150 XP)";
       }
-      if (onXpAwarded) onXpAwarded(150, "Colour Sensor: Inverse-Square Distance Sweep Verified");
-      if (unlockBadge) unlockBadge("badge-cs-inverse-sweep", "Optoelectronic Photometrist (Distance Attenuation Sweep)");
-      if (showToast) showToast("Challenge 3 Completed! +150 XP awarded");
+      if (onChallengeCompleted) {
+        onChallengeCompleted({
+          challengeId: "colour-sensor.distanceSweep",
+          xp: 150,
+          badgeId: "badge-cs-inverse-sweep",
+          badgeTitle: "Optoelectronic Photometrist (Distance Attenuation Sweep)",
+          title: "Colour Sensor: Inverse-Square Distance Sweep Verified"
+        });
+      } else {
+        if (onXpAwarded) onXpAwarded(150, "Colour Sensor: Inverse-Square Distance Sweep Verified");
+        if (unlockBadge) unlockBadge("badge-cs-inverse-sweep", "Optoelectronic Photometrist (Distance Attenuation Sweep)");
+        if (showToast) showToast("Challenge 3 Completed! +150 XP awarded");
+      }
+      updateChallengeCounters();
+    }
+  }
+
+  function saveChallengesToStorage() {
+    try {
+      localStorage.setItem("physix_cs_challenges", JSON.stringify(state.challenges));
+    } catch (e) {}
+  }
+
+  function loadChallengesFromStorage() {
+    try {
+      const saved = localStorage.getItem("physix_cs_challenges");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.primaryCalib) {
+          state.challenges.primaryCalib.completed = !!parsed.primaryCalib.completed;
+          if (parsed.primaryCalib.calibratedSteps) state.challenges.primaryCalib.calibratedSteps = parsed.primaryCalib.calibratedSteps;
+        }
+        if (parsed.mysteryDetective) {
+          state.challenges.mysteryDetective.completed = !!parsed.mysteryDetective.completed;
+          state.challenges.mysteryDetective.solved = !!parsed.mysteryDetective.solved;
+        }
+        if (parsed.distanceSweep) {
+          state.challenges.distanceSweep.completed = !!parsed.distanceSweep.completed;
+          if (parsed.distanceSweep.zones) state.challenges.distanceSweep.zones = parsed.distanceSweep.zones;
+        }
+      }
+    } catch (e) {}
+  }
+
+  function hydrateChallenges(completedIds) {
+    if (!Array.isArray(completedIds)) return;
+    const set = new Set(completedIds);
+    let changed = false;
+    if (set.has("colour-sensor.primaryCalib") && !state.challenges.primaryCalib.completed) {
+      state.challenges.primaryCalib.completed = true;
+      changed = true;
+    }
+    if (set.has("colour-sensor.mysteryDetective") && !state.challenges.mysteryDetective.completed) {
+      state.challenges.mysteryDetective.completed = true;
+      state.challenges.mysteryDetective.solved = true;
+      changed = true;
+    }
+    if (set.has("colour-sensor.distanceSweep") && !state.challenges.distanceSweep.completed) {
+      state.challenges.distanceSweep.completed = true;
+      changed = true;
+    }
+    if (changed) {
+      saveChallengesToStorage();
       updateChallengeCounters();
     }
   }
@@ -1871,6 +1954,7 @@ export function createColourSensorExperiment(callbacks = {}) {
       oscCanvas = document.getElementById("cs-osc-canvas");
       if (oscCanvas) oscCtx = oscCanvas.getContext("2d");
 
+      loadChallengesFromStorage();
       bindEvents();
       updateDomHud();
       renderObservationsTable();
@@ -1888,6 +1972,7 @@ export function createColourSensorExperiment(callbacks = {}) {
     },
 
     updateChallengeCounters,
+    hydrateChallenges,
 
     getState() {
       return {

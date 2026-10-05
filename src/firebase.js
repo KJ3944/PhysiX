@@ -27,7 +27,9 @@ import {
   limit,
   serverTimestamp,
   increment,
-  arrayUnion
+  arrayUnion,
+  onSnapshot,
+  runTransaction
 } from "firebase/firestore";
 
 // Firebase Configuration from User Project
@@ -82,6 +84,8 @@ export {
   serverTimestamp,
   increment,
   arrayUnion,
+  onSnapshot,
+  runTransaction,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,

@@ -1,0 +1,1137 @@
+/* ==========================================================================
+   PHYSIX • DEEP-SPACE SCIENTIFIC SCROLLABLE LANDING PAGE STYLES
+   ========================================================================== */
+
+/* State when user is browsing the standalone homepage */
+body.on-homepage {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  min-height: 100vh !important;
+  height: auto !important;
+  padding-bottom: 0 !important;
+  background: #02040a !important;
+  scroll-behavior: smooth;
+}
+
+/* Hide standard lab navigation & simulation dashboards while on homepage */
+body.on-homepage .header,
+body.on-homepage .exp-switch-container,
+body.on-homepage .exp-section-wrapper,
+body.on-homepage .ai-copilot-fab,
+body.on-homepage .ai-copilot-panel,
+body.on-homepage .ai-context-strip {
+  display: none !important;
+}
+
+/* Master Homepage Viewport Container (Fully Scrollable) */
+.physix-home {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  z-index: 85;
+  background: #02040a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  opacity: 1;
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.physix-home.home-transition-out {
+  opacity: 0;
+  transform: scale(1.025);
+  pointer-events: none;
+}
+
+/* Fixed High-Performance Cosmic Canvas (Flows behind entire page) */
+.home-space-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  display: block;
+  pointer-events: none;
+}
+
+/* Fixed Ambient Vignette & Cosmic Atmosphere */
+.home-ambient-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(2, 4, 10, 0) 30%, rgba(2, 4, 10, 0.72) 80%, #02040a 100%),
+    linear-gradient(180deg, rgba(2, 4, 10, 0.3) 0%, transparent 25%, transparent 75%, rgba(2, 4, 10, 0.85) 100%);
+}
+
+/* Fixed Coordinate Reticle Grid */
+.home-coordinate-grid {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.14;
+  background-image:
+    linear-gradient(rgba(56, 189, 248, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.08) 1px, transparent 1px);
+  background-size: 100px 100px;
+  background-position: center center;
+  mask-image: radial-gradient(circle at 50% 50%, black 15%, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, black 15%, transparent 80%);
+}
+
+/* ==========================================================================
+   HERO SECTION (Initial Viewport - 100vh)
+   ========================================================================== */
+.home-hero-viewport {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 24px 20px 32px 20px;
+}
+
+/* Precision Corner Reticles (Only on Hero viewport) */
+.home-reticle-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: rgba(56, 189, 248, 0.32);
+  border-style: solid;
+  pointer-events: none;
+  z-index: 3;
+}
+.home-reticle-tl { top: 24px; left: 28px; border-width: 1.5px 0 0 1.5px; }
+.home-reticle-tr { top: 24px; right: 28px; border-width: 1.5px 1.5px 0 0; }
+.home-reticle-bl { bottom: 24px; left: 28px; border-width: 0 0 1.5px 1.5px; }
+.home-reticle-br { bottom: 24px; right: 28px; border-width: 0 1.5px 1.5px 0; }
+
+/* Status Beacon Badge */
+.home-system-status {
+  position: relative;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgba(8, 14, 30, 0.55);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-family: var(--font-mono, monospace);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: rgba(148, 163, 184, 0.85);
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.8s ease 0.15s, transform 0.8s ease 0.15s;
+}
+
+.home-system-status .status-beacon {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00f0ff;
+  box-shadow: 0 0 8px #00f0ff;
+  animation: beaconPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes beaconPulse {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.85); }
+}
+
+/* Central Hero Group */
+.home-hero {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 20px;
+  margin: auto 0;
+  max-width: 900px;
+  width: 100%;
+}
+
+.home-title-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.96) translateY(10px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.3s,
+              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+}
+
+/* Master Title Typography */
+.home-title {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-space, 'Orbitron', 'Space Grotesk', 'Outfit', sans-serif);
+  font-size: clamp(3.6rem, 8.5vw, 6.5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+/* Individual Deformable Letterform */
+.home-letter {
+  display: inline-block;
+  position: relative;
+  will-change: transform, filter;
+  transform-origin: center center;
+  background: linear-gradient(
+    var(--sheen-angle, 135deg),
+    #ffffff 0%,
+    #ffffff 35%,
+    #a5f3fc 48%,
+    #ffffff 58%,
+    #e2e8f0 80%,
+    #94a3b8 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 22px rgba(56, 189, 248, 0.28))
+          drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+  pointer-events: auto;
+  user-select: none;
+}
+
+/* Signature 'X' with luminous quantum gradient */
+.home-letter.home-title-x,
+.home-title-x {
+  font-weight: 900;
+  background: linear-gradient(135deg, #00f0ff 0%, #38bdf8 45%, #a855f7 90%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 16px rgba(0, 240, 255, 0.75))
+          drop-shadow(0 0 35px rgba(168, 85, 247, 0.5));
+}
+
+/* Subtitle */
+.home-subtitle {
+  margin: 16px 0 0 0;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: clamp(0.85rem, 1.9vw, 1.12rem);
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.5s,
+              transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.5s,
+              color 0.3s ease;
+}
+
+.home-subtitle:hover {
+  color: #e2e8f0;
+}
+
+/* Primary Action Button: Explore Simulations */
+.home-action-container {
+  margin-top: 42px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.7s,
+              transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.7s;
+}
+
+.btn-explore-simulations {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 15px 36px;
+  border-radius: 999px;
+  background: rgba(8, 14, 28, 0.75);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(56, 189, 248, 0.38);
+  color: #f8fafc;
+  font-family: var(--font-sans, 'Space Grotesk', 'Outfit', sans-serif);
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  outline: none;
+  overflow: hidden;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.6),
+    0 0 15px rgba(56, 189, 248, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15),
+    inset 0 0 12px rgba(8, 14, 30, 0.6);
+  transition:
+    transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.btn-explore-simulations::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 240, 255, 0.35) 40%,
+    rgba(168, 85, 247, 0.35) 70%,
+    transparent 100%
+  );
+  opacity: 0;
+  filter: blur(4px);
+  z-index: -1;
+  transition: opacity 0.3s ease;
+}
+
+.btn-explore-simulations .btn-reticle-icon {
+  width: 16px;
+  height: 16px;
+  color: #00f0ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
+}
+
+.btn-explore-simulations .btn-reticle-icon svg {
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+}
+
+.btn-explore-simulations .btn-label {
+  position: relative;
+  z-index: 2;
+}
+
+.btn-explore-simulations:hover {
+  transform: translateY(-2px) scale(1.02);
+  border-color: rgba(0, 240, 255, 0.75);
+  background: rgba(12, 22, 44, 0.85);
+  color: #ffffff;
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.7),
+    0 0 25px rgba(0, 240, 255, 0.38),
+    0 0 50px rgba(168, 85, 247, 0.22),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3),
+    inset 0 0 16px rgba(0, 240, 255, 0.15);
+}
+
+.btn-explore-simulations:hover::before {
+  opacity: 1;
+}
+
+.btn-explore-simulations:hover .btn-reticle-icon {
+  transform: rotate(90deg) scale(1.15);
+  color: #ffffff;
+}
+
+/* Subtle Hero Scroll Indicator */
+.home-scroll-hint {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono, monospace);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  color: rgba(148, 163, 184, 0.55);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.9s,
+              transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.9s,
+              color 0.2s ease;
+}
+
+.home-scroll-hint:hover {
+  color: #38bdf8;
+}
+
+.home-scroll-hint .scroll-mouse-icon {
+  width: 16px;
+  height: 24px;
+  border: 1.5px solid rgba(148, 163, 184, 0.4);
+  border-radius: 10px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.home-scroll-hint .scroll-mouse-icon::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  width: 2.5px;
+  height: 5px;
+  background: #38bdf8;
+  border-radius: 2px;
+  animation: scrollWheel 1.8s ease-in-out infinite;
+}
+
+@keyframes scrollWheel {
+  0% { transform: translateY(0); opacity: 1; }
+  60% { transform: translateY(8px); opacity: 0; }
+  61% { transform: translateY(0); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Warp Pulse Ring */
+.home-warp-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #00f0ff;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: none;
+  opacity: 1;
+  animation: warpPulseOut 0.55s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes warpPulseOut {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    border-width: 3px;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(40);
+    border-width: 1px;
+    border-color: #a855f7;
+  }
+}
+
+/* ==========================================================================
+   SCROLLABLE SECTIONS COMMON STYLING
+   ========================================================================== */
+.home-section {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1180px;
+  padding: 100px 28px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Scroll reveal initial states */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Section Header Tags & Typography */
+.section-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #38bdf8;
+  margin-bottom: 20px;
+}
+
+.section-tag .tag-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 6px #38bdf8;
+}
+
+.section-heading {
+  margin: 0;
+  font-family: var(--font-space, 'Orbitron', 'Space Grotesk', sans-serif);
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  color: #f8fafc;
+}
+
+.section-lead {
+  max-width: 780px;
+  margin: 18px 0 0 0;
+  font-family: var(--font-sans, sans-serif);
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  font-weight: 500;
+  line-height: 1.65;
+  color: #cbd5e1;
+}
+
+.section-lead strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   SECTION 1: WHAT IS PHYSIX?
+   ========================================================================== */
+.about-interactive-viewport {
+  margin-top: 54px;
+  width: 100%;
+  max-width: 920px;
+  background: rgba(8, 14, 28, 0.65);
+  border: 1px solid rgba(56, 189, 248, 0.24);
+  border-radius: 18px;
+  padding: 36px 40px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 35px rgba(56, 189, 248, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.about-diagram-canvas-wrap {
+  width: 100%;
+  height: 220px;
+  position: relative;
+  border-radius: 12px;
+  background: rgba(3, 7, 18, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.about-diagram-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.about-features-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  text-align: left;
+}
+
+.about-feature-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 16px;
+  background: rgba(15, 23, 42, 0.45);
+  border-left: 2px solid #38bdf8;
+  border-radius: 0 8px 8px 0;
+}
+
+.about-feature-item .feat-label {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #38bdf8;
+  text-transform: uppercase;
+}
+
+.about-feature-item .feat-text {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ==========================================================================
+   SECTION 2: LEARN BY INTERACTING (Supported Experiments)
+   ========================================================================== */
+.concepts-grid {
+  margin-top: 54px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.concept-card {
+  position: relative;
+  background: rgba(10, 16, 32, 0.65);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 16px;
+  padding: 30px;
+  text-align: left;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  overflow: hidden;
+}
+
+.concept-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(56, 189, 248, 0.15);
+}
+
+.concept-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.concept-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #38bdf8;
+}
+
+.concept-icon-box svg {
+  width: 22px;
+  height: 22px;
+}
+
+.concept-tag {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #a855f7;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+}
+
+.concept-card h3 {
+  margin: 0 0 10px 0;
+  font-family: var(--font-space, sans-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.concept-card p {
+  margin: 0 0 18px 0;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  color: #94a3b8;
+}
+
+.concept-parameters-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.param-pill {
+  font-family: var(--font-mono, monospace);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 3px 10px;
+  border-radius: 6px;
+}
+
+/* ==========================================================================
+   SECTION 3: HOW IT WORKS (Connected 3-Step Flow)
+   ========================================================================== */
+.workflow-deck {
+  margin-top: 54px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  position: relative;
+}
+
+/* Flow trajectory connector line */
+.workflow-deck::before {
+  content: "";
+  position: absolute;
+  top: 36px;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: linear-gradient(90deg, #38bdf8 0%, #a855f7 50%, #00f0ff 100%);
+  opacity: 0.35;
+  z-index: 1;
+}
+
+.workflow-card {
+  position: relative;
+  z-index: 2;
+  background: rgba(8, 14, 28, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 32px 24px;
+  text-align: left;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.workflow-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 240, 255, 0.4);
+}
+
+.workflow-step-num {
+  display: inline-block;
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: #00f0ff;
+  margin-bottom: 16px;
+}
+
+.workflow-card h3 {
+  margin: 0 0 10px 0;
+  font-family: var(--font-space, sans-serif);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.workflow-card p {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  color: #94a3b8;
+}
+
+/* ==========================================================================
+   SECTION 4: EXPLORE PHYSICS (Call to action / library teaser)
+   ========================================================================== */
+.explore-physics-card {
+  margin-top: 54px;
+  width: 100%;
+  max-width: 980px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(56, 189, 248, 0.12) 0%, rgba(8, 14, 28, 0.8) 75%);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 20px;
+  padding: 56px 44px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.7), 0 0 40px rgba(56, 189, 248, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 24px;
+}
+
+.explore-physics-card h3 {
+  margin: 0;
+  font-family: var(--font-space, sans-serif);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.explore-physics-card p {
+  margin: 0;
+  max-width: 620px;
+  font-family: var(--font-sans);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #cbd5e1;
+}
+
+.explore-btn-wrap {
+  margin-top: 8px;
+}
+
+/* ==========================================================================
+   SECTION 5: WHY PHYSIX? (4 Pillars)
+   ========================================================================== */
+.why-grid {
+  margin-top: 54px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  text-align: left;
+}
+
+.why-card {
+  background: rgba(10, 16, 32, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 24px 20px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.why-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.why-card-kicker {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #38bdf8;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.why-card h4 {
+  margin: 0 0 10px 0;
+  font-family: var(--font-space, sans-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.why-card p {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #94a3b8;
+}
+
+/* ==========================================================================
+   FULL HOMEPAGE FOOTER
+   ========================================================================== */
+.home-footer-full {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1180px;
+  padding: 60px 28px 40px 28px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 40px;
+}
+
+.footer-brand-title {
+  margin: 0;
+  font-family: var(--font-space, sans-serif);
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+}
+
+.footer-brand-subtitle {
+  margin: 0;
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.footer-legal-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.home-footer-link {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: rgba(148, 163, 184, 0.65);
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 6px 10px;
+  cursor: pointer;
+  outline: none;
+  position: relative;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.home-footer-link::after {
+  content: "";
+  position: absolute;
+  bottom: 3px;
+  left: 10px;
+  right: 10px;
+  height: 1px;
+  background: rgba(56, 189, 248, 0.4);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.25s ease;
+}
+
+.home-footer-link:hover {
+  color: #38bdf8;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+.home-footer-link:hover::after {
+  transform: scaleX(1);
+}
+
+.home-footer-divider {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(148, 163, 184, 0.3);
+}
+
+.footer-credit-note {
+  margin: 6px 0 0 0;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  color: rgba(148, 163, 184, 0.45);
+  letter-spacing: 0.08em;
+}
+
+/* ==========================================================================
+   ACTIVATION STATES (MICRO-ANIMATION SEQUENCE)
+   ========================================================================== */
+.physix-home.is-ready .home-system-status,
+.physix-home.is-ready .home-title-container,
+.physix-home.is-ready .home-subtitle,
+.physix-home.is-ready .home-action-container,
+.physix-home.is-ready .home-scroll-hint {
+  opacity: 1;
+  transform: none;
+}
+
+/* ==========================================================================
+   CLEAN SCIENTIFIC LEGAL MODAL (TERMS & PRIVACY)
+   ========================================================================== */
+.legal-modal-card {
+  max-width: 680px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.legal-tab-bar {
+  display: flex;
+  gap: 10px;
+  padding: 0 24px 16px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.legal-tab-btn {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted, #94a3b8);
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.legal-tab-btn:hover {
+  color: #ffffff;
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.legal-tab-btn.active {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: #38bdf8;
+  color: #ffffff;
+}
+
+.legal-content-body {
+  padding: 24px;
+  overflow-y: auto;
+  color: #cbd5e1;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.legal-content-body h3 {
+  color: #ffffff;
+  font-size: 16px;
+  margin-top: 18px;
+  margin-bottom: 8px;
+  font-family: var(--font-sans);
+}
+
+.legal-content-body h3:first-child {
+  margin-top: 0;
+}
+
+.legal-content-body p {
+  margin: 0 0 12px 0;
+  color: #94a3b8;
+}
+
+.legal-content-body ul {
+  margin: 0 0 16px 20px;
+  padding: 0;
+  color: #94a3b8;
+}
+
+.legal-content-body li {
+  margin-bottom: 6px;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN ACROSS ALL DEVICE SIZES
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .why-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .workflow-deck::before {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-title {
+    font-size: clamp(2.8rem, 12vw, 4.2rem);
+    letter-spacing: 0.06em;
+  }
+
+  .home-subtitle {
+    font-size: 0.8rem;
+    letter-spacing: 0.22em;
+    margin-top: 12px;
+  }
+
+  .btn-explore-simulations {
+    padding: 13px 28px;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+  }
+
+  .home-reticle-corner {
+    display: none;
+  }
+
+  .about-features-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .concepts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-deck {
+    grid-template-columns: 1fr;
+  }
+
+  .why-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .explore-physics-card {
+    padding: 36px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-title {
+    font-size: 2.5rem;
+  }
+  .home-subtitle {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+  }
+  .btn-explore-simulations {
+    width: 100%;
+    max-width: 280px;
+  }
+  .home-section {
+    padding: 70px 18px;
+  }
+}
+
+/* Prefers Reduced Motion Respect */
+@media (prefers-reduced-motion: reduce) {
+  .physix-home,
+  .home-system-status,
+  .home-title-container,
+  .home-subtitle,
+  .home-action-container,
+  .reveal-on-scroll,
+  .home-scroll-hint {
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .btn-explore-simulations {
+    transition: none !important;
+  }
+}
