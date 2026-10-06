@@ -53,4 +53,4 @@ npm run build
 ---
 
 ## 📄 License
-MIT License © 2026 Ojas Joshi, Jeshurun Selvakumar, Kshitij Jadhav
+MIT License © Team PhysiX
