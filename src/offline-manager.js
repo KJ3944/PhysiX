@@ -187,10 +187,77 @@ async function registerServiceWorker() {
       registration.update().catch(() => {});
     }, 60 * 60 * 1000); // Every hour
 
+    // Cache current page scripts and styles once SW is active
+    if (navigator.onLine) {
+      cacheCurrentPageAssets().catch(() => {});
+    }
+
     return registration;
   } catch (err) {
     console.error("[PWA] Service Worker registration failed:", err);
     return null;
+  }
+}
+
+/**
+ * Proactively cache all currently loaded scripts, stylesheets, and assets
+ * into runtime cache to ensure instant offline availability even on first visit
+ */
+async function cacheCurrentPageAssets() {
+  if (!("caches" in window)) return;
+  try {
+    const cache = await caches.open("physix-runtime-v3");
+    const urls = new Set([
+      window.location.origin + "/",
+      window.location.origin + "/index.html",
+      window.location.origin + "/manifest.webmanifest",
+      window.location.origin + "/favicon.svg",
+      window.location.origin + "/icons.svg",
+      window.location.origin + "/cursor.png",
+      window.location.origin + "/offline.html",
+      window.location.origin + "/quiz.json"
+    ]);
+
+    // All active script tags on current page
+    document.querySelectorAll("script[src]").forEach((s) => {
+      if (s.src) {
+        urls.add(s.src);
+        try {
+          const u = new URL(s.src);
+          urls.add(u.origin + u.pathname);
+        } catch (e) {}
+      }
+    });
+
+    // All active stylesheet links on current page
+    document.querySelectorAll('link[rel="stylesheet"]').forEach((l) => {
+      if (l.href) {
+        urls.add(l.href);
+        try {
+          const u = new URL(l.href);
+          urls.add(u.origin + u.pathname);
+        } catch (e) {}
+      }
+    });
+
+    // Cache them in background
+    await Promise.allSettled(
+      Array.from(urls).map(async (url) => {
+        try {
+          const res = await fetch(url, { cache: "no-cache" });
+          if (res.ok) {
+            await cache.put(url, res.clone());
+            const parsed = new URL(url);
+            if (parsed.search) {
+              await cache.put(parsed.origin + parsed.pathname, res);
+            }
+          }
+        } catch (e) {}
+      })
+    );
+    console.log("[PWA] Proactively cached page assets for offline use:", urls.size);
+  } catch (err) {
+    console.warn("[PWA] Asset caching warning:", err);
   }
 }
 
@@ -285,6 +352,11 @@ export async function initPwaSystem() {
   
   // Register Service Worker
   await registerServiceWorker();
+
+  // Proactively cache all current page assets if online
+  if (navigator.onLine) {
+    cacheCurrentPageAssets().catch(() => {});
+  }
   
   // Initialize offline indicator
   initOfflineIndicator();
@@ -295,7 +367,8 @@ export async function initPwaSystem() {
     onNetworkChange,
     canPerformCloudOperation,
     forceNetworkCheck,
-    stopNetworkMonitoring
+    stopNetworkMonitoring,
+    cacheCurrentPageAssets
   };
 }
 
@@ -309,7 +382,8 @@ export {
   stopNetworkMonitoring,
   registerServiceWorker,
   initOfflineIndicator,
-  showAiOfflineMessage
+  showAiOfflineMessage,
+  cacheCurrentPageAssets
 };
 
 // Default export for convenience
@@ -322,5 +396,6 @@ export default {
   stopNetworkMonitoring,
   registerServiceWorker,
   initOfflineIndicator,
-  showAiOfflineMessage
+  showAiOfflineMessage,
+  cacheCurrentPageAssets
 };
