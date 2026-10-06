@@ -10,6 +10,7 @@ import {
   showStreakLostAnimation,
   showStreakMilestoneAnimation
 } from "./celebrations.js";
+import { isCloudOperationAllowed } from "./user-data-service.js";
 
 // Helper: Format date to local YYYY-MM-DD
 export function getLocalDateString(date = new Date()) {
@@ -81,6 +82,12 @@ export function saveStoredUserStreak(userId = "guest", streakData) {
 export async function syncStreakWithFirebase(user, streakData) {
   if (!user || !user.uid) return;
 
+  // Guard: Skip cloud sync when offline
+  if (!navigator.onLine || !isCloudOperationAllowed()) {
+    console.log("[Streak] Offline mode: Skipping Firebase/Express streak sync");
+    return;
+  }
+
   const payload = {
     email: user.email || "",
     uid: user.uid,
@@ -121,6 +128,13 @@ export async function syncStreakWithFirebase(user, streakData) {
 // Fetch Streak from Firebase Firestore on login
 export async function fetchStreakFromFirebase(user) {
   if (!user || !user.uid || !db) return null;
+  
+  // Guard: Skip cloud fetch when offline
+  if (!navigator.onLine || !isCloudOperationAllowed()) {
+    console.log("[Streak] Offline mode: Skipping Firebase streak fetch");
+    return null;
+  }
+  
   try {
     const userRef = doc(db, "users", user.uid);
     const snap = await getDoc(userRef);
@@ -151,6 +165,13 @@ export async function processUserDailyStreak(user) {
 
   // Try reading remote Firebase data first if authenticated
   let stored = getStoredUserStreak(userId);
+
+  // In offline mode: Do NOT increment, break, or save streaks
+  if (!navigator.onLine || !isCloudOperationAllowed()) {
+    console.log("[Streak] Offline mode: Preserving existing streak without modification");
+    return { ...stored, status: "offline_preserved", changed: false };
+  }
+
   if (user && db) {
     try {
       const remoteData = await fetchStreakFromFirebase(user);

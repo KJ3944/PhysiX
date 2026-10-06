@@ -10,7 +10,7 @@ import { api } from "./api.js";
 import { generateLabReportPdf } from "./pdf-export.js";
 
 export function createOpticalFibreExperiment(callbacks = {}) {
-  const { onXpAwarded, onExperimentRecorded, showToast, getActiveUserId, loadUserProfile, getStoredUserProfile, unlockBadge, isUserAuthenticated, openLoginModal } = callbacks;
+  const { onXpAwarded, onExperimentRecorded, showToast, getActiveUserId, loadUserProfile, getStoredUserProfile, unlockBadge, isUserAuthenticated, openLoginModal, onChallengeCompleted } = callbacks;
 
   // Scientific Model State
   const state = {
@@ -1175,9 +1175,19 @@ export function createOpticalFibreExperiment(callbacks = {}) {
       ch.completed = true;
       saveChallengesToStorage();
       renderChallengesDom();
-      if (onXpAwarded) onXpAwarded(ch.xp, `Spot Match Master (${ch.targetDiameter} cm)`);
-      if (unlockBadge) unlockBadge("badge-of-spot-match", "Spot Match Master (Concentric Laser Alignment)");
-      showToast(`Challenge Accomplished: Spot Match (${ch.targetDiameter} cm) +${ch.xp} XP!`);
+      if (onChallengeCompleted) {
+        onChallengeCompleted({
+          challengeId: "optical.spotMatch",
+          xp: ch.xp,
+          badgeId: "badge-of-spot-match",
+          badgeTitle: "Spot Match Master (Concentric Laser Alignment)",
+          title: `Spot Match Master (${ch.targetDiameter} cm)`
+        });
+      } else {
+        if (onXpAwarded) onXpAwarded(ch.xp, `Spot Match Master (${ch.targetDiameter} cm)`);
+        if (unlockBadge) unlockBadge("badge-of-spot-match", "Spot Match Master (Concentric Laser Alignment)");
+        showToast(`Challenge Accomplished: Spot Match (${ch.targetDiameter} cm) +${ch.xp} XP!`);
+      }
     }
   }
 
@@ -1225,9 +1235,19 @@ export function createOpticalFibreExperiment(callbacks = {}) {
         ch.completed = true;
         saveChallengesToStorage();
         renderChallengesDom();
-        if (onXpAwarded) onXpAwarded(ch.xp, "Rapid 3-Point Laser Calibration");
-        if (unlockBadge) unlockBadge("badge-of-rapid-calib", "Laser Calibration Virtuoso (40s Speedrun)");
-        showToast(`Challenge Accomplished: Rapid Calibration Run +${ch.xp} XP!`);
+        if (onChallengeCompleted) {
+          onChallengeCompleted({
+            challengeId: "optical.rapidCalib",
+            xp: ch.xp,
+            badgeId: "badge-of-rapid-calib",
+            badgeTitle: "Laser Calibration Virtuoso (40s Speedrun)",
+            title: "Rapid 3-Point Laser Calibration"
+          });
+        } else {
+          if (onXpAwarded) onXpAwarded(ch.xp, "Rapid 3-Point Laser Calibration");
+          if (unlockBadge) unlockBadge("badge-of-rapid-calib", "Laser Calibration Virtuoso (40s Speedrun)");
+          showToast(`Challenge Accomplished: Rapid Calibration Run +${ch.xp} XP!`);
+        }
       } else {
         const nextRing = ch.targetSteps[ch.currentStep];
         showToast(`Step ${ch.currentStep}/3 Aligned! Next target: ${nextRing} cm!`);
@@ -1257,10 +1277,42 @@ export function createOpticalFibreExperiment(callbacks = {}) {
       ch.completed = true;
       saveChallengesToStorage();
       renderChallengesDom();
-      if (onXpAwarded) onXpAwarded(ch.xp, "Multi-Distance NA Invariance Sweep");
-      if (unlockBadge) unlockBadge("badge-of-multi-sweep", "NA Invariance Champion (3-Zone Distance Sweep)");
-      showToast(`Challenge Accomplished: Multi-Distance Data Sweep +${ch.xp} XP!`);
+      if (onChallengeCompleted) {
+        onChallengeCompleted({
+          challengeId: "optical.multiSweep",
+          xp: ch.xp,
+          badgeId: "badge-of-multi-sweep",
+          badgeTitle: "NA Invariance Champion (3-Zone Distance Sweep)",
+          title: "Multi-Distance NA Invariance Sweep"
+        });
+      } else {
+        if (onXpAwarded) onXpAwarded(ch.xp, "Multi-Distance NA Invariance Sweep");
+        if (unlockBadge) unlockBadge("badge-of-multi-sweep", "NA Invariance Champion (3-Zone Distance Sweep)");
+        showToast(`Challenge Accomplished: Multi-Distance Data Sweep +${ch.xp} XP!`);
+      }
     } else {
+      renderChallengesDom();
+    }
+  }
+
+  function hydrateChallenges(completedIds) {
+    if (!Array.isArray(completedIds)) return;
+    const set = new Set(completedIds);
+    let changed = false;
+    if (set.has("optical.spotMatch") && !state.challenges.spotMatch.completed) {
+      state.challenges.spotMatch.completed = true;
+      changed = true;
+    }
+    if (set.has("optical.rapidCalib") && !state.challenges.rapidCalib.completed) {
+      state.challenges.rapidCalib.completed = true;
+      changed = true;
+    }
+    if (set.has("optical.multiSweep") && !state.challenges.multiSweep.completed) {
+      state.challenges.multiSweep.completed = true;
+      changed = true;
+    }
+    if (changed) {
+      saveChallengesToStorage();
       renderChallengesDom();
     }
   }
@@ -1669,6 +1721,7 @@ export function createOpticalFibreExperiment(callbacks = {}) {
     init,
     renderAll,
     renderChallengesDom,
+    hydrateChallenges,
     getState: () => state,
     setDistance: (d) => { state.distanceL = d; renderAll(); },
     setWavelength,

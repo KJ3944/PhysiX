@@ -6,7 +6,21 @@
 const API_BASE = "/api";
 const DIRECT_API_BASE = "http://localhost:3001/api";
 
+/**
+ * Check if cloud operations are allowed (online mode)
+ * Returns false when offline to prevent cloud writes
+ */
+function isCloudOperationAllowed() {
+  return navigator.onLine;
+}
+
 async function fetchJson(url, options = {}) {
+  // Guard: Prevent cloud operations when offline
+  if (!isCloudOperationAllowed()) {
+    console.log(`[API Client] Offline mode: Skipping network request to ${url}`);
+    return null;
+  }
+
   try {
     const res = await fetch(url, {
       headers: {

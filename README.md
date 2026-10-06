@@ -1,4 +1,4 @@
-# ⚛️ PhysiX — Interactive STEM Physics Laboratory
+# ⚛️ PhysiX — Interactive Physics Simulator
 
 ![PhysiX Banner](src/assets/hero.png)
 

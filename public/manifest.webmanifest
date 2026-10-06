@@ -1,0 +1,55 @@
+{
+  "name": "PhysiX — Physics Simulation Laboratory",
+  "short_name": "PhysiX",
+  "description": "Interactive physics experiments: Projectile Motion, Optical Fibre Numerical Aperture, Colour Sensor (TCS3200), and Physics Sandbox with Vectra AI Copilot",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b0f1a",
+  "theme_color": "#1e293b",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512 any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons.svg",
+      "sizes": "192x192 512x512 any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["education", "science", "simulation"],
+  "shortcuts": [
+    {
+      "name": "Projectile Motion",
+      "short_name": "Projectile",
+      "description": "2D Projectile Motion Virtual Lab",
+      "url": "/experiment/projectile",
+      "icons": [{ "src": "/favicon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Optical Fibre",
+      "short_name": "Optical",
+      "description": "Determination of Numerical Aperture of an Optical Fibre",
+      "url": "/experiment/optical",
+      "icons": [{ "src": "/favicon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Colour Sensor",
+      "short_name": "Colour Sensor",
+      "description": "Study of Colour Sensor (TCS3200)",
+      "url": "/experiment/colour-sensor",
+      "icons": [{ "src": "/favicon.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Physics Sandbox",
+      "short_name": "Sandbox",
+      "description": "Physics Sandbox — Build & Simulate",
+      "url": "/experiment/sandbox",
+      "icons": [{ "src": "/favicon.svg", "sizes": "192x192" }]
+    }
+  ]
+}

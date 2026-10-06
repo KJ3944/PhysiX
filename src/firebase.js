@@ -9,6 +9,8 @@ import {
   signOut,
   sendPasswordResetEmail,
   updatePassword,
+  sendEmailVerification,
+  reload,
   onAuthStateChanged
 } from "firebase/auth";
 import {
@@ -24,7 +26,10 @@ import {
   orderBy,
   limit,
   serverTimestamp,
-  increment
+  increment,
+  arrayUnion,
+  onSnapshot,
+  runTransaction
 } from "firebase/firestore";
 
 // Firebase Configuration from User Project
@@ -78,11 +83,16 @@ export {
   limit,
   serverTimestamp,
   increment,
+  arrayUnion,
+  onSnapshot,
+  runTransaction,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
   updatePassword,
+  sendEmailVerification,
+  reload,
   onAuthStateChanged
 };
 export default app;

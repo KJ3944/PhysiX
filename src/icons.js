@@ -433,5 +433,28 @@ export const BADGE_SVGS = {
     <circle cx="10" cy="12" r="2.5" fill="#f97316"/>
     <circle cx="18" cy="19" r="2.5" fill="#fb923c"/>
     <circle cx="26" cy="24" r="2.5" fill="#fed7aa"/>
+  </svg>`,
+
+  "badge-lab-veteran": `<svg class="badge-vector-svg" viewBox="0 0 36 36" fill="none">
+    <circle cx="18" cy="18" r="16" fill="rgba(16,185,129,0.2)" stroke="#10b981" stroke-width="1.8"/>
+    <polygon points="18 7 21.5 14 29 15 23.5 20.5 25 28 18 24.5 11 28 12.5 20.5 7 15 14.5 14 18 7" fill="#34d399" stroke="#059669" stroke-width="1.2"/>
+  </svg>`,
+
+  "badge-sb-thrust": `<svg class="badge-vector-svg" viewBox="0 0 36 36" fill="none">
+    <circle cx="18" cy="18" r="16" fill="rgba(56,189,248,0.2)" stroke="#38bdf8" stroke-width="1.5"/>
+    <path d="M10 22L18 10L26 22H10Z" fill="rgba(56,189,248,0.3)" stroke="#38bdf8" stroke-width="1.8" stroke-linejoin="round"/>
+    <line x1="18" y1="22" x2="18" y2="26" stroke="#00f0ff" stroke-width="2.5" stroke-linecap="round"/>
+  </svg>`,
+
+  "badge-sb-kick": `<svg class="badge-vector-svg" viewBox="0 0 36 36" fill="none">
+    <circle cx="18" cy="18" r="16" fill="rgba(244,63,94,0.2)" stroke="#f43f5e" stroke-width="1.5"/>
+    <polygon points="14 10 26 18 14 26 18 18" fill="#fb7185" stroke="#f43f5e" stroke-width="1.5" stroke-linejoin="round"/>
+    <circle cx="26" cy="18" r="3" fill="#ffe4e6" stroke="#f43f5e" stroke-width="1.2"/>
+  </svg>`,
+
+  "badge-sb-zerog": `<svg class="badge-vector-svg" viewBox="0 0 36 36" fill="none">
+    <circle cx="18" cy="18" r="16" fill="rgba(52,211,153,0.2)" stroke="#34d399" stroke-width="1.5"/>
+    <circle cx="18" cy="18" r="8" stroke="#34d399" stroke-width="1.5" stroke-dasharray="3 2"/>
+    <ellipse cx="18" cy="18" rx="12" ry="4" stroke="#a7f3d0" stroke-width="1.5" transform="rotate(-25 18 18)"/>
   </svg>`
 };

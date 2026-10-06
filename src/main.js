@@ -10,6 +10,8 @@ import {
   signOut,
   sendPasswordResetEmail,
   updatePassword,
+  sendEmailVerification,
+  reload,
   onAuthStateChanged
 } from "./firebase.js";
 import { QUIZ_DATA, generateRandom10QuestionQuiz } from "./quiz-data.js";
@@ -17,9 +19,13 @@ import { api } from "./api.js";
 import { ICONS, AVATAR_SVGS, BADGE_SVGS } from "./icons.js";
 import { createOpticalFibreExperiment } from "./optical-fibre.js";
 import { createColourSensorExperiment } from "./colour-sensor.js";
+import { createPhysicsSandboxExperiment } from "./sandbox/sandbox-experiment.js";
 import { initSplashScreen } from "./splash.js";
+import { initHomepage } from "./homepage/homepage.js";
+import { initPhysixLogoAnimation } from "./logo-animation.js";
 import { generateLabReportPdf } from "./pdf-export.js";
 import { initContentProtection } from "./content-protection.js";
+import { EXPERIMENT_DETAILS } from "./experiment-details-data.js";
 import {
   initCelebrations,
   showLevelUpCelebration,
@@ -35,11 +41,61 @@ import {
   getNextStreakMilestone
 } from "./streak.js";
 import {
+  initPwaSystem,
+  getNetworkStatus,
+  canPerformCloudOperation,
+  onNetworkChange,
+  setNetworkStatusOverride
+} from "./offline-manager.js";
+import {
   syncUserToFirestore,
   recordExperimentInFirestore,
   recordQuizAttemptInFirestore,
-  fetchFullUserDataFromFirestore
+  fetchFullUserDataFromFirestore,
+  unlockBadgeInFirestore,
+  recordChallengeCompletionInFirestore,
+  recordExperimentActivity,
+  getExperimentNameById,
+  calculateRankFromXp,
+  awardUserXpInFirestore,
+  subscribeToUserDoc,
+  isCloudOperationAllowed
 } from "./user-data-service.js";
+
+// ==========================================
+// AUTHORITATIVE PROGRESSION & MULTI-DEVICE SYNC
+// ==========================================
+let activeAuthoritativeXp = null; // null indicates not yet loaded from Firestore
+let activeAuthoritativeCompletedChallenges = [];
+const inFlightChallenges = new Set();
+const inFlightBadges = new Set();
+let userDocUnsubscribe = null;
+
+export function getAuthoritativeUserXp(uid) {
+  if (typeof activeAuthoritativeXp === "number") {
+    return activeAuthoritativeXp;
+  }
+  if (uid && uid !== "guest") {
+    try {
+      const cached = localStorage.getItem(`physix_xp_${uid}`);
+      if (cached !== null) {
+        const parsed = Number(cached);
+        if (!isNaN(parsed) && parsed >= 0) return parsed;
+      }
+    } catch (e) {}
+  }
+  return 0;
+}
+
+export function setAuthoritativeUserXp(uid, xp, persistToStorage = true) {
+  const cleanXp = Math.max(0, Number(xp) || 0);
+  activeAuthoritativeXp = cleanXp;
+  if (persistToStorage && canPerformCloudOperation() && uid && uid !== "guest") {
+    try {
+      localStorage.setItem(`physix_xp_${uid}`, String(cleanXp));
+    } catch (e) {}
+  }
+}
 
 const {
   Engine,
@@ -255,10 +311,24 @@ const navBadgesCountBadge = document.getElementById("nav-badges-count-badge");
 const userProfileBtn = document.getElementById("user-profile-btn");
 const btnCloseProfile = document.getElementById("btn-close-profile");
 
+// Homepage & Legal Modals Elements
+const physixHome = document.getElementById("physix-home");
+const legalModal = document.getElementById("legal-modal");
+const btnCloseLegal = document.getElementById("btn-close-legal");
+const btnLegalTabTerms = document.getElementById("btn-legal-tab-terms");
+const btnLegalTabPrivacy = document.getElementById("btn-legal-tab-privacy");
+const legalTermsContent = document.getElementById("legal-terms-content");
+const legalPrivacyContent = document.getElementById("legal-privacy-content");
+const legalModalHeading = document.getElementById("legal-modal-heading");
+const navLogo = document.querySelector(".logo");
+
+let homepageInstance = null;
+
 // Active Experiment State
 let activeExperimentId = "projectile";
 let opticalExperimentInstance = null;
 let colourSensorExperimentInstance = null;
+let physicsSandboxExperimentInstance = null;
 
 // Help & Interactive User Guide DOM Elements
 const helpModal = document.getElementById("help-modal");
@@ -382,6 +452,15 @@ const secUserEmailDisplay = document.getElementById("sec-user-email-display");
 const secDetailEmail = document.getElementById("sec-detail-email");
 const secDetailUid = document.getElementById("sec-detail-uid");
 const btnDashboardLogout = document.getElementById("btn-dashboard-logout");
+
+// Firebase Email Verification Modal DOM Elements
+const emailVerificationModal = document.getElementById("email-verification-modal");
+const verifyUserEmail = document.getElementById("verify-user-email");
+const verifyFeedbackBanner = document.getElementById("verify-feedback-banner");
+const btnVerifyCheck = document.getElementById("btn-verify-check");
+const btnVerifyResend = document.getElementById("btn-verify-resend");
+const verifyResendLabel = document.getElementById("verify-resend-label");
+const btnVerifySignout = document.getElementById("btn-verify-signout");
 
 // ==========================================
 // OBSERVATIONS & CHALLENGES DOM ELEMENTS
@@ -602,7 +681,6 @@ function checkTargetHit(landX) {
     simState.targetHitX = currentTargetX;
     showToast(`DIRECT HIT! Bullseye (+100 pts) • Spawning new target...`);
     recordTargetHitTelemetry(true);
-    unlockBadge("badge-target-hit", "Bullseye Sniper");
     setTimeout(() => {
       spawnNewTarget(true);
     }, 600);
@@ -1148,14 +1226,39 @@ const ALL_BADGES = [
   { id: "badge-cs-mystery-detective", name: "Spectroscopic Detective", desc: "Identify unknown chemical pigment by analyzing spectral frequency peaks." },
   { id: "badge-cs-inverse-sweep", name: "Optoelectronic Photometrist", desc: "Complete 3-zone distance sweep verifying irradiance decay and optimal focus." },
 
+  // Physics Sandbox Mastery (Exp 4)
+  { id: "badge-sb-thrust", name: "Newtonian Dynamicist", desc: "Apply continuous force F ≥ 50N to accelerate rigid body to |v| ≥ 12 m/s." },
+  { id: "badge-sb-kick", name: "Momentum Master", desc: "Deliver high-force KICK impulse (F ≥ 80N) imparting kinetic energy KE ≥ 100 J." },
+  { id: "badge-sb-zerog", name: "Gravity Defier", desc: "Navigate in Zero-G (g = 0) and maintain unhindered inertial drift for 3 seconds." },
+
   // Knowledge & Profile Honors
   { id: "badge-quiz-pass", name: "Kinematics Scholar", desc: "Achieve at least 80% (8/10) on the 2D Kinematics Quiz." },
   { id: "badge-quiz-perfect", name: "Grand Physics Virtuoso", desc: "Score a flawless 10/10 on the Kinematics Knowledge Check." },
-  { id: "badge-profile-saved", name: "PhysiX Pioneer", desc: "Personalize and customize your student profile dossier." }
+  { id: "badge-profile-saved", name: "PhysiX Pioneer", desc: "Personalize and customize your student profile dossier." },
+  { id: "badge-lab-veteran", name: "Laboratory Veteran", desc: "Engage with virtual lab experiments 5 or more times." }
 ];
 
+// ==========================================
+// EMAIL VERIFICATION HELPER & STATE
+// ==========================================
+function isEmailVerificationRequired(user) {
+  if (!user) return false;
+  if (user.emailVerified) return false;
+
+  // Distinguish providers: Google accounts are pre-verified OAuth accounts
+  const providers = Array.isArray(user.providerData) ? user.providerData.map(p => p.providerId) : [];
+  const isGoogle = providers.includes("google.com");
+  if (isGoogle) return false;
+
+  const isPassword = providers.includes("password");
+  return isPassword || providers.length === 0;
+}
+
 function getActiveUserId() {
-  return auth.currentUser ? auth.currentUser.uid : "guest";
+  if (!auth.currentUser || isEmailVerificationRequired(auth.currentUser)) {
+    return "guest";
+  }
+  return auth.currentUser.uid;
 }
 
 async function checkBackendStatus() {
@@ -1210,20 +1313,21 @@ function saveStoredUserProfile(profileData) {
   if (auth.currentUser) {
     try {
       const stats = getStoredTelemetry();
-      const badges = getStoredBadges();
+      const badges = getStoredBadges(auth.currentUser.uid);
       const quizHigh = Number(localStorage.getItem("physix_quiz_highscore") || 0);
-      const targetScore = simState?.targetScore || 0;
-      const rankInfo = calculateStudentRankAndLevel(stats, quizHigh, targetScore, badges.length);
+      const authoritativeXp = getAuthoritativeUserXp(auth.currentUser.uid);
+      const rankInfo = calculateRankFromXp(authoritativeXp);
       const streak = getStoredUserStreak(auth.currentUser.uid);
 
       syncUserToFirestore(auth.currentUser, {
         name: profileData.name || auth.currentUser.displayName || (auth.currentUser.email ? auth.currentUser.email.split("@")[0] : "PhysiX Scholar"),
         email: auth.currentUser.email,
         photoURL: auth.currentUser.photoURL || null,
-        totalXP: rankInfo.totalXp,
+        totalXP: authoritativeXp,
         level: rankInfo.level,
         streak: streak.currentStreak || 1,
         experimentsPerformed: stats.totalLaunches || 0,
+        badges: badges,
         bestQuizScore: quizHigh,
         extra: {
           avatar: profileData.avatar || "quantum",
@@ -1284,9 +1388,17 @@ function saveStoredFlightLogs(logs) {
   }
 }
 
-function getStoredBadges() {
+function getStoredBadges(userId = getActiveUserId()) {
   try {
-    const saved = localStorage.getItem("physix_unlocked_badges");
+    const userKey = userId && userId !== "guest" ? `physix_unlocked_badges_${userId}` : "physix_unlocked_badges";
+    let saved = localStorage.getItem(userKey);
+    // Backward compatibility: check legacy key
+    if (!saved && userId && userId !== "guest") {
+      saved = localStorage.getItem("physix_unlocked_badges");
+      if (saved) {
+        localStorage.setItem(userKey, saved);
+      }
+    }
     if (saved) return JSON.parse(saved);
   } catch (e) {
     console.warn("Error reading badges", e);
@@ -1294,22 +1406,77 @@ function getStoredBadges() {
   return [];
 }
 
-function saveStoredBadges(badges) {
+function saveStoredBadges(badges, userId = getActiveUserId()) {
   try {
-    localStorage.setItem("physix_unlocked_badges", JSON.stringify(badges));
+    const unique = Array.from(new Set(badges || []));
+    const userKey = userId && userId !== "guest" ? `physix_unlocked_badges_${userId}` : "physix_unlocked_badges";
+    localStorage.setItem(userKey, JSON.stringify(unique));
+    if (!userId || userId === "guest") {
+      localStorage.setItem("physix_unlocked_badges", JSON.stringify(unique));
+    }
   } catch (e) {
     console.warn("Error saving badges", e);
   }
 }
 
-function unlockBadge(badgeId, badgeTitle) {
-  const badges = getStoredBadges();
-  if (!badges.includes(badgeId)) {
-    badges.push(badgeId);
-    saveStoredBadges(badges);
-    api.unlockBadge(getActiveUserId(), badgeId).catch(() => {});
+async function unlockBadge(badgeId, badgeTitle, persistToStorage = true) {
+  if (!badgeId) return;
+  const userId = getActiveUserId();
+  const currentBadges = getStoredBadges(userId);
+
+  // In offline mode or transient session: do NOT persist to cloud or localStorage
+  if (!canPerformCloudOperation() || !persistToStorage) {
+    console.log(`[Badge] Offline unlock of "${badgeTitle}" (${badgeId}) — in-memory only`);
+    showToast(`Milestone Unlocked: ${badgeTitle} (Offline Session)`);
+    return;
+  }
+
+  // 1. Fast local idempotency check & in-flight debouncing
+  if (inFlightBadges.has(badgeId) || currentBadges.includes(badgeId)) {
+    return;
+  }
+  inFlightBadges.add(badgeId);
+
+  try {
+    console.log(`[Badge] Checking eligibility for: ${badgeId}`);
+
+    // 2. If authenticated in Firebase, atomically check & persist in Firestore
+    if (auth.currentUser) {
+      try {
+        const res = await unlockBadgeInFirestore(auth.currentUser.uid, badgeId);
+        if (res && res.alreadyUnlocked) {
+          console.log(`[Badge] Badge already unlocked? true. (Firestore check). Idempotent bypass.`);
+          if (!currentBadges.includes(badgeId)) {
+            currentBadges.push(badgeId);
+            saveStoredBadges(currentBadges, userId);
+            loadUserProfile();
+          }
+          return;
+        }
+        if (res && res.badges) {
+          saveStoredBadges(res.badges, userId);
+        }
+      } catch (e) {
+        console.warn("[Badge] Firestore unlock sync notice:", e);
+      }
+    }
+
+    // 3. Update local storage with newly unlocked badge
+    const updatedBadges = getStoredBadges(userId);
+    if (!updatedBadges.includes(badgeId)) {
+      updatedBadges.push(badgeId);
+      saveStoredBadges(updatedBadges, userId);
+    }
+
+    // 4. Sync with Express backend
+    api.unlockBadge(userId, badgeId).catch(() => {});
+
+    // 5. Notify user and refresh UI
+    console.log(`%c[Badge] ✓ Badge eligibility result: Unlocked "${badgeTitle}" (${badgeId})`, "color: #10b981; font-weight: bold;");
     showToast(`Milestone Unlocked: ${badgeTitle}`);
     loadUserProfile();
+  } finally {
+    inFlightBadges.delete(badgeId);
   }
 }
 
@@ -1317,7 +1484,9 @@ function unlockBadge(badgeId, badgeTitle) {
 // AUTHENTICATION & ACCESS RESTRICTION HELPERS
 // ==========================================
 function isUserAuthenticated() {
-  return !!auth.currentUser;
+  if (!auth.currentUser) return false;
+  if (isEmailVerificationRequired(auth.currentUser)) return false;
+  return true;
 }
 
 function openLoginModal(reasonMessage) {
@@ -1384,30 +1553,312 @@ function saveStoredChallenges(challenges) {
   }
 }
 
+function syncChallengeToLocalState(challengeId, persistToStorage = true) {
+  if (!challengeId) return;
+  if (!activeAuthoritativeCompletedChallenges.includes(challengeId)) {
+    activeAuthoritativeCompletedChallenges.push(challengeId);
+  }
+
+  // Exp 1: Projectile Motion
+  if (challengeId.startsWith("projectile.")) {
+    const projKey = challengeId.replace("projectile.", "");
+    const projState = getStoredChallenges();
+    if (projState[projKey]) {
+      projState[projKey].completed = true;
+      if (persistToStorage && canPerformCloudOperation()) {
+        saveStoredChallenges(projState);
+      }
+    }
+    renderChallenges();
+  }
+
+  // Exp 2: Optical Fibre
+  if (challengeId.startsWith("optical.")) {
+    const ofKey = challengeId.replace("optical.", "");
+    if (persistToStorage && canPerformCloudOperation()) {
+      try {
+        const savedOf = JSON.parse(localStorage.getItem("physix_of_challenges") || "{}");
+        if (!savedOf[ofKey]) savedOf[ofKey] = {};
+        savedOf[ofKey].completed = true;
+        localStorage.setItem("physix_of_challenges", JSON.stringify(savedOf));
+      } catch (e) {}
+    }
+    if (opticalExperimentInstance && typeof opticalExperimentInstance.hydrateChallenges === "function") {
+      opticalExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+    }
+  }
+
+  // Exp 3: Colour Sensor
+  if (challengeId.startsWith("colour-sensor.")) {
+    const csKey = challengeId.replace("colour-sensor.", "");
+    if (persistToStorage && canPerformCloudOperation()) {
+      try {
+        const savedCs = JSON.parse(localStorage.getItem("physix_cs_challenges") || "{}");
+        if (!savedCs[csKey]) savedCs[csKey] = {};
+        savedCs[csKey].completed = true;
+        localStorage.setItem("physix_cs_challenges", JSON.stringify(savedCs));
+      } catch (e) {}
+    }
+    if (colourSensorExperimentInstance && typeof colourSensorExperimentInstance.hydrateChallenges === "function") {
+      colourSensorExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+    }
+  }
+
+  // Exp 4: Physics Sandbox
+  if (challengeId.startsWith("sandbox.")) {
+    const sbKey = challengeId.replace("sandbox.", "");
+    if (persistToStorage && canPerformCloudOperation()) {
+      try {
+        const savedSb = JSON.parse(localStorage.getItem("physix_sb_challenges") || "{}");
+        if (!savedSb[sbKey]) savedSb[sbKey] = {};
+        savedSb[sbKey].completed = true;
+        localStorage.setItem("physix_sb_challenges", JSON.stringify(savedSb));
+      } catch (e) {}
+    }
+    if (physicsSandboxExperimentInstance && typeof physicsSandboxExperimentInstance.hydrateChallenges === "function") {
+      physicsSandboxExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+    }
+  }
+}
+
+export async function completeChallengeAuthoritatively({ challengeId, xp, badgeId, badgeTitle, title }) {
+  if (!challengeId) return { alreadyCompleted: false };
+
+  // Fast client idempotency / in-flight check
+  if (inFlightChallenges.has(challengeId) || activeAuthoritativeCompletedChallenges.includes(challengeId)) {
+    console.log(`[Challenge] Challenge ${challengeId} already in flight or completed. Skipping.`);
+    syncChallengeToLocalState(challengeId, canPerformCloudOperation());
+    return { alreadyCompleted: true };
+  }
+  inFlightChallenges.add(challengeId);
+
+  try {
+    const user = auth.currentUser;
+    const isAuth = isUserAuthenticated();
+    const numXp = Math.max(0, Number(xp) || 0);
+
+    // OFFLINE MODE:
+    // In-session temporary interaction ONLY.
+    // Do NOT write to Firestore, do NOT sync to API, do NOT persist to permanent localStorage.
+    if (!canPerformCloudOperation()) {
+      console.log(`[Challenge] Offline completion of ${challengeId} (+${numXp} XP) — in-memory session only`);
+      
+      activeAuthoritativeCompletedChallenges = Array.from(new Set([...activeAuthoritativeCompletedChallenges, challengeId]));
+      if (typeof activeAuthoritativeXp === "number") {
+        activeAuthoritativeXp += numXp;
+      }
+      
+      // Update in-memory state of active experiment simulators without writing to localStorage
+      syncChallengeToLocalState(challengeId, false);
+
+      showChallengeGraffiti(title || "Laboratory Challenge Completed", numXp);
+      showToast(`Challenge Accomplished: ${title || challengeId} +${numXp} XP (Offline Session)`);
+      if (badgeId && badgeTitle) {
+        unlockBadge(badgeId, badgeTitle, false);
+      }
+
+      loadUserProfile();
+      renderChallenges();
+      return { alreadyCompleted: false, offline: true };
+    }
+
+    if (user && isAuth) {
+      try {
+        const res = await recordChallengeCompletionInFirestore(user.uid, challengeId, numXp, badgeId);
+        if (res && res.alreadyCompleted) {
+          console.log(`[Challenge] Challenge ${challengeId} was already completed in Firestore. Skipping duplicate award.`);
+          syncChallengeToLocalState(challengeId);
+          return { alreadyCompleted: true };
+        }
+
+        if (res && typeof res.totalXP === "number") {
+          setAuthoritativeUserXp(user.uid, res.totalXP);
+          loadUserProfile();
+        }
+        if (res && Array.isArray(res.badges)) {
+          saveStoredBadges(res.badges, user.uid);
+          loadUserProfile();
+        }
+        if (res && Array.isArray(res.completedChallenges)) {
+          activeAuthoritativeCompletedChallenges = res.completedChallenges;
+        }
+      } catch (err) {
+        console.error("[Challenge] Error recording completion in Firestore:", err);
+      }
+
+      // Sync with Express backend
+      api.addXp(user.uid, numXp, title || challengeId).catch(() => {});
+      if (badgeId) {
+        api.unlockBadge(user.uid, badgeId).catch(() => {});
+      }
+    } else {
+      // Unauthenticated guest mode
+      const guestXp = getStoredBonusXp() + numXp;
+      saveStoredBonusXp(guestXp);
+    }
+
+    // Synchronize to local state across all experiments
+    syncChallengeToLocalState(challengeId);
+
+    // Celebratory feedback
+    showChallengeGraffiti(title || "Laboratory Challenge Completed", numXp);
+    showToast(`Challenge Accomplished: ${title || challengeId} +${numXp} XP!`);
+    if (badgeId && badgeTitle) {
+      unlockBadge(badgeId, badgeTitle);
+    }
+
+    loadUserProfile();
+    renderChallenges();
+
+    return { alreadyCompleted: false };
+  } finally {
+    inFlightChallenges.delete(challengeId);
+  }
+}
+
+function hydrateAllExperimentChallenges(completedChallengeIds) {
+  if (!Array.isArray(completedChallengeIds)) return;
+  activeAuthoritativeCompletedChallenges = Array.from(new Set(completedChallengeIds));
+  const set = new Set(activeAuthoritativeCompletedChallenges);
+
+  // 1. Exp 1: Projectile Motion
+  const projState = getStoredChallenges();
+  let projChanged = false;
+  if (set.has("projectile.target") && !projState.target?.completed) {
+    if (!projState.target) projState.target = { xp: 50, title: "Precision Bullseye" };
+    projState.target.completed = true;
+    projChanged = true;
+  }
+  if (set.has("projectile.complementary") && !projState.complementary?.completed) {
+    if (!projState.complementary) projState.complementary = { xp: 75, title: "Complementary Angle Law" };
+    projState.complementary.completed = true;
+    projChanged = true;
+  }
+  if (set.has("projectile.apex") && !projState.apex?.completed) {
+    if (!projState.apex) projState.apex = { xp: 100, title: "Stratospheric Apex" };
+    projState.apex.completed = true;
+    projChanged = true;
+  }
+  if (projChanged) {
+    saveStoredChallenges(projState);
+  }
+  renderChallenges();
+
+  // 2. Exp 2: Optical Fibre
+  try {
+    const savedOf = JSON.parse(localStorage.getItem("physix_of_challenges") || "{}");
+    if (set.has("optical.spotMatch")) {
+      if (!savedOf.spotMatch) savedOf.spotMatch = { xp: 100 };
+      savedOf.spotMatch.completed = true;
+    }
+    if (set.has("optical.rapidCalib")) {
+      if (!savedOf.rapidCalib) savedOf.rapidCalib = { xp: 125 };
+      savedOf.rapidCalib.completed = true;
+    }
+    if (set.has("optical.multiSweep")) {
+      if (!savedOf.multiSweep) savedOf.multiSweep = { xp: 150 };
+      savedOf.multiSweep.completed = true;
+    }
+    localStorage.setItem("physix_of_challenges", JSON.stringify(savedOf));
+  } catch (e) {}
+
+  if (opticalExperimentInstance && typeof opticalExperimentInstance.hydrateChallenges === "function") {
+    opticalExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+  }
+
+  // 3. Exp 3: Colour Sensor
+  try {
+    const savedCs = JSON.parse(localStorage.getItem("physix_cs_challenges") || "{}");
+    if (set.has("colour-sensor.primaryCalib")) {
+      if (!savedCs.primaryCalib) savedCs.primaryCalib = { xp: 100 };
+      savedCs.primaryCalib.completed = true;
+    }
+    if (set.has("colour-sensor.mysteryDetective")) {
+      if (!savedCs.mysteryDetective) savedCs.mysteryDetective = { xp: 125 };
+      savedCs.mysteryDetective.completed = true;
+    }
+    if (set.has("colour-sensor.distanceSweep")) {
+      if (!savedCs.distanceSweep) savedCs.distanceSweep = { xp: 150 };
+      savedCs.distanceSweep.completed = true;
+    }
+    localStorage.setItem("physix_cs_challenges", JSON.stringify(savedCs));
+  } catch (e) {}
+
+  if (colourSensorExperimentInstance && typeof colourSensorExperimentInstance.hydrateChallenges === "function") {
+    colourSensorExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+  }
+
+  // 4. Exp 4: Physics Sandbox
+  try {
+    const savedSb = JSON.parse(localStorage.getItem("physix_sb_challenges") || "{}");
+    if (set.has("sandbox.thrust")) {
+      if (!savedSb.thrust) savedSb.thrust = { xp: 100 };
+      savedSb.thrust.completed = true;
+    }
+    if (set.has("sandbox.kick")) {
+      if (!savedSb.kick) savedSb.kick = { xp: 125 };
+      savedSb.kick.completed = true;
+    }
+    if (set.has("sandbox.zerog")) {
+      if (!savedSb.zerog) savedSb.zerog = { xp: 150 };
+      savedSb.zerog.completed = true;
+    }
+    localStorage.setItem("physix_sb_challenges", JSON.stringify(savedSb));
+  } catch (e) {}
+
+  if (physicsSandboxExperimentInstance && typeof physicsSandboxExperimentInstance.hydrateChallenges === "function") {
+    physicsSandboxExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+  }
+}
+
 function addStudentXp(amount, reason) {
-  const currentXp = getStoredBonusXp();
-  const newXp = currentXp + amount;
-  saveStoredBonusXp(newXp);
+  const user = auth.currentUser;
+  const numAmount = Math.max(0, Number(amount) || 0);
+  if (numAmount <= 0) return;
 
-  // Sync to Express backend
-  api.addXp(getActiveUserId(), amount, reason).catch(() => {});
+  if (user && isUserAuthenticated()) {
+    if (!canPerformCloudOperation()) {
+      // In offline mode: ONLY in-memory visual update for this session!
+      // Do NOT persist to localStorage or call Firestore / Express.
+      activeAuthoritativeXp = (activeAuthoritativeXp !== null ? activeAuthoritativeXp : getAuthoritativeUserXp(user.uid)) + numAmount;
+      loadUserProfile();
+      showChallengeGraffiti(reason || "Laboratory Challenge Completed", numAmount);
+      showToast(`+${numAmount} XP (Offline Session): ${reason}!`);
+      renderChallenges();
+      return;
+    }
 
-  // Sync to Firestore
-  if (auth.currentUser) {
-    const stats = getStoredTelemetry();
-    const badges = getStoredBadges();
-    const quizHigh = Number(localStorage.getItem("physix_quiz_highscore") || 0);
-    const targetScore = simState?.targetScore || 0;
-    const rankInfo = calculateStudentRankAndLevel(stats, quizHigh, targetScore, badges.length);
-    syncUserToFirestore(auth.currentUser, {
-      totalXP: rankInfo.totalXp,
-      level: rankInfo.level
-    }).catch(() => {});
+    // 1. Optimistically update local authoritative XP so the UI responds immediately
+    const prevXp = getAuthoritativeUserXp(user.uid);
+    const optimisticXp = prevXp + numAmount;
+    setAuthoritativeUserXp(user.uid, optimisticXp);
+
+    // 2. Persist atomically to Firestore users/{uid}.totalXP via increment()
+    awardUserXpInFirestore(user.uid, numAmount, reason).then(res => {
+      if (res && typeof res.totalXP === "number") {
+        setAuthoritativeUserXp(user.uid, res.totalXP);
+        loadUserProfile();
+      }
+    }).catch(err => {
+      console.error("[Firestore] Failed to award XP in cloud:", err);
+    });
+
+    // Sync to Express backend
+    api.addXp(user.uid, numAmount, reason).catch(() => {});
+  } else {
+    if (!canPerformCloudOperation()) {
+      showChallengeGraffiti(reason || "Laboratory Challenge Completed", numAmount);
+      showToast(`+${numAmount} XP (Offline Session): ${reason}!`);
+      return;
+    }
+    // Guest mode: save to guest bonus XP
+    const guestXp = getStoredBonusXp() + numAmount;
+    saveStoredBonusXp(guestXp);
   }
 
   // Trigger celebratory cyber graffiti banner and confetti shower
-  showChallengeGraffiti(reason || "Laboratory Challenge Completed", amount);
-  showToast(`+${amount} XP Earned: ${reason}!`);
+  showChallengeGraffiti(reason || "Laboratory Challenge Completed", numAmount);
+  showToast(`+${numAmount} XP Earned: ${reason}!`);
   loadUserProfile();
   renderChallenges();
 }
@@ -1531,8 +1982,13 @@ function checkFlightChallenges(flightData) {
     if (compMatch) {
       challenges.complementary.completed = true;
       updated = true;
-      addStudentXp(75, `Complementary Law Verified (${Math.round(compMatch.angle)}° & ${Math.round(currentAngle)}°)`);
-      unlockBadge("badge-ch-compl", "Complementary Angle Ace (Verified θ & 90°-θ Law)");
+      completeChallengeAuthoritatively({
+        challengeId: "projectile.complementary",
+        xp: 75,
+        badgeId: "badge-ch-compl",
+        badgeTitle: "Complementary Angle Ace (Verified θ & 90°-θ Law)",
+        title: `Complementary Law Verified (${Math.round(compMatch.angle)}° & ${Math.round(currentAngle)}°)`
+      });
     }
 
     flatGroundLaunches.unshift({ angle: currentAngle, v0: currentV0, g: currentG, range: currentRange, h0: currentH0 });
@@ -1543,8 +1999,13 @@ function checkFlightChallenges(flightData) {
   if (!challenges.apex?.completed && flightData.apex >= 40) {
     challenges.apex.completed = true;
     updated = true;
-    addStudentXp(100, "Stratospheric Apex Challenge");
-    unlockBadge("badge-ch-moon", "Lunar Gravity Explorer (Stratospheric High Apex)");
+    completeChallengeAuthoritatively({
+      challengeId: "projectile.apex",
+      xp: 100,
+      badgeId: "badge-ch-moon",
+      badgeTitle: "Lunar Gravity Explorer (Stratospheric High Apex)",
+      title: "Stratospheric Apex Challenge"
+    });
   }
 
   if (updated) {
@@ -1689,17 +2150,27 @@ function recordCurrentObservation() {
   if (obsList.length > 50) obsList.pop();
   saveStoredObservations(obsList);
 
-  // Sync with Express backend
-  api.addObservation(getActiveUserId(), obsEntry).catch(() => {});
+  // Sync with Express backend if online
+  if (canPerformCloudOperation()) {
+    api.addObservation(getActiveUserId(), obsEntry).catch(() => {});
+  }
 
-  // Sync to Firestore users/{uid}/experiments/projectile
-  if (auth.currentUser) {
+  // Sync to Firestore users/{uid}/experiments/projectile if online
+  if (auth.currentUser && canPerformCloudOperation()) {
     recordExperimentInFirestore(auth.currentUser.uid, "projectile", {
       experimentName: "2D Projectile Motion",
       completed: true,
       score: Number(rangeVal),
       xpEarned: 15
-    });
+    }).then(res => {
+      if (res && typeof res.totalXP === "number") {
+        setAuthoritativeUserXp(auth.currentUser.uid, res.totalXP);
+        loadUserProfile();
+      }
+      if (res && res.experimentsPerformed >= 5) {
+        unlockBadge("badge-lab-veteran", "Laboratory Veteran (Explored Labs 5+ Times)");
+      }
+    }).catch(() => {});
   }
 
   renderObservationsTable();
@@ -1812,63 +2283,40 @@ function exportProjectilePdf() {
   }
 }
 
-function calculateStudentRankAndLevel(stats, quizHigh, targetScore, badgeCount) {
+function calculateLegacyLocalXp(stats, quizHigh, targetScore, badgeCount) {
   const bonusXp = getStoredBonusXp();
-  let ofXp = 0;
+  let chXp = 0;
   try {
     const ofChallenges = JSON.parse(localStorage.getItem("physix_of_challenges") || "{}");
-    if (ofChallenges.spotMatch?.completed) ofXp += 100;
-    if (ofChallenges.rapidCalib?.completed) ofXp += 125;
-    if (ofChallenges.multiSweep?.completed) ofXp += 150;
+    if (ofChallenges.spotMatch?.completed) chXp += 100;
+    if (ofChallenges.rapidCalib?.completed) chXp += 125;
+    if (ofChallenges.multiSweep?.completed) chXp += 150;
+
+    const csChallenges = JSON.parse(localStorage.getItem("physix_cs_challenges") || "{}");
+    if (csChallenges.primaryCalib?.completed) chXp += 100;
+    if (csChallenges.mysteryDetective?.completed) chXp += 125;
+    if (csChallenges.distanceSweep?.completed) chXp += 150;
+
+    const sbChallenges = JSON.parse(localStorage.getItem("physix_sb_challenges") || "{}");
+    if (sbChallenges.thrust?.completed) chXp += 100;
+    if (sbChallenges.kick?.completed) chXp += 125;
+    if (sbChallenges.zerog?.completed) chXp += 150;
   } catch (e) {}
 
-  const totalScore = (quizHigh * 50) + targetScore + (stats.totalLaunches * 15) + (badgeCount * 40) + bonusXp + ofXp;
-  
-  // Progressive doubling level scale:
-  // Level 1: 0 -> 1000 XP
-  // Level 2: 1000 -> 3000 XP (delta: 2000)
-  // Level 3: 3000 -> 7000 XP (delta: 4000)
-  // Level 4: 7000 -> 15000 XP (delta: 8000)
-  // Level 5: 15000 -> 31000 XP (delta: 16000)
-  // Level 6: 31000 -> 63000 XP (delta: 32000)
-  let level = 1;
-  let currentThreshold = 0;
-  let currentDelta = 1000;
-  let nextThreshold = 1000;
+  return (quizHigh * 50) + (targetScore || 0) + ((stats?.totalLaunches || 0) * 15) + ((badgeCount || 0) * 40) + bonusXp + chXp;
+}
 
-  while (totalScore >= nextThreshold) {
-    level++;
-    currentThreshold = nextThreshold;
-    currentDelta = currentDelta * 2;
-    nextThreshold = currentThreshold + currentDelta;
+function calculateStudentRankAndLevel(stats, quizHigh, targetScore, badgeCount) {
+  const user = auth.currentUser;
+  let totalScore = 0;
+  if (user && isUserAuthenticated()) {
+    // For authenticated users, Firestore is the single source of truth
+    totalScore = getAuthoritativeUserXp(user.uid);
+  } else {
+    // Fallback for unauthenticated guest mode
+    totalScore = calculateLegacyLocalXp(stats, quizHigh, targetScore, badgeCount);
   }
-
-  const xpInLevel = totalScore - currentThreshold;
-  const xpNeededForNext = nextThreshold - currentThreshold;
-  const progressPct = Math.min(100, Math.max(0, (xpInLevel / xpNeededForNext) * 100));
-
-  const rankTitles = [
-    "Newtonian Novice",
-    "Galilean Scholar",
-    "Kinetic Specialist",
-    "Orbital Dynamist",
-    "Waveguide Optician",
-    "Quantum Luminary",
-    "Grand Astrophysics Virtuoso"
-  ];
-  const rank = rankTitles[Math.min(level - 1, rankTitles.length - 1)];
-
-  return {
-    level,
-    rank,
-    title: `Level ${level} • ${rank}`,
-    totalXp: totalScore,
-    currentThreshold,
-    nextThreshold,
-    xpInLevel,
-    xpNeededForNext,
-    progressPct
-  };
+  return calculateRankFromXp(totalScore);
 }
 
 function recordLaunchTelemetry(v0, angleDeg, h0, g) {
@@ -1952,13 +2400,20 @@ function recordTargetHitTelemetry(isBullseye) {
 
   // Check Challenge 1: Precision Bullseye (+50 XP)
   const challenges = getStoredChallenges();
-  if (!challenges.target?.completed) {
+  if (!challenges.target?.completed && !activeAuthoritativeCompletedChallenges.includes("projectile.target")) {
     challenges.target.completed = true;
     saveStoredChallenges(challenges);
-    addStudentXp(50, "Precision Bullseye Challenge");
+    completeChallengeAuthoritatively({
+      challengeId: "projectile.target",
+      xp: 50,
+      badgeId: "badge-target-hit",
+      badgeTitle: isBullseye ? "Bullseye Sniper (Direct Hit)" : "Target Hit Accomplished",
+      title: "Precision Bullseye Challenge"
+    });
+  } else {
+    unlockBadge("badge-target-hit", isBullseye ? "Bullseye Sniper (Direct Hit)" : "Target Hit Accomplished");
   }
 
-  unlockBadge("badge-target-hit", isBullseye ? "Bullseye Sniper (Direct Hit)" : "Target Hit Accomplished");
   loadUserProfile();
 }
 
@@ -2003,7 +2458,7 @@ function loadUserProfile() {
 
   // Derive active user identity
   const user = auth.currentUser;
-  const isAuth = !!user;
+  const isAuth = isUserAuthenticated();
 
   // Automatic Level-Up celebration: triggers ONLY when a user advances to a higher level
   try {
@@ -2493,10 +2948,20 @@ formLogin?.addEventListener("submit", async (e) => {
   try {
     loginErrorMsg.classList.add("hidden");
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    showToast(`Welcome back, ${userCredential.user.email}! Please review your student details.`);
     loginEmail.value = "";
     loginPassword.value = "";
-    await processUserDailyStreak(userCredential.user);
+
+    // Check if email verification is required for email/password user
+    if (isEmailVerificationRequired(userCredential.user)) {
+      profileModal?.classList.add("hidden");
+      showVerificationOverlay(userCredential.user);
+      setVerifyBanner("Your email is not verified yet. Please check your inbox and verify your email to unlock PhysiX.", "info");
+      showToast("Email verification required. Please verify your email.");
+      return;
+    }
+
+    showToast(`Welcome back, ${userCredential.user.email}! Please review your student details.`);
+    await completeVerifiedUserInitialization(userCredential.user);
     loadUserProfile();
     openEditProfileModal();
   } catch (error) {
@@ -2533,13 +2998,24 @@ formSignup?.addEventListener("submit", async (e) => {
   try {
     signupErrorMsg.classList.add("hidden");
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    showToast(`Account created for ${userCredential.user.email}! Please enter your student details.`);
+    
+    // 1. Immediately send verification email
+    try {
+      await sendEmailVerification(userCredential.user);
+    } catch (verifErr) {
+      console.warn("sendEmailVerification error upon signup:", verifErr);
+    }
+
     signupEmail.value = "";
     signupPassword.value = "";
     signupConfirm.value = "";
-    await processUserDailyStreak(userCredential.user);
-    loadUserProfile();
-    openEditProfileModal();
+
+    // 2. Block main app and display verification screen
+    profileModal?.classList.add("hidden");
+    showVerificationOverlay(userCredential.user);
+    startResendCooldown(60);
+    setVerifyBanner(`We've sent a verification link to ${userCredential.user.email}. Please verify your email to activate your account.`, "info");
+    showToast(`Verification email sent to ${userCredential.user.email}!`);
   } catch (error) {
     console.error("Signup error:", error);
     signupErrorMsg.textContent = formatAuthError(error);
@@ -2711,6 +3187,163 @@ function formatAuthError(error) {
   return cleaned || msg;
 }
 
+// ==========================================
+// EMAIL VERIFICATION UI CONTROLLER & LISTENERS
+// ==========================================
+let resendCooldownInterval = null;
+let resendCooldownRemaining = 0;
+
+function showVerificationOverlay(user) {
+  if (!emailVerificationModal) return;
+  const email = (user && user.email) || (auth.currentUser && auth.currentUser.email) || "your email address";
+  if (verifyUserEmail) {
+    verifyUserEmail.textContent = email;
+  }
+  // Close any potentially interfering modals
+  profileModal?.classList.add("hidden");
+  editProfileModal?.classList.add("hidden");
+
+  emailVerificationModal.classList.remove("hidden");
+}
+
+function hideVerificationOverlay() {
+  if (!emailVerificationModal) return;
+  emailVerificationModal.classList.add("hidden");
+}
+
+function setVerifyBanner(message, type = "info") {
+  if (!verifyFeedbackBanner) return;
+  verifyFeedbackBanner.textContent = message;
+  verifyFeedbackBanner.className = `verify-feedback-banner feedback-${type}`;
+  verifyFeedbackBanner.classList.remove("hidden");
+}
+
+function startResendCooldown(seconds = 60) {
+  if (resendCooldownInterval) {
+    clearInterval(resendCooldownInterval);
+    resendCooldownInterval = null;
+  }
+  resendCooldownRemaining = seconds;
+  if (btnVerifyResend) btnVerifyResend.disabled = true;
+  if (verifyResendLabel) verifyResendLabel.textContent = `Resend in ${resendCooldownRemaining}s`;
+
+  resendCooldownInterval = setInterval(() => {
+    resendCooldownRemaining--;
+    if (resendCooldownRemaining <= 0) {
+      clearInterval(resendCooldownInterval);
+      resendCooldownInterval = null;
+      if (btnVerifyResend) btnVerifyResend.disabled = false;
+      if (verifyResendLabel) verifyResendLabel.textContent = "Resend Verification Email";
+    } else {
+      if (verifyResendLabel) verifyResendLabel.textContent = `Resend in ${resendCooldownRemaining}s`;
+    }
+  }, 1000);
+}
+
+// "I've Verified My Email" Button Handler (Refresh & Check)
+btnVerifyCheck?.addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if (!user) {
+    setVerifyBanner("No active session found. Please sign in again.", "error");
+    return;
+  }
+
+  const originalContent = btnVerifyCheck.innerHTML;
+  btnVerifyCheck.disabled = true;
+  btnVerifyCheck.innerHTML = `
+    <svg class="svg-icon svg-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;">
+      <circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-linecap="round"></circle>
+    </svg>
+    <span>Checking Verification...</span>
+  `;
+
+  try {
+    // 1. Force reload user from Firebase server to get fresh emailVerified state
+    await reload(user);
+
+    // 2. Inspect reloaded verification status
+    if (auth.currentUser && auth.currentUser.emailVerified) {
+      setVerifyBanner("Email verified successfully! Initializing PhysiX Laboratory...", "success");
+      showToast("Email verified! Welcome to PhysiX.");
+      setTimeout(async () => {
+        hideVerificationOverlay();
+        btnVerifyCheck.disabled = false;
+        btnVerifyCheck.innerHTML = originalContent;
+        await completeVerifiedUserInitialization(auth.currentUser);
+      }, 600);
+    } else {
+      setVerifyBanner("Your email is not verified yet. Please check your inbox (and spam/junk folder), click the link, and try again.", "info");
+      btnVerifyCheck.disabled = false;
+      btnVerifyCheck.innerHTML = originalContent;
+    }
+  } catch (error) {
+    console.error("Verification reload error:", error);
+    setVerifyBanner("Unable to refresh verification status. Please check your internet connection.", "error");
+    btnVerifyCheck.disabled = false;
+    btnVerifyCheck.innerHTML = originalContent;
+  }
+});
+
+// "Resend Verification Email" Button Handler
+btnVerifyResend?.addEventListener("click", async () => {
+  if (resendCooldownRemaining > 0) return;
+  const user = auth.currentUser;
+  if (!user) {
+    setVerifyBanner("No active session found. Please sign in again.", "error");
+    return;
+  }
+
+  btnVerifyResend.disabled = true;
+  if (verifyResendLabel) verifyResendLabel.textContent = "Sending Email...";
+
+  try {
+    await sendEmailVerification(user);
+    setVerifyBanner(`Verification link resent to ${user.email}! Please check your inbox and spam folder.`, "success");
+    showToast("Verification email resent.");
+    startResendCooldown(60);
+  } catch (error) {
+    console.error("Resend verification error:", error);
+    const code = error?.code || "";
+    const msg = error?.message || "";
+    if (code === "auth/too-many-requests" || msg.includes("too-many-requests")) {
+      setVerifyBanner("Too many requests. Please wait a minute before requesting another verification email.", "error");
+      startResendCooldown(60);
+    } else if (code === "auth/network-request-failed" || msg.includes("network-request-failed")) {
+      setVerifyBanner("Network connection failed. Please check your internet connection.", "error");
+      btnVerifyResend.disabled = false;
+      if (verifyResendLabel) verifyResendLabel.textContent = "Resend Verification Email";
+    } else if (code === "auth/user-token-expired" || code === "auth/requires-recent-login" || msg.includes("user-token-expired")) {
+      setVerifyBanner("Your authentication session has expired. Please sign out and sign in again.", "error");
+      btnVerifyResend.disabled = false;
+      if (verifyResendLabel) verifyResendLabel.textContent = "Resend Verification Email";
+    } else {
+      setVerifyBanner(formatAuthError(error), "error");
+      btnVerifyResend.disabled = false;
+      if (verifyResendLabel) verifyResendLabel.textContent = "Resend Verification Email";
+    }
+  }
+});
+
+// "Sign Out / Use Another Account" Button Handler
+btnVerifySignout?.addEventListener("click", async () => {
+  try {
+    if (resendCooldownInterval) {
+      clearInterval(resendCooldownInterval);
+      resendCooldownInterval = null;
+      resendCooldownRemaining = 0;
+    }
+    if (btnVerifyResend) btnVerifyResend.disabled = false;
+    if (verifyResendLabel) verifyResendLabel.textContent = "Resend Verification Email";
+
+    await signOut(auth);
+    hideVerificationOverlay();
+    showToast("Signed out. You can sign in with another account.");
+    loadUserProfile();
+  } catch (error) {
+    showToast(`Error signing out: ${error.message}`);
+  }
+});
+
 // Edit Profile Modal Elements
 const editProfileModal = document.getElementById("edit-profile-modal");
 const btnOpenEditProfile = document.getElementById("btn-open-edit-profile");
@@ -2811,10 +3444,7 @@ btnCloseEditProfile?.addEventListener("click", () => {
   profileModal?.classList.remove("hidden");
 });
 
-// Track Auth State in Real-Time
-onAuthStateChanged(auth, () => {
-  loadUserProfile();
-});
+
 
 function openBadgesModal() {
   loadUserProfile();
@@ -2857,6 +3487,7 @@ const quizBadgeHeader = document.getElementById("quiz-badge-header");
 const quizCurrentNum = document.getElementById("quiz-current-num");
 const quizTotalNum = document.getElementById("quiz-total-num");
 const quizProgressBar = document.getElementById("quiz-progress-bar");
+const quizProgressPercent = document.getElementById("quiz-progress-percent");
 const quizQuestionText = document.getElementById("quiz-question-text");
 const quizOptionsList = document.getElementById("quiz-options-list");
 const btnQuizPrev = document.getElementById("btn-quiz-prev");
@@ -2949,6 +3580,7 @@ function renderQuizQuestion(index) {
   if (quizCurrentNum) quizCurrentNum.textContent = index + 1;
   const progressPercent = ((index + 1) / activeQuizData.questions.length) * 100;
   if (quizProgressBar) quizProgressBar.style.width = `${progressPercent}%`;
+  if (quizProgressPercent) quizProgressPercent.textContent = `${Math.round(progressPercent)}%`;
 
   if (quizQuestionText) quizQuestionText.textContent = `${index + 1}. ${q.question}`;
   if (quizOptionsList) quizOptionsList.innerHTML = "";
@@ -3114,6 +3746,10 @@ function showQuizResults() {
       localStorage.setItem(storageKey, score);
       showToast(`New ${activeQuizData.experimentName} High Score: ${score}/${total}!`);
     }
+    if (!canPerformCloudOperation()) {
+      console.log("[Quiz] Offline mode: quiz completed in-memory. Skipping persistence.");
+      return;
+    }
     localStorage.setItem("physix_quiz_highscore", Math.max(score, Number(localStorage.getItem("physix_quiz_highscore") || 0)));
 
     recordQuizTelemetry(score, total);
@@ -3127,6 +3763,13 @@ function showQuizResults() {
         totalQuestions: total,
         percentage: pct,
         xpEarned: score * 10
+      }).then(res => {
+        if (res && typeof res.totalXP === "number") {
+          setAuthoritativeUserXp(auth.currentUser.uid, res.totalXP);
+          loadUserProfile();
+        }
+      }).catch(err => {
+        console.warn("[Quiz Sync] Error recording quiz attempt:", err);
       });
     }
   } catch (e) {
@@ -3450,6 +4093,11 @@ function updateAiContextStrip() {
 
 async function updateAiServerStatus() {
   if (!aiLiveBadge) return;
+  if (!canPerformCloudOperation()) {
+    aiLiveBadge.textContent = "○ Vectra Offline";
+    aiLiveBadge.style.color = "#94a3b8";
+    return;
+  }
   const isAuth = isUserAuthenticated();
   if (!isAuth) {
     const used = getGuestAiMessageCount();
@@ -3643,6 +4291,13 @@ async function handleSendAiChat(userText) {
   const message = (userText || aiChatInput?.value || "").trim();
   if (!message) return;
 
+  if (!canPerformCloudOperation()) {
+    if (aiChatInput) aiChatInput.value = "";
+    appendAiMessage("user", message);
+    appendAiMessage("bot", "Vectra AI is currently unavailable offline. An active internet connection is required for cloud physics intelligence. All simulators, experiments, formulas, and sandbox controls remain fully operational offline!");
+    return;
+  }
+
   const isAuth = isUserAuthenticated();
   if (!isAuth) {
     const used = getGuestAiMessageCount();
@@ -3721,7 +4376,7 @@ aiSuggestionChips.forEach(chip => {
 });
 
 // Close modals on backdrop click
-[explorerModal, theoryModal, profileModal, quizModal, editProfileModal, aiCopilotModal].forEach(modal => {
+[explorerModal, theoryModal, profileModal, quizModal, editProfileModal, aiCopilotModal, legalModal].forEach(modal => {
   if (modal) {
     modal.addEventListener("click", (e) => {
       if (e.target === modal) {
@@ -3741,6 +4396,7 @@ window.addEventListener("keydown", (e) => {
     quizModal?.classList.add("hidden");
     editProfileModal?.classList.add("hidden");
     aiCopilotModal?.classList.add("hidden");
+    legalModal?.classList.add("hidden");
   }
 });
 
@@ -3750,22 +4406,99 @@ window.addEventListener("keydown", (e) => {
 const expProjSection = document.getElementById("exp-projectile-section");
 const expOptSection = document.getElementById("exp-optical-section");
 const expColourSection = document.getElementById("exp-colour-sensor-section");
+const expSandboxSection = document.getElementById("exp-sandbox-section");
 const btnSwitchProj = document.getElementById("btn-switch-exp-projectile");
 const btnSwitchOpt = document.getElementById("btn-switch-exp-optical");
 const btnSwitchColour = document.getElementById("btn-switch-exp-colour");
+const btnSwitchSandbox = document.getElementById("btn-switch-exp-sandbox");
+
+async function trackExperimentEngagement(expId) {
+  if (!canPerformCloudOperation()) return;
+  const userId = getActiveUserId();
+  const isAuth = !!auth.currentUser;
+
+  let currentCount = 0;
+  if (isAuth) {
+    try {
+      const res = await recordExperimentActivity(auth.currentUser.uid, expId, {
+        experimentName: getExperimentNameById(expId)
+      });
+      if (res && typeof res.experimentsPerformed === "number") {
+        currentCount = res.experimentsPerformed;
+        const stats = getStoredTelemetry();
+        stats.totalLaunches = Math.max(stats.totalLaunches || 0, currentCount);
+        saveStoredTelemetry(stats);
+      }
+    } catch (err) {
+      console.warn("[Experiment Activity] Sync notice:", err);
+    }
+  } else {
+    const guestKey = "physix_guest_experiment_count";
+    currentCount = (Number(localStorage.getItem(guestKey)) || 0) + 1;
+    localStorage.setItem(guestKey, String(currentCount));
+    const stats = getStoredTelemetry();
+    stats.totalLaunches = Math.max(stats.totalLaunches || 0, currentCount);
+    saveStoredTelemetry(stats);
+  }
+
+  console.log(`[Experiment Activity] Current activity count: ${currentCount} (exp: ${expId})`);
+
+  // Check 5-use milestone badge threshold
+  const BADGE_THRESHOLD = 5;
+  const isEligible = currentCount >= BADGE_THRESHOLD;
+  console.log(`[Badge] Badge eligibility result for 'badge-lab-veteran': eligible = ${isEligible} (${currentCount}/${BADGE_THRESHOLD})`);
+
+  if (isEligible) {
+    unlockBadge("badge-lab-veteran", "Laboratory Veteran (Explored Labs 5+ Times)");
+  }
+}
 
 function switchExperiment(expId) {
   activeExperimentId = expId;
+  trackExperimentEngagement(expId);
 
   expProjSection?.classList.add("hidden");
   expOptSection?.classList.add("hidden");
   expColourSection?.classList.add("hidden");
+  expSandboxSection?.classList.add("hidden");
 
   btnSwitchProj?.classList.remove("active");
   btnSwitchOpt?.classList.remove("active");
   btnSwitchColour?.classList.remove("active");
+  btnSwitchSandbox?.classList.remove("active");
 
-  if (expId === "colour-sensor") {
+  if (expId === "sandbox") {
+    expSandboxSection?.classList.remove("hidden");
+    btnSwitchSandbox?.classList.add("active");
+
+    if (!physicsSandboxExperimentInstance) {
+      physicsSandboxExperimentInstance = createPhysicsSandboxExperiment({
+        onXpAwarded: (amount, reason) => addStudentXp(amount, reason),
+        showToast,
+        getActiveUserId,
+        loadUserProfile,
+        getStoredUserProfile,
+        unlockBadge: (badgeId, badgeName) => unlockBadge(badgeId, badgeName),
+        isUserAuthenticated,
+        openLoginModal,
+        onChallengeCompleted: (data) => completeChallengeAuthoritatively(data)
+      });
+      physicsSandboxExperimentInstance.init();
+      if (activeAuthoritativeCompletedChallenges.length > 0 && typeof physicsSandboxExperimentInstance.hydrateChallenges === "function") {
+        physicsSandboxExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+      }
+    } else {
+      if (activeAuthoritativeCompletedChallenges.length > 0 && typeof physicsSandboxExperimentInstance.hydrateChallenges === "function") {
+        physicsSandboxExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+      }
+      physicsSandboxExperimentInstance.renderAll();
+      if (physicsSandboxExperimentInstance.renderChallengesDom) {
+        physicsSandboxExperimentInstance.renderChallengesDom();
+      }
+    }
+
+    showToast("Switched to Exp 4: Physics Sandbox");
+  } else if (expId === "colour-sensor") {
     expColourSection?.classList.remove("hidden");
     btnSwitchColour?.classList.add("active");
 
@@ -3773,7 +4506,17 @@ function switchExperiment(expId) {
       colourSensorExperimentInstance = createColourSensorExperiment({
         onXpAwarded: (amount, reason) => addStudentXp(amount, reason),
         onExperimentRecorded: (id, data) => {
-          if (auth.currentUser) recordExperimentInFirestore(auth.currentUser.uid, id, data);
+          if (auth.currentUser && canPerformCloudOperation()) {
+            recordExperimentInFirestore(auth.currentUser.uid, id, data).then(res => {
+              if (res && typeof res.totalXP === "number") {
+                setAuthoritativeUserXp(auth.currentUser.uid, res.totalXP);
+                loadUserProfile();
+              }
+              if (res && res.experimentsPerformed >= 5) {
+                unlockBadge("badge-lab-veteran", "Laboratory Veteran (Explored Labs 5+ Times)");
+              }
+            }).catch(() => {});
+          }
         },
         showToast,
         getActiveUserId,
@@ -3781,10 +4524,17 @@ function switchExperiment(expId) {
         getStoredUserProfile,
         unlockBadge: (badgeId, badgeName) => unlockBadge(badgeId, badgeName),
         isUserAuthenticated,
-        openLoginModal
+        openLoginModal,
+        onChallengeCompleted: (data) => completeChallengeAuthoritatively(data)
       });
       colourSensorExperimentInstance.init();
+      if (activeAuthoritativeCompletedChallenges.length > 0 && typeof colourSensorExperimentInstance.hydrateChallenges === "function") {
+        colourSensorExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+      }
     } else {
+      if (activeAuthoritativeCompletedChallenges.length > 0 && typeof colourSensorExperimentInstance.hydrateChallenges === "function") {
+        colourSensorExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+      }
       colourSensorExperimentInstance.renderAll();
     }
 
@@ -3797,7 +4547,17 @@ function switchExperiment(expId) {
       opticalExperimentInstance = createOpticalFibreExperiment({
         onXpAwarded: (amount, reason) => addStudentXp(amount, reason),
         onExperimentRecorded: (id, data) => {
-          if (auth.currentUser) recordExperimentInFirestore(auth.currentUser.uid, id, data);
+          if (auth.currentUser && canPerformCloudOperation()) {
+            recordExperimentInFirestore(auth.currentUser.uid, id, data).then(res => {
+              if (res && typeof res.totalXP === "number") {
+                setAuthoritativeUserXp(auth.currentUser.uid, res.totalXP);
+                loadUserProfile();
+              }
+              if (res && res.experimentsPerformed >= 5) {
+                unlockBadge("badge-lab-veteran", "Laboratory Veteran (Explored Labs 5+ Times)");
+              }
+            }).catch(() => {});
+          }
         },
         showToast,
         getActiveUserId,
@@ -3805,10 +4565,17 @@ function switchExperiment(expId) {
         getStoredUserProfile,
         unlockBadge: (badgeId, badgeName) => unlockBadge(badgeId, badgeName),
         isUserAuthenticated,
-        openLoginModal
+        openLoginModal,
+        onChallengeCompleted: (data) => completeChallengeAuthoritatively(data)
       });
       opticalExperimentInstance.init();
+      if (activeAuthoritativeCompletedChallenges.length > 0 && typeof opticalExperimentInstance.hydrateChallenges === "function") {
+        opticalExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+      }
     } else {
+      if (activeAuthoritativeCompletedChallenges.length > 0 && typeof opticalExperimentInstance.hydrateChallenges === "function") {
+        opticalExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+      }
       opticalExperimentInstance.renderAll();
     }
 
@@ -3826,25 +4593,57 @@ function switchExperiment(expId) {
 btnSwitchProj?.addEventListener("click", () => switchExperiment("projectile"));
 btnSwitchOpt?.addEventListener("click", () => switchExperiment("optical"));
 btnSwitchColour?.addEventListener("click", () => switchExperiment("colour-sensor"));
+btnSwitchSandbox?.addEventListener("click", () => switchExperiment("sandbox"));
 
-// Lab Cards Interaction in Hub
-const labCards = document.querySelectorAll(".lab-card");
-labCards.forEach(card => {
-  card.addEventListener("click", () => {
+// ==========================================
+// LAB & EXPERIMENT CARDS INTERACTION & WHITE LIGHT EFFECT
+// ==========================================
+const allExperimentCards = document.querySelectorAll(".lab-card, .concept-card");
+allExperimentCards.forEach(card => {
+  card.addEventListener("click", (e) => {
+    // If the click was on the bookmark button, do not launch
+    if (e.target.closest(".card-bookmark-btn")) return;
+
     const target = card.getAttribute("data-exp-target");
-    if (target === "colour-sensor") {
-      explorerModal.classList.add("hidden");
-      switchExperiment("colour-sensor");
-    } else if (target === "optical") {
-      explorerModal.classList.add("hidden");
-      switchExperiment("optical");
-    } else if (card.classList.contains("active-lab")) {
-      explorerModal.classList.add("hidden");
-      switchExperiment("projectile");
+    const name = card.getAttribute("data-name") || "";
+
+    let expId = null;
+    if (target === "sandbox" || name.toLowerCase().includes("sandbox")) expId = "sandbox";
+    else if (target === "colour-sensor" || name.toLowerCase().includes("colour sensor")) expId = "colour-sensor";
+    else if (target === "optical" || name.toLowerCase().includes("optical fibre")) expId = "optical";
+    else if (target === "projectile" || card.classList.contains("active-lab") || name.toLowerCase().includes("projectile")) expId = "projectile";
+
+    if (expId) {
+      explorerModal?.classList.add("hidden");
+      navigateTo(`/experiment/${expId}`);
     } else {
-      const name = card.getAttribute("data-name") || "This experiment";
-      showToast(`${name} is currently in development.`);
+      showToast(`${name || "This experiment"} is currently in calibration. Full module coming soon!`);
     }
+  });
+});
+
+// Interactive Bookmarks Controller
+const savedBookmarkList = JSON.parse(localStorage.getItem("physix_bookmarked_labs") || "[]");
+const bookmarkedSet = new Set(savedBookmarkList);
+
+document.querySelectorAll(".card-bookmark-btn").forEach(btn => {
+  const card = btn.closest(".lab-card, .concept-card");
+  const labName = card?.getAttribute("data-name") || "lab";
+  if (bookmarkedSet.has(labName)) {
+    btn.classList.add("bookmarked");
+  }
+
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isNowBookmarked = btn.classList.toggle("bookmarked");
+    if (isNowBookmarked) {
+      bookmarkedSet.add(labName);
+      showToast(`Bookmarked: ${labName}`);
+    } else {
+      bookmarkedSet.delete(labName);
+      showToast(`Removed bookmark: ${labName}`);
+    }
+    localStorage.setItem("physix_bookmarked_labs", JSON.stringify([...bookmarkedSet]));
   });
 });
 
@@ -4015,6 +4814,12 @@ function updateAuthStateRestrictions() {
       colourSensorExperimentInstance.updateChallengeCounters();
     }
   }
+  if (physicsSandboxExperimentInstance) {
+    physicsSandboxExperimentInstance.renderAll();
+    if (physicsSandboxExperimentInstance.renderChallengesDom) {
+      physicsSandboxExperimentInstance.renderChallengesDom();
+    }
+  }
 
   // Update Vectra AI copilot header badge
   updateAiServerStatus();
@@ -4028,45 +4833,661 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// Listen to Firebase Auth state transitions
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
+let isInitializingUser = false;
+
+async function completeVerifiedUserInitialization(user) {
+  if (!user || isEmailVerificationRequired(user)) return;
+  if (isInitializingUser) return;
+  isInitializingUser = true;
+
+  try {
+    if (!canPerformCloudOperation()) {
+      console.log("[Auth] Offline mode detected during user initialization. Loading cached profile/progression in read-only mode.");
+      const cachedXp = Number(localStorage.getItem(`physix_xp_${user.uid}`) || 0);
+      setAuthoritativeUserXp(user.uid, cachedXp, false);
+
+      const localCandidates = [];
+      try {
+        const p = getStoredChallenges();
+        if (p.target?.completed) localCandidates.push("projectile.target");
+        if (p.complementary?.completed) localCandidates.push("projectile.complementary");
+        if (p.apex?.completed) localCandidates.push("projectile.apex");
+
+        const ofSaved = JSON.parse(localStorage.getItem("physix_of_challenges") || "{}");
+        if (ofSaved.spotMatch?.completed) localCandidates.push("optical.spotMatch");
+        if (ofSaved.rapidCalib?.completed) localCandidates.push("optical.rapidCalib");
+        if (ofSaved.multiSweep?.completed) localCandidates.push("optical.multiSweep");
+
+        const csSaved = JSON.parse(localStorage.getItem("physix_cs_challenges") || "{}");
+        if (csSaved.primaryCalib?.completed) localCandidates.push("colour-sensor.primaryCalib");
+        if (csSaved.mysteryDetective?.completed) localCandidates.push("colour-sensor.mysteryDetective");
+        if (csSaved.distanceSweep?.completed) localCandidates.push("colour-sensor.distanceSweep");
+
+        const sbSaved = JSON.parse(localStorage.getItem("physix_sb_challenges") || "{}");
+        if (sbSaved.thrust?.completed) localCandidates.push("sandbox.thrust");
+        if (sbSaved.kick?.completed) localCandidates.push("sandbox.kick");
+        if (sbSaved.zerog?.completed) localCandidates.push("sandbox.zerog");
+      } catch (e) {}
+
+      activeAuthoritativeCompletedChallenges = localCandidates;
+      hydrateAllExperimentChallenges(localCandidates);
+      updateAuthStateRestrictions();
+      loadUserProfile();
+      renderChallenges();
+      return;
+    }
+
     await processUserDailyStreak(user);
 
-    // Sync user schema to Firestore users/{uid}
+    // 1. Authoritative Firestore fetch: populate user progress, XP, and unlocked badges from Firestore
+    let cloudBadges = [];
+    let cloudExpCount = 0;
+    let cloudXp = null;
+    let cloudQuizScore = 0;
+    let cloudChallenges = [];
+
+    try {
+      const cloudData = await fetchFullUserDataFromFirestore(user.uid);
+      if (cloudData && cloudData.user) {
+        const cUser = cloudData.user;
+        cloudBadges = Array.isArray(cUser.badges) ? cUser.badges : [];
+        cloudExpCount = Number(cUser.experimentsPerformed || 0);
+        cloudQuizScore = Number(cUser.bestQuizScore || 0);
+        cloudChallenges = Array.isArray(cUser.completedChallenges) ? cUser.completedChallenges : [];
+
+        if (typeof cUser.totalXP === "number") {
+          cloudXp = cUser.totalXP;
+        } else if (typeof cUser.xp === "number") {
+          cloudXp = cUser.xp;
+        }
+
+        // Sync authoritative cloud badges to user-scoped local storage
+        const localBadges = getStoredBadges(user.uid);
+        const mergedBadges = Array.from(new Set([...cloudBadges, ...localBadges]));
+        saveStoredBadges(mergedBadges, user.uid);
+
+        // Keep local telemetry counts aligned without downgrading
+        const stats = getStoredTelemetry();
+        if (cloudExpCount > (stats.totalLaunches || 0)) {
+          stats.totalLaunches = cloudExpCount;
+          saveStoredTelemetry(stats);
+        }
+
+        // Align high score if cloud has higher
+        if (cloudQuizScore > 0) {
+          const currentHigh = Number(localStorage.getItem("physix_quiz_highscore") || 0);
+          if (cloudQuizScore > currentHigh) {
+            localStorage.setItem("physix_quiz_highscore", String(cloudQuizScore));
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("[Firestore] fetchFullUserDataFromFirestore sync notice:", err);
+    }
+
+    // 2. Authoritative Completed Challenges Resolution & Safe One-Way Migration:
+    // Gather any legacy local completions and safely merge into cloud authoritative set.
+    const localCandidates = [];
+    try {
+      const p = getStoredChallenges();
+      if (p.target?.completed) localCandidates.push("projectile.target");
+      if (p.complementary?.completed) localCandidates.push("projectile.complementary");
+      if (p.apex?.completed) localCandidates.push("projectile.apex");
+
+      const ofSaved = JSON.parse(localStorage.getItem("physix_of_challenges") || "{}");
+      if (ofSaved.spotMatch?.completed) localCandidates.push("optical.spotMatch");
+      if (ofSaved.rapidCalib?.completed) localCandidates.push("optical.rapidCalib");
+      if (ofSaved.multiSweep?.completed) localCandidates.push("optical.multiSweep");
+
+      const csSaved = JSON.parse(localStorage.getItem("physix_cs_challenges") || "{}");
+      if (csSaved.primaryCalib?.completed) localCandidates.push("colour-sensor.primaryCalib");
+      if (csSaved.mysteryDetective?.completed) localCandidates.push("colour-sensor.mysteryDetective");
+      if (csSaved.distanceSweep?.completed) localCandidates.push("colour-sensor.distanceSweep");
+
+      const sbSaved = JSON.parse(localStorage.getItem("physix_sb_challenges") || "{}");
+      if (sbSaved.thrust?.completed) localCandidates.push("sandbox.thrust");
+      if (sbSaved.kick?.completed) localCandidates.push("sandbox.kick");
+      if (sbSaved.zerog?.completed) localCandidates.push("sandbox.zerog");
+    } catch (e) {}
+
+    const mergedChallenges = Array.from(new Set([...cloudChallenges, ...localCandidates]));
+    activeAuthoritativeCompletedChallenges = mergedChallenges;
+    hydrateAllExperimentChallenges(mergedChallenges);
+
+    // 3. Authoritative XP Resolution:
+    // Firestore is the SINGLE SOURCE OF TRUTH for progression.
+    let authoritativeXp = 0;
+    if (cloudXp !== null && cloudXp >= 0) {
+      authoritativeXp = cloudXp;
+    } else {
+      // First-time migration check: only if Firestore has no record yet
+      const stats = getStoredTelemetry();
+      const badges = getStoredBadges(user.uid);
+      const quizHigh = Number(localStorage.getItem("physix_quiz_highscore") || 0);
+      const targetScore = simState.targetScore || 0;
+      const legacyLocalXp = calculateLegacyLocalXp(stats, quizHigh, targetScore, badges.length);
+      const cachedXp = Number(localStorage.getItem(`physix_xp_${user.uid}`) || 0);
+      authoritativeXp = Math.max(legacyLocalXp, cachedXp);
+      console.log(`[Firestore] Initializing new cloud progression with ${authoritativeXp} XP for users/${user.uid}`);
+    }
+
+    setAuthoritativeUserXp(user.uid, authoritativeXp);
+
+    // 4. Sync user profile metadata & challenges to Firestore users/{uid} safely preserving cloud progression
     try {
       const profile = getStoredUserProfile();
       const stats = getStoredTelemetry();
-      const badges = getStoredBadges();
+      const badges = getStoredBadges(user.uid);
       const quizHigh = Number(localStorage.getItem("physix_quiz_highscore") || 0);
-      const targetScore = simState.targetScore || 0;
-      const rankInfo = calculateStudentRankAndLevel(stats, quizHigh, targetScore, badges.length);
+      const rankInfo = calculateRankFromXp(authoritativeXp);
       const streak = getStoredUserStreak(user.uid);
 
       await syncUserToFirestore(user, {
         name: (user && user.displayName) || profile.name || (user.email ? user.email.split("@")[0] : "PhysiX Scholar"),
         email: user.email,
         photoURL: user.photoURL || null,
-        totalXP: rankInfo.totalXp,
+        totalXP: authoritativeXp,
         level: rankInfo.level,
         streak: streak.currentStreak || 1,
-        experimentsPerformed: stats.totalLaunches || 0,
-        bestQuizScore: quizHigh
+        experimentsPerformed: Math.max(cloudExpCount, stats.totalLaunches || 0),
+        badges: badges,
+        completedChallenges: mergedChallenges,
+        bestQuizScore: Math.max(cloudQuizScore, quizHigh)
       });
     } catch (e) {
       console.warn("[Firestore] User sync notice:", e);
     }
+
+    // 5. Real-time Multi-Device Synchronization:
+    // When another laptop or device completes challenges or awards XP, this listener automatically synchronizes state.
+    if (userDocUnsubscribe) {
+      userDocUnsubscribe();
+      userDocUnsubscribe = null;
+    }
+
+    userDocUnsubscribe = subscribeToUserDoc(user.uid, (cloudUser) => {
+      if (!cloudUser) return;
+      const remoteXp = typeof cloudUser.totalXP === "number" ? cloudUser.totalXP : (typeof cloudUser.xp === "number" ? cloudUser.xp : null);
+      if (remoteXp !== null && remoteXp !== activeAuthoritativeXp) {
+        console.log(`%c[Firestore Realtime] Multi-device XP synchronized: ${activeAuthoritativeXp} -> ${remoteXp}`, "color: #10b981; font-weight: bold;");
+        setAuthoritativeUserXp(user.uid, remoteXp);
+        loadUserProfile();
+        renderChallenges();
+      }
+
+      if (Array.isArray(cloudUser.completedChallenges)) {
+        const hasDiff = cloudUser.completedChallenges.length !== activeAuthoritativeCompletedChallenges.length ||
+          cloudUser.completedChallenges.some(id => !activeAuthoritativeCompletedChallenges.includes(id));
+        if (hasDiff) {
+          console.log(`%c[Firestore Realtime] Multi-device challenges synchronized:`, "color: #10b981; font-weight: bold;", cloudUser.completedChallenges);
+          activeAuthoritativeCompletedChallenges = cloudUser.completedChallenges;
+          hydrateAllExperimentChallenges(cloudUser.completedChallenges);
+        }
+      }
+
+      if (Array.isArray(cloudUser.badges)) {
+        const localBadges = getStoredBadges(user.uid);
+        const hasNewBadge = cloudUser.badges.some(b => !localBadges.includes(b));
+        if (hasNewBadge || cloudUser.badges.length !== localBadges.length) {
+          saveStoredBadges(cloudUser.badges, user.uid);
+          loadUserProfile();
+        }
+      }
+
+      if (typeof cloudUser.experimentsPerformed === "number") {
+        const curStats = getStoredTelemetry();
+        if (cloudUser.experimentsPerformed > (curStats.totalLaunches || 0)) {
+          curStats.totalLaunches = cloudUser.experimentsPerformed;
+          saveStoredTelemetry(curStats);
+          loadUserProfile();
+        }
+      }
+    });
+
+  } finally {
+    isInitializingUser = false;
   }
+
   updateAuthStateRestrictions();
   loadUserProfile();
+  renderChallenges();
+}
+
+// Listen to Firebase Auth state transitions
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    if (isEmailVerificationRequired(user)) {
+      // Unverified email/password user: block access and do not initialize/sync Firestore data
+      showVerificationOverlay(user);
+      updateAuthStateRestrictions();
+      loadUserProfile();
+      return;
+    }
+    // Verified user (or Google user): dismiss overlay and complete initialization
+    hideVerificationOverlay();
+    await completeVerifiedUserInitialization(user);
+  } else {
+    // User signed out: cleanup subscriptions and reset progression to guest mode
+    if (userDocUnsubscribe) {
+      userDocUnsubscribe();
+      userDocUnsubscribe = null;
+    }
+    activeAuthoritativeXp = null;
+    activeAuthoritativeCompletedChallenges = [];
+    hydrateAllExperimentChallenges([]);
+    hideVerificationOverlay();
+    updateAuthStateRestrictions();
+    loadUserProfile();
+    renderChallenges();
+  }
 });
+
+// ==========================================
+// HOMEPAGE, STANDALONE ROUTING & EXPERIMENT DETAILS CONTROLLER
+// ==========================================
+let isExperimentsPageInitialized = false;
+let currentActiveDetailExpId = "projectile";
+
+export function openExperimentDetailsPage(expId) {
+  const normalizedId = (expId === "sandbox" || expId === "colour-sensor" || expId === "optical" || expId === "projectile")
+    ? expId
+    : "projectile";
+
+  const data = EXPERIMENT_DETAILS[normalizedId] || EXPERIMENT_DETAILS["projectile"];
+  currentActiveDetailExpId = normalizedId;
+
+  const detailPage = document.getElementById("physix-experiment-detail-page");
+  if (!detailPage) return;
+
+  // Header content
+  const categoryBadge = document.getElementById("exp-detail-category-badge");
+  const titleEl = document.getElementById("exp-detail-title");
+  const descEl = document.getElementById("exp-detail-desc");
+  const difficultyEl = document.getElementById("exp-meta-difficulty");
+  const durationEl = document.getElementById("exp-meta-duration");
+  const engineEl = document.getElementById("exp-meta-engine");
+
+  if (categoryBadge) categoryBadge.textContent = data.category || "PHYSICS EXPERIMENT";
+  if (titleEl) titleEl.textContent = data.title;
+  if (descEl) descEl.textContent = data.shortDescription;
+  if (difficultyEl) difficultyEl.textContent = data.difficulty || "Undergraduate Practical";
+  if (durationEl) durationEl.textContent = data.duration || "45 Minutes";
+  if (engineEl) engineEl.textContent = data.engine || "Matter.js 2D Newtonian";
+
+  // Set the 7 sections in exact required order
+  const aimContent = document.getElementById("manual-content-aim");
+  const theoryContent = document.getElementById("manual-content-theory");
+  const howToContent = document.getElementById("manual-content-how-to");
+  const procContent = document.getElementById("manual-content-procedure");
+  const formulasContent = document.getElementById("manual-content-formulas");
+  const obsContent = document.getElementById("manual-content-observations");
+  const resultContent = document.getElementById("manual-content-result");
+
+  if (aimContent) aimContent.innerHTML = data.aim || "";
+  if (theoryContent) theoryContent.innerHTML = data.theory || "";
+  if (howToContent) howToContent.innerHTML = data.howToPerform || "";
+  if (procContent) procContent.innerHTML = data.procedure || "";
+  if (formulasContent) formulasContent.innerHTML = data.formulas || "";
+  if (obsContent) obsContent.innerHTML = data.observations || "";
+  if (resultContent) resultContent.innerHTML = data.result || "";
+
+  // Hide other pages & modals
+  document.body.classList.remove("on-homepage");
+  document.body.classList.add("on-standalone-page");
+  physixHome?.classList.add("hidden");
+  document.getElementById("physix-terms-page")?.classList.add("hidden");
+  document.getElementById("physix-privacy-page")?.classList.add("hidden");
+  document.getElementById("physix-experiments-page")?.classList.add("hidden");
+  explorerModal?.classList.add("hidden");
+
+  // Show details page
+  detailPage.classList.remove("hidden");
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+
+export function startSimulatorFromDetails(expId) {
+  const targetId = expId || currentActiveDetailExpId || "projectile";
+
+  // Hide standalone pages & leave standalone mode
+  document.body.classList.remove("on-standalone-page");
+  document.body.classList.remove("on-homepage");
+
+  const detailPage = document.getElementById("physix-experiment-detail-page");
+  const expPage = document.getElementById("physix-experiments-page");
+  detailPage?.classList.add("hidden");
+  expPage?.classList.add("hidden");
+  physixHome?.classList.add("hidden");
+
+  // Close modals
+  [explorerModal, theoryModal, profileModal, quizModal, editProfileModal, aiCopilotModal, legalModal].forEach(m => m?.classList.add("hidden"));
+
+  // Launch existing simulator without breaking existing functionality
+  switchExperiment(targetId);
+  window.history.pushState({}, "", `/#${targetId}`);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function initExperimentsPage() {
+  const pageGrid = document.getElementById("exp-page-labs-grid");
+  const modalGrid = explorerModal?.querySelector(".labs-grid");
+  const searchInput = document.getElementById("exp-page-search-input");
+  const catPills = document.querySelectorAll("#exp-page-cat-pills .exp-cat-pill");
+
+  if (!pageGrid || !modalGrid) return;
+
+  // Populate cards from modal if not yet populated
+  if (pageGrid.children.length === 0) {
+    pageGrid.innerHTML = modalGrid.innerHTML;
+  }
+
+  // Sync bookmark states with current bookmarkedSet
+  const savedBookmarks = JSON.parse(localStorage.getItem("physix_bookmarked_labs") || "[]");
+  const bSet = new Set(savedBookmarks);
+  pageGrid.querySelectorAll(".card-bookmark-btn").forEach(btn => {
+    const card = btn.closest(".lab-card");
+    const labName = card?.getAttribute("data-name") || "";
+    if (bSet.has(labName)) {
+      btn.classList.add("bookmarked");
+    } else {
+      btn.classList.remove("bookmarked");
+    }
+  });
+
+  if (isExperimentsPageInitialized) return;
+  isExperimentsPageInitialized = true;
+
+  // Handle clicking on cards in the dedicated page grid
+  pageGrid.addEventListener("click", (e) => {
+    // If bookmark button clicked
+    const bookmarkBtn = e.target.closest(".card-bookmark-btn");
+    if (bookmarkBtn) {
+      e.stopPropagation();
+      const card = bookmarkBtn.closest(".lab-card");
+      const labName = card?.getAttribute("data-name") || "lab";
+      const isNowBookmarked = bookmarkBtn.classList.toggle("bookmarked");
+
+      const curBookmarks = new Set(JSON.parse(localStorage.getItem("physix_bookmarked_labs") || "[]"));
+      if (isNowBookmarked) {
+        curBookmarks.add(labName);
+        showToast(`Bookmarked: ${labName}`);
+      } else {
+        curBookmarks.delete(labName);
+        showToast(`Removed bookmark: ${labName}`);
+      }
+      localStorage.setItem("physix_bookmarked_labs", JSON.stringify([...curBookmarks]));
+
+      // Synchronize in explorer modal as well
+      modalGrid.querySelectorAll(".lab-card").forEach(mc => {
+        if (mc.getAttribute("data-name") === labName) {
+          const mb = mc.querySelector(".card-bookmark-btn");
+          if (mb) {
+            if (isNowBookmarked) mb.classList.add("bookmarked");
+            else mb.classList.remove("bookmarked");
+          }
+        }
+      });
+      return;
+    }
+
+    // Card or Perform button clicked -> Open dedicated details page!
+    const card = e.target.closest(".lab-card");
+    if (!card) return;
+
+    const target = card.getAttribute("data-exp-target");
+    const name = card.getAttribute("data-name") || "";
+
+    let expId = null;
+    if (target === "sandbox" || name.toLowerCase().includes("sandbox")) expId = "sandbox";
+    else if (target === "colour-sensor" || name.toLowerCase().includes("colour sensor")) expId = "colour-sensor";
+    else if (target === "optical" || name.toLowerCase().includes("optical fibre")) expId = "optical";
+    else if (target === "projectile" || card.classList.contains("active-lab") || name.toLowerCase().includes("projectile")) expId = "projectile";
+
+    if (expId) {
+      navigateTo(`/experiment/${expId}`);
+    } else {
+      showToast(`${name || "This experiment"} is currently in calibration. Full module coming soon!`);
+    }
+  });
+
+  // Filter functionality for category pills
+  let currentCategory = "all";
+  let currentSearchQuery = "";
+
+  function filterCards() {
+    const cards = pageGrid.querySelectorAll(".lab-card");
+    const q = currentSearchQuery.trim().toLowerCase();
+
+    cards.forEach(card => {
+      const cardCat = card.getAttribute("data-category") || "all";
+      const cardName = (card.getAttribute("data-name") || "").toLowerCase();
+      const cardDesc = (card.querySelector(".card-desc")?.textContent || "").toLowerCase();
+
+      const matchesCat = currentCategory === "all" || cardCat === currentCategory;
+      const matchesSearch = !q || cardName.includes(q) || cardDesc.includes(q);
+
+      if (matchesCat && matchesSearch) {
+        card.style.display = "";
+      } else {
+        card.style.display = "none";
+      }
+    });
+  }
+
+  catPills.forEach(pill => {
+    pill.addEventListener("click", () => {
+      catPills.forEach(p => p.classList.remove("active"));
+      pill.classList.add("active");
+      currentCategory = pill.getAttribute("data-category") || "all";
+      filterCards();
+    });
+  });
+
+  searchInput?.addEventListener("input", (e) => {
+    currentSearchQuery = e.target.value;
+    filterCards();
+  });
+}
+
+export function handleRoute(path = window.location.pathname, hash = window.location.hash) {
+  const cleanPath = (path || "/").toLowerCase();
+  const cleanHash = (hash || "").toLowerCase();
+
+  // Close any open modals
+  [explorerModal, theoryModal, profileModal, quizModal, editProfileModal, aiCopilotModal, legalModal].forEach(m => m?.classList.add("hidden"));
+
+  const termsPage = document.getElementById("physix-terms-page");
+  const privacyPage = document.getElementById("physix-privacy-page");
+  const expPage = document.getElementById("physix-experiments-page");
+  const detailPage = document.getElementById("physix-experiment-detail-page");
+
+  termsPage?.classList.add("hidden");
+  privacyPage?.classList.add("hidden");
+  expPage?.classList.add("hidden");
+  detailPage?.classList.add("hidden");
+
+  if (cleanPath.startsWith("/experiment/")) {
+    const parts = cleanPath.split("/").filter(Boolean);
+    const expId = parts[1] || "projectile";
+    openExperimentDetailsPage(expId);
+  } else if (cleanPath.endsWith("/terms")) {
+    document.body.classList.remove("on-homepage");
+    document.body.classList.add("on-standalone-page");
+    physixHome?.classList.add("hidden");
+    termsPage?.classList.remove("hidden");
+    window.scrollTo({ top: 0, behavior: "instant" });
+  } else if (cleanPath.endsWith("/privacy")) {
+    document.body.classList.remove("on-homepage");
+    document.body.classList.add("on-standalone-page");
+    physixHome?.classList.add("hidden");
+    privacyPage?.classList.remove("hidden");
+    window.scrollTo({ top: 0, behavior: "instant" });
+  } else if (cleanPath.endsWith("/experiments") || cleanPath.endsWith("/simulations") || cleanHash === "#simulations" || cleanHash === "#experiments") {
+    document.body.classList.remove("on-homepage");
+    document.body.classList.add("on-standalone-page");
+    physixHome?.classList.add("hidden");
+    expPage?.classList.remove("hidden");
+    initExperimentsPage();
+    window.scrollTo({ top: 0, behavior: "instant" });
+  } else if (cleanHash === "#sandbox" || cleanHash === "#optical" || cleanHash === "#colour-sensor" || cleanHash === "#projectile") {
+    // Direct link to simulation
+    document.body.classList.remove("on-homepage");
+    document.body.classList.remove("on-standalone-page");
+    physixHome?.classList.add("hidden");
+    switchExperiment(cleanHash.replace("#", ""));
+  } else {
+    // Default to Homepage
+    document.body.classList.remove("on-standalone-page");
+    showHomePage();
+  }
+}
+
+export function navigateTo(path, pushState = true) {
+  if (pushState && window.location.pathname !== path) {
+    window.history.pushState({}, "", path);
+  }
+  handleRoute(path);
+}
+
+// Global listener for [data-route] triggers
+document.addEventListener("click", (e) => {
+  const routeTrigger = e.target.closest("[data-route]");
+  if (routeTrigger) {
+    const route = routeTrigger.getAttribute("data-route");
+    if (route) {
+      e.preventDefault();
+      navigateTo(route);
+    }
+  }
+});
+
+// Start Simulator button bindings on experiment details page
+document.getElementById("btn-start-simulator")?.addEventListener("click", () => {
+  startSimulatorFromDetails(currentActiveDetailExpId);
+});
+document.querySelector(".btn-start-simulator-bottom")?.addEventListener("click", () => {
+  startSimulatorFromDetails(currentActiveDetailExpId);
+});
+
+window.addEventListener("popstate", () => {
+  handleRoute(window.location.pathname, window.location.hash);
+});
+
+export function showHomePage() {
+  document.body.classList.add("on-homepage");
+  if (physixHome) {
+    physixHome.classList.remove("hidden");
+  }
+  // Close any open modals
+  [explorerModal, theoryModal, profileModal, quizModal, editProfileModal, aiCopilotModal, legalModal].forEach(m => m?.classList.add("hidden"));
+
+  if (!homepageInstance) {
+    homepageInstance = initHomepage({
+      onExplore: () => {
+        navigateTo("/experiments");
+      },
+      onOpenTerms: () => {
+        navigateTo("/terms");
+      },
+      onOpenPrivacy: () => {
+        navigateTo("/privacy");
+      }
+    });
+  } else {
+    homepageInstance.resume?.();
+  }
+}
+
+export function leaveHomePageAndExplore() {
+  navigateTo("/experiments");
+}
+
+export function openLegalModal(tab = "terms") {
+  if (tab === "terms") {
+    navigateTo("/terms");
+  } else {
+    navigateTo("/privacy");
+  }
+}
+
+btnCloseLegal?.addEventListener("click", () => {
+  legalModal?.classList.add("hidden");
+});
+
+btnLegalTabTerms?.addEventListener("click", () => openLegalModal("terms"));
+btnLegalTabPrivacy?.addEventListener("click", () => openLegalModal("privacy"));
+
+if (navLogo) {
+  navLogo.style.cursor = "pointer";
+  navLogo.setAttribute("title", "Return to PhysiX Homepage");
+  navLogo.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Strip any experiment hash (e.g. #sandbox) so the router cannot re-enter a simulation
+    if (window.location.hash) {
+      window.history.replaceState({}, "", window.location.pathname || "/");
+    }
+    handleRoute("/", "");
+  });
+}
 
 // ==========================================
 // INITIAL SETUP & RUN
 // ==========================================
 initContentProtection();
 initCelebrations();
-initSplashScreen();
+
+// Initialize PWA / Offline System
+initPwaSystem().then(() => {
+  // Connect offline-manager's accurate network status to user-data-service
+  setNetworkStatusOverride(() => canPerformCloudOperation());
+}).catch(err => console.warn("[PWA] Initialization error:", err));
+
+// Listen for network changes to handle transitions
+onNetworkChange((isOnline, quality) => {
+  if (isOnline) {
+    console.log("[Network] Back online - restoring authoritative cloud state...");
+    updateAiServerStatus();
+    if (aiChatInput) aiChatInput.placeholder = "Ask Vectra AI about physics, formulas, or experiments...";
+    if (auth.currentUser && isUserAuthenticated()) {
+      completeVerifiedUserInitialization(auth.currentUser);
+    }
+  } else {
+    console.log("[Network] Gone offline - pausing cloud operations");
+    updateAiServerStatus();
+    if (aiChatInput) aiChatInput.placeholder = "Vectra AI is unavailable while offline";
+    // Clear any pending Firestore listeners to prevent errors
+    if (userDocUnsubscribe) {
+      userDocUnsubscribe();
+      userDocUnsubscribe = null;
+    }
+  }
+});
+
+// Start on appropriate page based on current URL path and hash
+const initialPath = window.location.pathname.toLowerCase();
+const initialHash = (window.location.hash || "").toLowerCase();
+
+if (initialPath.startsWith("/experiment/") || initialPath.endsWith("/terms") || initialPath.endsWith("/privacy") || initialPath.endsWith("/experiments") || initialPath.endsWith("/simulations")) {
+  document.body.classList.remove("on-homepage");
+  document.body.classList.add("on-standalone-page");
+  physixHome?.classList.add("hidden");
+  handleRoute(initialPath, initialHash);
+  initSplashScreen(() => {
+    handleRoute(initialPath, initialHash);
+  });
+} else if (initialHash === "#sandbox" || initialHash === "#optical" || initialHash === "#colour-sensor" || initialHash === "#projectile") {
+  document.body.classList.remove("on-homepage");
+  physixHome?.classList.add("hidden");
+  initSplashScreen(() => {
+    switchExperiment(initialHash.replace("#", ""));
+  });
+} else {
+  document.body.classList.add("on-homepage");
+  initSplashScreen(() => {
+    handleRoute(initialPath, initialHash);
+  });
+}
+initPhysixLogoAnimation();
 initTheme();
 loadUserProfile();
 renderObservationsTable();
