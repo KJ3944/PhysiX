@@ -3022,3 +3022,222 @@ body.light-mode .btn-secondary-back:hover,
   color: #0f172a !important;
 }
 
+/* ==================================================
+   EXPERIMENT 5: DIFFRACTION GRATING LIGHT MODE
+   ================================================== */
+body.light-mode #exp-diffraction-section,
+[data-theme="light"] #exp-diffraction-section {
+  background: transparent !important;
+}
+
+body.light-mode .dg-card,
+[data-theme="light"] .dg-card {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(2, 132, 199, 0.2) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+body.light-mode .dg-card-title,
+[data-theme="light"] .dg-card-title {
+  color: #0f172a !important;
+}
+
+body.light-mode .dg-canvas-wrapper,
+[data-theme="light"] .dg-canvas-wrapper {
+  background: radial-gradient(circle at 45% 45%, #f8fafc 0%, #f1f5f9 100%) !important;
+  border-color: rgba(2, 132, 199, 0.25) !important;
+}
+
+body.light-mode .dg-deck-group,
+[data-theme="light"] .dg-deck-group {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+body.light-mode .dg-deck-label,
+[data-theme="light"] .dg-deck-label {
+  color: #475569 !important;
+}
+
+body.light-mode .dg-deck-val,
+[data-theme="light"] .dg-deck-val {
+  background: #e0f2fe !important;
+  border-color: #bae6fd !important;
+  color: #0284c7 !important;
+}
+
+body.light-mode .dg-preset-btn,
+body.light-mode .dg-wl-preset-btn,
+body.light-mode .dg-density-preset-btn,
+[data-theme="light"] .dg-preset-btn,
+[data-theme="light"] .dg-wl-preset-btn,
+[data-theme="light"] .dg-density-preset-btn {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+body.light-mode .dg-preset-btn:hover,
+body.light-mode .dg-wl-preset-btn:hover,
+body.light-mode .dg-density-preset-btn:hover,
+[data-theme="light"] .dg-preset-btn:hover,
+[data-theme="light"] .dg-wl-preset-btn:hover,
+[data-theme="light"] .dg-density-preset-btn:hover {
+  background: #e0f2fe !important;
+  border-color: #38bdf8 !important;
+  color: #0284c7 !important;
+}
+
+body.light-mode .dg-order-pill,
+body.light-mode .dg-order-select-btn,
+[data-theme="light"] .dg-order-pill,
+[data-theme="light"] .dg-order-select-btn {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #475569 !important;
+}
+
+body.light-mode .dg-order-pill.active,
+body.light-mode .dg-order-select-btn.active,
+[data-theme="light"] .dg-order-pill.active,
+[data-theme="light"] .dg-order-select-btn.active {
+  background: #0284c7 !important;
+  border-color: #0284c7 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px rgba(2, 132, 199, 0.4) !important;
+}
+
+body.light-mode .dg-challenge-card,
+[data-theme="light"] .dg-challenge-card {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+body.light-mode .dg-challenge-card h4,
+[data-theme="light"] .dg-challenge-card h4 {
+  color: #0f172a !important;
+}
+
+body.light-mode .dg-res-card,
+[data-theme="light"] .dg-res-card {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+body.light-mode .dg-res-label,
+[data-theme="light"] .dg-res-label {
+  color: #64748b !important;
+}
+
+body.light-mode .dg-res-value,
+[data-theme="light"] .dg-res-value {
+  color: #0f172a !important;
+}
+
+body.light-mode .dg-tele-item,
+[data-theme="light"] .dg-tele-item {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* =========================================================================
+   LIGHT MODE: GUIDED TUTORIAL SYSTEM
+   ========================================================================= */
+body.light-mode .tutorial-backdrop-blocker,
+[data-theme="light"] .tutorial-backdrop-blocker {
+  background: rgba(15, 23, 42, 0.45) !important;
+}
+
+body.light-mode .tutorial-spotlight,
+[data-theme="light"] .tutorial-spotlight {
+  box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.65), 0 0 25px rgba(2, 132, 199, 0.45), inset 0 0 10px rgba(2, 132, 199, 0.15) !important;
+  border-color: #0284c7 !important;
+}
+
+body.light-mode .tutorial-card,
+[data-theme="light"] .tutorial-card {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid rgba(2, 132, 199, 0.35) !important;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.25), 0 0 20px rgba(2, 132, 199, 0.18) !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .tutorial-card-title,
+[data-theme="light"] .tutorial-card-title {
+  color: #0f172a !important;
+}
+
+body.light-mode .tutorial-card-desc,
+[data-theme="light"] .tutorial-card-desc {
+  color: #334155 !important;
+}
+
+body.light-mode .tutorial-counter,
+[data-theme="light"] .tutorial-counter {
+  color: #64748b !important;
+}
+
+body.light-mode .tutorial-badge,
+[data-theme="light"] .tutorial-badge {
+  color: #0284c7 !important;
+  background: rgba(2, 132, 199, 0.1) !important;
+  border-color: rgba(2, 132, 199, 0.3) !important;
+}
+
+body.light-mode .tutorial-close-btn,
+[data-theme="light"] .tutorial-close-btn {
+  color: #64748b !important;
+}
+
+body.light-mode .tutorial-close-btn:hover,
+[data-theme="light"] .tutorial-close-btn:hover {
+  color: #0f172a !important;
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+body.light-mode .tutorial-progress-bar,
+[data-theme="light"] .tutorial-progress-bar {
+  background: rgba(0, 0, 0, 0.08) !important;
+}
+
+body.light-mode .tutorial-btn-skip,
+[data-theme="light"] .tutorial-btn-skip {
+  color: #64748b !important;
+}
+
+body.light-mode .tutorial-btn-skip:hover,
+[data-theme="light"] .tutorial-btn-skip:hover {
+  color: #0f172a !important;
+}
+
+body.light-mode .tutorial-btn-back,
+[data-theme="light"] .tutorial-btn-back {
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.light-mode .tutorial-btn-back:hover,
+[data-theme="light"] .tutorial-btn-back:hover {
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .nav-btn-tutorial,
+[data-theme="light"] .nav-btn-tutorial {
+  color: #0284c7 !important;
+  background: rgba(2, 132, 199, 0.08) !important;
+  border-color: rgba(2, 132, 199, 0.3) !important;
+}
+
+body.light-mode .nav-btn-tutorial:hover,
+[data-theme="light"] .nav-btn-tutorial:hover {
+  background: rgba(2, 132, 199, 0.16) !important;
+  border-color: #0284c7 !important;
+  color: #0369a1 !important;
+  box-shadow: 0 0 10px rgba(2, 132, 199, 0.25) !important;
+}
+
+
+
+

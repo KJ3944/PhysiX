@@ -63,6 +63,60 @@ export function createPhysicsSandboxExperiment(callbacks = {}) {
   let graphsCanvas = null;
 
   /**
+   * Tactile Audio Feedback Synthesizer for Realistic Hardware Console
+   */
+  function playTactileClick(freq = 950, duration = 0.035) {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!window._sbAudioCtx) {
+        window._sbAudioCtx = new AudioCtx();
+      }
+      const actx = window._sbAudioCtx;
+      if (actx.state === "suspended") actx.resume();
+      const osc = actx.createOscillator();
+      const gain = actx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, actx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(120, actx.currentTime + duration);
+      gain.gain.setValueAtTime(0.18, actx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(actx.destination);
+      osc.start();
+      osc.stop(actx.currentTime + duration + 0.01);
+    } catch (e) {}
+  }
+
+  function setupHardwareControllerTactility() {
+    const concaveButtons = document.querySelectorAll(".shc-concave-btn");
+    concaveButtons.forEach(btn => {
+      btn.addEventListener("pointerdown", () => playTactileClick(950, 0.035));
+    });
+
+    const sliders = document.querySelectorAll(".shc-knurled-slider");
+    let lastTickTime = 0;
+    sliders.forEach(slider => {
+      slider.addEventListener("input", () => {
+        const now = performance.now();
+        if (now - lastTickTime > 45) {
+          lastTickTime = now;
+          playTactileClick(1350, 0.018);
+        }
+      });
+    });
+
+    const btnSceneObjToggle = document.getElementById("btn-scene-objects-toggle");
+    const sceneDrawer = document.getElementById("shc-scene-drawer");
+    btnSceneObjToggle?.addEventListener("click", () => {
+      if (sceneDrawer) {
+        sceneDrawer.classList.toggle("hidden");
+        btnSceneObjToggle.classList.toggle("active", !sceneDrawer.classList.contains("hidden"));
+      }
+    });
+  }
+
+  /**
    * Initialize Sandbox Experiment
    */
   function init() {
@@ -86,6 +140,7 @@ export function createPhysicsSandboxExperiment(callbacks = {}) {
     setupPresetControls();
     setupGraphTabControls();
     setupDeckTabControls();
+    setupHardwareControllerTactility();
 
     // Load gamified challenges state
     loadChallengesFromStorage();

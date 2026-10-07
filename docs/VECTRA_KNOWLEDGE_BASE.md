@@ -58,7 +58,7 @@ PhysiX hosts 15 physics laboratories in its catalog: 4 fully implemented interac
 | `experiment.newtons-rings` | Determination of Radius of Curvature via Newton's Rings | Wave Optics & Interference | In Calibration |
 | `experiment.wedge-film` | Thickness Measurement using Wedge-Shaped Thin Film | Wave Optics & Interference | In Calibration |
 | `experiment.hall-effect` | Determination of Hall Coefficient | Solid State & Magnetism | In Calibration |
-| `experiment.diffraction-grating` | Wavelength Determination using Diffraction Grating | Wave Optics & Spectra | In Calibration |
+| `experiment.diffraction-grating` | Wavelength Determination using Diffraction Grating | Wave Optics & Spectra | Fully Implemented & Interactive |
 | `experiment.planck-constant` | Determination of Planck's Constant using Photocell | Quantum Mechanics | In Calibration |
 | `experiment.udm-parameters` | Determine Ultrasonic Distance Measurement Parameters | Sensors & Instrumentation | In Calibration |
 | `experiment.nanotech-simulation`| Nanotechnology Computational Modeling | Nanoscience & Devices | In Calibration |
@@ -466,6 +466,25 @@ An open computational laboratory where students instantiate rigid bodies (sphere
    - **Physics Concept**: Newton's First Law (Law of Inertia) and weightlessness: $\sum \mathbf{F} = 0 \implies \mathbf{a} = 0 \implies \mathbf{v} = \text{constant}$.
    - **Reward**: $+150\text{ XP}$ and badge `badge-sb-zerog` ("Gravity Defier").
 
+### 8.5 Experiment 5: Diffraction Grating Challenges
+1. `challenge.dg-first-order` — **First-Order Precision**:
+   - **Objective**: Configure laser to He-Ne $633\text{ nm}$ (Red) with grating ruling density $N = 600\text{ lines/mm}$, and accurately resolve the first-order diffraction maximum ($\theta \approx 22.3^\circ$).
+   - **Physics Concept**: Fraunhofer multi-slit interference equation: $d \sin\theta = m\lambda$.
+   - **Reward**: $+100\text{ XP}$.
+2. `challenge.dg-high-density` — **High-Density Dispersion**:
+   - **Objective**: Set $532\text{ nm}$ (Green) at $N = 1000\text{ lines/mm}$ and measure wide-angle spectral dispersion ($\theta \approx 32.1^\circ$).
+   - **Physics Concept**: Angular dispersion $D = \frac{m}{d \cos\theta}$ increases directly with line density $N$.
+   - **Reward**: $+125\text{ XP}$.
+3. `challenge.dg-second-order` — **Second-Order Spectral Resolution**:
+   - **Objective**: Isolate second-order maximum ($m = 2$) with $\lambda = 450\text{ nm}$ and $N = 600\text{ lines/mm}$.
+   - **Reward**: $+150\text{ XP}$.
+4. `challenge.dg-mystery-gas` — **Mystery Gas Tube Spectrometry**:
+   - **Objective**: Mount unknown sealed discharge tube, measure diffraction angle $\theta$, calculate $\lambda = \frac{d\sin\theta}{m}$, and identify the atomic element (He-Ne 633nm, Argon 488nm, Krypton 568nm).
+   - **Reward**: $+175\text{ XP}$.
+5. `challenge.dg-spectroscopy-master` — **Spectroscopy Mastery**:
+   - **Objective**: Complete and log at least 4 scientific observation trials across diverse orders and wavelengths into the Observation Table.
+   - **Reward**: $+200\text{ XP}$.
+
 ---
 
 ## 9. XP, LEVELS & STUDENT RANKS
@@ -715,7 +734,7 @@ Device Action (Challenge / Quiz / Observation)
   - **A**: PhysiX is an interactive 2D physics simulation suite and digital physics laboratory manual. It allows students to conduct physics experiments with real-time computational engines, live telemetry, and integrated laboratory manual guides.
 - `faq.general.experiments-available`:
   - **Q**: What experiments are available in PhysiX?
-  - **A**: PhysiX features 4 fully interactive laboratories: (1) 2D Projectile Motion, (2) Numerical Aperture of an Optical Fibre, (3) Study of Colour Sensor TCS3200, and (4) Physics Sandbox Playground. An additional 11 virtual laboratories are featured in the catalog in calibration.
+  - **A**: PhysiX features 5 fully interactive laboratories: (1) 2D Projectile Motion, (2) Numerical Aperture of an Optical Fibre, (3) Study of Colour Sensor TCS3200, (4) Physics Sandbox Playground, and (5) Diffraction Grating Spectrometry Laboratory. An additional 10 virtual laboratories are featured in the catalog in calibration.
 
 ### Sandbox
 - `faq.sandbox.what-is-kick`:

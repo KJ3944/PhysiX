@@ -694,6 +694,11 @@ export function getExperimentNameById(id) {
     case "sandbox":
     case "exp-sandbox":
       return "Physics Sandbox";
+    case "diffraction":
+    case "diffraction-grating":
+    case "exp-diffraction":
+    case "exp-diffraction-grating":
+      return "Diffraction Grating";
     default:
       return id;
   }

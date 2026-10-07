@@ -20,6 +20,12 @@ import { ICONS, AVATAR_SVGS, BADGE_SVGS } from "./icons.js";
 import { createOpticalFibreExperiment } from "./optical-fibre.js";
 import { createColourSensorExperiment } from "./colour-sensor.js";
 import { createPhysicsSandboxExperiment } from "./sandbox/sandbox-experiment.js";
+import { createDiffractionGratingExperiment } from "./diffraction-grating.js";
+import {
+  tutorialManager,
+  isExperimentTutorialCompleted,
+  markExperimentTutorialCompleted
+} from "./tutorial-manager.js";
 import { initSplashScreen } from "./splash.js";
 import { initHomepage } from "./homepage/homepage.js";
 import { initPhysixLogoAnimation } from "./logo-animation.js";
@@ -329,6 +335,7 @@ let activeExperimentId = "projectile";
 let opticalExperimentInstance = null;
 let colourSensorExperimentInstance = null;
 let physicsSandboxExperimentInstance = null;
+let diffractionExperimentInstance = null;
 
 // Help & Interactive User Guide DOM Elements
 const helpModal = document.getElementById("help-modal");
@@ -337,9 +344,13 @@ const btnCloseHelp = document.getElementById("btn-close-help");
 const btnHelpExp1 = document.getElementById("btn-help-tab-exp1");
 const btnHelpExp2 = document.getElementById("btn-help-tab-exp2");
 const btnHelpExp3 = document.getElementById("btn-help-tab-exp3");
+const btnHelpExp4 = document.getElementById("btn-help-tab-exp4");
+const btnHelpExp5 = document.getElementById("btn-help-tab-exp5");
 const helpPaneExp1 = document.getElementById("help-pane-exp1");
 const helpPaneExp2 = document.getElementById("help-pane-exp2");
 const helpPaneExp3 = document.getElementById("help-pane-exp3");
+const helpPaneExp4 = document.getElementById("help-pane-exp4");
+const helpPaneExp5 = document.getElementById("help-pane-exp5");
 
 // Vectra AI DOM Elements
 const aiCopilotModal = document.getElementById("ai-copilot-modal");
@@ -1619,6 +1630,22 @@ function syncChallengeToLocalState(challengeId, persistToStorage = true) {
       physicsSandboxExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
     }
   }
+
+  // Exp 5: Diffraction Grating
+  if (challengeId.startsWith("diffraction.")) {
+    const dgKey = challengeId.replace("diffraction.", "");
+    if (persistToStorage && canPerformCloudOperation()) {
+      try {
+        const savedDg = JSON.parse(localStorage.getItem("physix_dg_challenges") || "{}");
+        if (!savedDg[dgKey]) savedDg[dgKey] = {};
+        savedDg[dgKey].completed = true;
+        localStorage.setItem("physix_dg_challenges", JSON.stringify(savedDg));
+      } catch (e) {}
+    }
+    if (diffractionExperimentInstance && typeof diffractionExperimentInstance.hydrateChallenges === "function") {
+      diffractionExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+    }
+  }
 }
 
 export async function completeChallengeAuthoritatively({ challengeId, xp, badgeId, badgeTitle, title }) {
@@ -1808,6 +1835,23 @@ function hydrateAllExperimentChallenges(completedChallengeIds) {
 
   if (physicsSandboxExperimentInstance && typeof physicsSandboxExperimentInstance.hydrateChallenges === "function") {
     physicsSandboxExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+  }
+
+  // 5. Exp 5: Diffraction Grating
+  try {
+    const savedDg = JSON.parse(localStorage.getItem("physix_dg_challenges") || "{}");
+    const dgKeys = ["firstOrder", "highDensity", "secondOrder", "wavelengthShift", "spectroscopyMaster"];
+    dgKeys.forEach(k => {
+      if (set.has(`diffraction.${k}`)) {
+        if (!savedDg[k]) savedDg[k] = {};
+        savedDg[k].completed = true;
+      }
+    });
+    localStorage.setItem("physix_dg_challenges", JSON.stringify(savedDg));
+  } catch (e) {}
+
+  if (diffractionExperimentInstance && typeof diffractionExperimentInstance.hydrateChallenges === "function") {
+    diffractionExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
   }
 }
 
@@ -3956,7 +4000,7 @@ btnCloseTheory.addEventListener("click", () => {
 
 // Help & Interactive User Guide Modal
 function switchHelpTab(tabIndex) {
-  [btnHelpExp1, btnHelpExp2, btnHelpExp3].forEach((btn, idx) => {
+  [btnHelpExp1, btnHelpExp2, btnHelpExp3, btnHelpExp4, btnHelpExp5].forEach((btn, idx) => {
     if (btn) {
       if (idx === tabIndex - 1) {
         btn.classList.add("active");
@@ -3966,7 +4010,7 @@ function switchHelpTab(tabIndex) {
     }
   });
 
-  [helpPaneExp1, helpPaneExp2, helpPaneExp3].forEach((pane, idx) => {
+  [helpPaneExp1, helpPaneExp2, helpPaneExp3, helpPaneExp4, helpPaneExp5].forEach((pane, idx) => {
     if (pane) {
       if (idx === tabIndex - 1) {
         pane.classList.remove("hidden");
@@ -3982,9 +4026,15 @@ function switchHelpTab(tabIndex) {
 btnHelpExp1?.addEventListener("click", () => switchHelpTab(1));
 btnHelpExp2?.addEventListener("click", () => switchHelpTab(2));
 btnHelpExp3?.addEventListener("click", () => switchHelpTab(3));
+btnHelpExp4?.addEventListener("click", () => switchHelpTab(4));
+btnHelpExp5?.addEventListener("click", () => switchHelpTab(5));
 
 btnOpenHelp?.addEventListener("click", () => {
-  if (activeExperimentId === "colour-sensor") {
+  if (activeExperimentId === "diffraction") {
+    switchHelpTab(5);
+  } else if (activeExperimentId === "sandbox") {
+    switchHelpTab(4);
+  } else if (activeExperimentId === "colour-sensor") {
     switchHelpTab(3);
   } else if (activeExperimentId === "optical") {
     switchHelpTab(2);
@@ -4032,6 +4082,35 @@ function getLiveSimulationContext() {
     };
   }
 
+  if (activeExperimentId === "diffraction" && diffractionExperimentInstance) {
+    const dgState = diffractionExperimentInstance.getState();
+    const density = dgState.gratingDensityLpMm || dgState.linesPerMm || 600;
+    const theta = dgState.currentAngleDeg ?? dgState.currentThetaDeg ?? 19.27;
+    const yPos = dgState.currentFringePositionCm ?? dgState.currentYPosCm ?? 34.96;
+    return {
+      experiment: "Diffraction Grating",
+      activeLab: "Diffraction Grating Principal Maxima & Wavelength",
+      wavelengthNm: dgState.wavelengthNm || 550,
+      linesPerMm: density,
+      gratingSpacingD: dgState.gratingSpacingD || (1 / (density * 1000)),
+      screenDistanceM: dgState.screenDistanceM || 1.00,
+      selectedOrder: dgState.selectedOrder ?? 1,
+      thetaDeg: Number(theta),
+      yPosCm: Number(yPos),
+      dispersion: dgState.currentDispersion || 0,
+      maxOrder: dgState.maxObservableOrder || 3,
+      isMysteryMode: !!dgState.isMysteryMode,
+      observationsCount: Array.isArray(dgState.observations) ? dgState.observations.length : 0
+    };
+  }
+
+  if (activeExperimentId === "sandbox") {
+    return {
+      experiment: "Physics Sandbox",
+      activeLab: "Physics Sandbox & 2D Kinematics Playground"
+    };
+  }
+
   if (activeExperimentId === "optical" && opticalExperimentInstance) {
     const ofState = opticalExperimentInstance.getState();
     return {
@@ -4073,21 +4152,33 @@ function getLiveSimulationContext() {
 
 function updateAiContextStrip() {
   const ctx = getLiveSimulationContext();
-  if (ctx.experiment === "Study of Colour Sensor") {
-    if (aiCtxV0) aiCtxV0.textContent = `d: ${ctx.distanceMm.toFixed(1)} mm`;
-    if (aiCtxAngle) aiCtxAngle.textContent = `Filter: ${ctx.filterChannel.toUpperCase()}`;
-    if (aiCtxH0) aiCtxH0.textContent = `f: ${ctx.outputFrequencyKhz.toFixed(1)} kHz`;
-    if (aiCtxG) aiCtxG.textContent = `Match: ${ctx.matchFidelityPct}% (${ctx.detectedHex})`;
+  if (ctx.experiment === "Diffraction Grating") {
+    if (aiCtxV0) aiCtxV0.textContent = `λ: ${ctx.wavelengthNm || 550} nm`;
+    if (aiCtxAngle) aiCtxAngle.textContent = `N: ${ctx.linesPerMm || 600} L/mm`;
+    const orderStr = ctx.selectedOrder === "all" ? "All" : (Number(ctx.selectedOrder) > 0 ? `+${ctx.selectedOrder}` : `${ctx.selectedOrder ?? 1}`);
+    if (aiCtxH0) aiCtxH0.textContent = `m: ${orderStr}`;
+    const thetaVal = typeof ctx.thetaDeg === "number" ? ctx.thetaDeg : 0;
+    if (aiCtxG) aiCtxG.textContent = `θ: ${thetaVal.toFixed(2)}°`;
+  } else if (ctx.experiment === "Study of Colour Sensor") {
+    if (aiCtxV0) aiCtxV0.textContent = `d: ${Number(ctx.distanceMm || 12).toFixed(1)} mm`;
+    if (aiCtxAngle) aiCtxAngle.textContent = `Filter: ${(ctx.filterChannel || "clear").toUpperCase()}`;
+    if (aiCtxH0) aiCtxH0.textContent = `f: ${Number(ctx.outputFrequencyKhz || 0).toFixed(1)} kHz`;
+    if (aiCtxG) aiCtxG.textContent = `Match: ${ctx.matchFidelityPct || 0}% (${ctx.detectedHex || "#000000"})`;
   } else if (ctx.experiment === "Optical Fibre Numerical Aperture") {
-    if (aiCtxV0) aiCtxV0.textContent = `L: ${ctx.distanceL.toFixed(1)} cm`;
-    if (aiCtxAngle) aiCtxAngle.textContent = `W: ${ctx.spotDiameterW.toFixed(2)} cm`;
-    if (aiCtxH0) aiCtxH0.textContent = `NA: ${ctx.numericalApertureNA.toFixed(4)}`;
-    if (aiCtxG) aiCtxG.textContent = `θ_a: ${ctx.acceptanceAngleDeg.toFixed(1)}°`;
+    if (aiCtxV0) aiCtxV0.textContent = `L: ${Number(ctx.distanceL || 2).toFixed(1)} cm`;
+    if (aiCtxAngle) aiCtxAngle.textContent = `W: ${Number(ctx.spotDiameterW || 1.88).toFixed(2)} cm`;
+    if (aiCtxH0) aiCtxH0.textContent = `NA: ${Number(ctx.numericalApertureNA || 0.426).toFixed(4)}`;
+    if (aiCtxG) aiCtxG.textContent = `θ_a: ${Number(ctx.acceptanceAngleDeg || 25.2).toFixed(1)}°`;
+  } else if (ctx.experiment === "Physics Sandbox") {
+    if (aiCtxV0) aiCtxV0.textContent = "Mode: Sandbox";
+    if (aiCtxAngle) aiCtxAngle.textContent = "Bodies: 2D Rigid";
+    if (aiCtxH0) aiCtxH0.textContent = "Engine: Verlet";
+    if (aiCtxG) aiCtxG.textContent = "Physics: Active";
   } else {
-    if (aiCtxV0) aiCtxV0.textContent = `v₀: ${ctx.v0.toFixed(1)} m/s`;
-    if (aiCtxAngle) aiCtxAngle.textContent = `θ: ${ctx.angleDeg}°`;
-    if (aiCtxH0) aiCtxH0.textContent = `h₀: ${ctx.h0.toFixed(1)} m`;
-    if (aiCtxG) aiCtxG.textContent = `g: ${ctx.g.toFixed(1)} m/s² (${ctx.planet})`;
+    if (aiCtxV0) aiCtxV0.textContent = `v₀: ${Number(ctx.v0 || 20).toFixed(1)} m/s`;
+    if (aiCtxAngle) aiCtxAngle.textContent = `θ: ${ctx.angleDeg || 45}°`;
+    if (aiCtxH0) aiCtxH0.textContent = `h₀: ${Number(ctx.h0 || 0).toFixed(1)} m`;
+    if (aiCtxG) aiCtxG.textContent = `g: ${Number(ctx.g || 9.8).toFixed(1)} m/s² (${ctx.planet || "Earth"})`;
   }
 }
 
@@ -4120,9 +4211,72 @@ async function updateAiServerStatus() {
   }
 }
 
+function updateAiSuggestionChipsForExperiment() {
+  const container = document.querySelector(".ai-suggestions-container");
+  if (!container) return;
+
+  let chips = [];
+  if (activeExperimentId === "diffraction") {
+    chips = [
+      { text: "🌈 Grating Equation", prompt: "Explain the diffraction grating equation d sin(theta) = m lambda and how to compute wavelength" },
+      { text: "🔬 Calculate Wavelength", prompt: "How do I calculate laser wavelength from diffraction angle and grating density?" },
+      { text: "📊 Angular Dispersion", prompt: "What is angular dispersion D and how does grating ruling density N affect it?" },
+      { text: "🧪 Mystery Gas Tube", prompt: "How do I identify unknown gas specimens in the Mystery Gas Tube challenge?" },
+      { text: "📖 Lab Operation Guide", prompt: "Give me step-by-step instructions on how to use the Diffraction Grating spectrometer" },
+      { text: "👨‍💻 About Authors", prompt: "Who built this website?" }
+    ];
+  } else if (activeExperimentId === "colour-sensor") {
+    chips = [
+      { text: "🌈 Tristimulus Principles", prompt: "How does the TCS3200 photodiode array convert light to frequency?" },
+      { text: "🔍 S2/S3 Filter Channels", prompt: "Explain the S2 and S3 pin filter selection truth table" },
+      { text: "📐 Inverse-Square Law", prompt: "How does standoff distance affect TCS3200 output frequency?" },
+      { text: "🧪 Mystery Sample Challenge", prompt: "How do I decode the unknown specimen in the Spectroscopic Detective challenge?" },
+      { text: "📖 Lab Operation Guide", prompt: "How to operate the Colour Sensor experiment step by step?" },
+      { text: "👨‍💻 About Authors", prompt: "Who built this website?" }
+    ];
+  } else if (activeExperimentId === "optical") {
+    chips = [
+      { text: "💡 Numerical Aperture Formula", prompt: "Explain the formula NA = W / sqrt(4L^2 + W^2) and acceptance angle" },
+      { text: "🔴 Wavelength Presets", prompt: "How does laser wavelength affect beam propagation through optical fibre?" },
+      { text: "⏱️ Rapid Calibration", prompt: "How do I complete the 40s Rapid Calibration Challenge?" },
+      { text: "📖 Lab Operation Guide", prompt: "How to operate the Numerical Aperture of Optical Fibre experiment step by step?" },
+      { text: "👨‍💻 About Authors", prompt: "Who built this website?" }
+    ];
+  } else if (activeExperimentId === "sandbox") {
+    chips = [
+      { text: "⚛️ Newtonian Playground", prompt: "How does the 2D physics sandbox engine work?" },
+      { text: "🚀 Dynamic Thrust Challenge", prompt: "How do I complete Newton's Dynamic Thrust challenge in the sandbox?" },
+      { text: "💥 High-Impulse Kick", prompt: "How do I apply impulse forces to rigid bodies in the sandbox?" },
+      { text: "📖 Sandbox Guide", prompt: "Give me a guide on how to use all sandbox tools and controls" },
+      { text: "👨‍💻 About Authors", prompt: "Who built this website?" }
+    ];
+  } else {
+    chips = [
+      { text: "🎯 Hit Target Solution", prompt: "How do I hit the target with my current velocity?" },
+      { text: "📐 Why 45° Max Range?", prompt: "Explain why 45 degrees gives the maximum range" },
+      { text: "🌕 Moon vs Earth", prompt: "How does launching on the Moon compare to Earth?" },
+      { text: "⏱️ Derive Flight Time", prompt: "Derive the formula for time of flight" },
+      { text: "📊 Flight Telemetry Debrief", prompt: "Analyze the kinematics of my latest flight" },
+      { text: "👨‍💻 About Authors", prompt: "Who built this website?" }
+    ];
+  }
+
+  container.innerHTML = chips
+    .map(c => `<button type="button" class="ai-suggestion-chip" data-prompt="${c.prompt}">${c.text}</button>`)
+    .join("");
+
+  container.querySelectorAll(".ai-suggestion-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      const prompt = chip.getAttribute("data-prompt");
+      if (prompt) handleSendAiChat(prompt);
+    });
+  });
+}
+
 function openAiCopilot() {
   updateAiContextStrip();
   updateAiServerStatus();
+  updateAiSuggestionChipsForExperiment();
   aiCopilotModal?.classList.remove("hidden");
   setTimeout(() => aiChatInput?.focus(), 100);
 }
@@ -4407,10 +4561,12 @@ const expProjSection = document.getElementById("exp-projectile-section");
 const expOptSection = document.getElementById("exp-optical-section");
 const expColourSection = document.getElementById("exp-colour-sensor-section");
 const expSandboxSection = document.getElementById("exp-sandbox-section");
+const expDiffractionSection = document.getElementById("exp-diffraction-section");
 const btnSwitchProj = document.getElementById("btn-switch-exp-projectile");
 const btnSwitchOpt = document.getElementById("btn-switch-exp-optical");
 const btnSwitchColour = document.getElementById("btn-switch-exp-colour");
 const btnSwitchSandbox = document.getElementById("btn-switch-exp-sandbox");
+const btnSwitchDiffraction = document.getElementById("btn-switch-exp-diffraction");
 
 async function trackExperimentEngagement(expId) {
   if (!canPerformCloudOperation()) return;
@@ -4453,21 +4609,80 @@ async function trackExperimentEngagement(expId) {
   }
 }
 
-function switchExperiment(expId) {
-  activeExperimentId = expId;
-  trackExperimentEngagement(expId);
+function switchExperiment(expId, updateUrl = true) {
+  let normalizedId = expId;
+  if (expId === "diffraction-grating") normalizedId = "diffraction";
+  else if (expId === "optical-fibre") normalizedId = "optical";
+  else if (expId === "physics-sandbox") normalizedId = "sandbox";
+
+  activeExperimentId = normalizedId;
+  trackExperimentEngagement(normalizedId);
 
   expProjSection?.classList.add("hidden");
   expOptSection?.classList.add("hidden");
   expColourSection?.classList.add("hidden");
   expSandboxSection?.classList.add("hidden");
+  expDiffractionSection?.classList.add("hidden");
 
   btnSwitchProj?.classList.remove("active");
   btnSwitchOpt?.classList.remove("active");
   btnSwitchColour?.classList.remove("active");
   btnSwitchSandbox?.classList.remove("active");
+  btnSwitchDiffraction?.classList.remove("active");
 
-  if (expId === "sandbox") {
+  const routeSlug = normalizedId === "diffraction"
+    ? "diffraction-grating"
+    : (normalizedId === "optical" ? "optical-fibre" : normalizedId);
+
+  if (updateUrl && !document.body.classList.contains("on-homepage")) {
+    const targetUrl = `/simulations/${routeSlug}`;
+    if (window.location.pathname !== targetUrl) {
+      window.history.pushState({}, "", targetUrl);
+    }
+  }
+
+  if (normalizedId === "diffraction") {
+    expDiffractionSection?.classList.remove("hidden");
+    btnSwitchDiffraction?.classList.add("active");
+
+    if (!diffractionExperimentInstance) {
+      diffractionExperimentInstance = createDiffractionGratingExperiment({
+        onXpAwarded: (amount, reason) => addStudentXp(amount, reason),
+        onExperimentRecorded: (id, data) => {
+          if (auth.currentUser && canPerformCloudOperation()) {
+            recordExperimentInFirestore(auth.currentUser.uid, id, data).then(res => {
+              if (res && typeof res.totalXP === "number") {
+                setAuthoritativeUserXp(auth.currentUser.uid, res.totalXP);
+                loadUserProfile();
+              }
+              if (res && res.experimentsPerformed >= 5) {
+                unlockBadge("badge-lab-veteran", "Laboratory Veteran (Explored Labs 5+ Times)");
+              }
+            }).catch(() => {});
+          }
+        },
+        showToast,
+        getActiveUserId,
+        loadUserProfile,
+        getStoredUserProfile,
+        unlockBadge: (badgeId, badgeName) => unlockBadge(badgeId, badgeName),
+        isUserAuthenticated,
+        openLoginModal,
+        onChallengeCompleted: (data) => completeChallengeAuthoritatively(data)
+      });
+      diffractionExperimentInstance.init();
+      if (activeAuthoritativeCompletedChallenges.length > 0 && typeof diffractionExperimentInstance.hydrateChallenges === "function") {
+        diffractionExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+      }
+    } else {
+      if (activeAuthoritativeCompletedChallenges.length > 0 && typeof diffractionExperimentInstance.hydrateChallenges === "function") {
+        diffractionExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+      }
+      diffractionExperimentInstance.renderAll();
+    }
+
+    showToast("Switched to Exp 5: Diffraction Grating");
+  } else if (normalizedId === "sandbox") {
     expSandboxSection?.classList.remove("hidden");
     btnSwitchSandbox?.classList.add("active");
 
@@ -4498,7 +4713,7 @@ function switchExperiment(expId) {
     }
 
     showToast("Switched to Exp 4: Physics Sandbox");
-  } else if (expId === "colour-sensor") {
+  } else if (normalizedId === "colour-sensor") {
     expColourSection?.classList.remove("hidden");
     btnSwitchColour?.classList.add("active");
 
@@ -4539,7 +4754,7 @@ function switchExperiment(expId) {
     }
 
     showToast("Switched to Exp 3: Study of Colour Sensor");
-  } else if (expId === "optical") {
+  } else if (normalizedId === "optical") {
     expOptSection?.classList.remove("hidden");
     btnSwitchOpt?.classList.add("active");
 
@@ -4588,12 +4803,16 @@ function switchExperiment(expId) {
   }
 
   updateAiContextStrip();
+
+  // Automatic first-time interactive guided onboarding tour
+  tutorialManager.maybeTriggerFirstTimeTutorial(normalizedId);
 }
 
 btnSwitchProj?.addEventListener("click", () => switchExperiment("projectile"));
 btnSwitchOpt?.addEventListener("click", () => switchExperiment("optical"));
 btnSwitchColour?.addEventListener("click", () => switchExperiment("colour-sensor"));
 btnSwitchSandbox?.addEventListener("click", () => switchExperiment("sandbox"));
+btnSwitchDiffraction?.addEventListener("click", () => switchExperiment("diffraction"));
 
 // ==========================================
 // LAB & EXPERIMENT CARDS INTERACTION & WHITE LIGHT EFFECT
@@ -4608,7 +4827,8 @@ allExperimentCards.forEach(card => {
     const name = card.getAttribute("data-name") || "";
 
     let expId = null;
-    if (target === "sandbox" || name.toLowerCase().includes("sandbox")) expId = "sandbox";
+    if (target === "diffraction" || target === "diffraction-grating" || name.toLowerCase().includes("diffraction")) expId = "diffraction-grating";
+    else if (target === "sandbox" || name.toLowerCase().includes("sandbox")) expId = "sandbox";
     else if (target === "colour-sensor" || name.toLowerCase().includes("colour sensor")) expId = "colour-sensor";
     else if (target === "optical" || name.toLowerCase().includes("optical fibre")) expId = "optical";
     else if (target === "projectile" || card.classList.contains("active-lab") || name.toLowerCase().includes("projectile")) expId = "projectile";
@@ -4754,6 +4974,11 @@ function applyTheme(theme) {
   if (colourSensorExperimentInstance) {
     colourSensorExperimentInstance.renderAll();
   }
+
+  // Update Diffraction Grating (Exp 5) simulation canvases
+  if (diffractionExperimentInstance) {
+    diffractionExperimentInstance.renderAll();
+  }
 }
 
 function initTheme() {
@@ -4794,12 +5019,15 @@ function updateAuthStateRestrictions() {
 
   const challengesCardExp2 = document.querySelector("#exp-optical-section .challenges-card");
   const challengesCardExp3 = document.querySelector("#exp-colour-sensor-section .challenges-card");
+  const challengesCardExp5 = document.querySelector("#exp-diffraction-section .challenges-card");
   if (isAuth) {
     challengesCardExp2?.classList.remove("challenges-locked");
     challengesCardExp3?.classList.remove("challenges-locked");
+    challengesCardExp5?.classList.remove("challenges-locked");
   } else {
     challengesCardExp2?.classList.add("challenges-locked");
     challengesCardExp3?.classList.add("challenges-locked");
+    challengesCardExp5?.classList.add("challenges-locked");
   }
 
   if (opticalExperimentInstance) {
@@ -4818,6 +5046,12 @@ function updateAuthStateRestrictions() {
     physicsSandboxExperimentInstance.renderAll();
     if (physicsSandboxExperimentInstance.renderChallengesDom) {
       physicsSandboxExperimentInstance.renderChallengesDom();
+    }
+  }
+  if (diffractionExperimentInstance) {
+    diffractionExperimentInstance.renderAll();
+    if (diffractionExperimentInstance.renderChallengesDom) {
+      diffractionExperimentInstance.renderChallengesDom();
     }
   }
 
@@ -5089,8 +5323,9 @@ let isExperimentsPageInitialized = false;
 let currentActiveDetailExpId = "projectile";
 
 export function openExperimentDetailsPage(expId) {
-  const normalizedId = (expId === "sandbox" || expId === "colour-sensor" || expId === "optical" || expId === "projectile")
-    ? expId
+  tutorialManager.destroyTour();
+  const normalizedId = (expId === "sandbox" || expId === "colour-sensor" || expId === "optical" || expId === "projectile" || expId === "diffraction" || expId === "diffraction-grating")
+    ? (expId === "diffraction-grating" ? "diffraction" : expId)
     : "projectile";
 
   const data = EXPERIMENT_DETAILS[normalizedId] || EXPERIMENT_DETAILS["projectile"];
@@ -5112,7 +5347,7 @@ export function openExperimentDetailsPage(expId) {
   if (descEl) descEl.textContent = data.shortDescription;
   if (difficultyEl) difficultyEl.textContent = data.difficulty || "Undergraduate Practical";
   if (durationEl) durationEl.textContent = data.duration || "45 Minutes";
-  if (engineEl) engineEl.textContent = data.engine || "Matter.js 2D Newtonian";
+  if (engineEl) engineEl.textContent = data.engine || "Wave Optics Engine";
 
   // Set the 7 sections in exact required order
   const aimContent = document.getElementById("manual-content-aim");
@@ -5162,8 +5397,7 @@ export function startSimulatorFromDetails(expId) {
   [explorerModal, theoryModal, profileModal, quizModal, editProfileModal, aiCopilotModal, legalModal].forEach(m => m?.classList.add("hidden"));
 
   // Launch existing simulator without breaking existing functionality
-  switchExperiment(targetId);
-  window.history.pushState({}, "", `/#${targetId}`);
+  switchExperiment(targetId, true);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -5237,7 +5471,8 @@ function initExperimentsPage() {
     const name = card.getAttribute("data-name") || "";
 
     let expId = null;
-    if (target === "sandbox" || name.toLowerCase().includes("sandbox")) expId = "sandbox";
+    if (target === "diffraction" || target === "diffraction-grating" || name.toLowerCase().includes("diffraction")) expId = "diffraction-grating";
+    else if (target === "sandbox" || name.toLowerCase().includes("sandbox")) expId = "sandbox";
     else if (target === "colour-sensor" || name.toLowerCase().includes("colour sensor")) expId = "colour-sensor";
     else if (target === "optical" || name.toLowerCase().includes("optical fibre")) expId = "optical";
     else if (target === "projectile" || card.classList.contains("active-lab") || name.toLowerCase().includes("projectile")) expId = "projectile";
@@ -5292,8 +5527,9 @@ export function handleRoute(path = window.location.pathname, hash = window.locat
   const cleanPath = (path || "/").toLowerCase();
   const cleanHash = (hash || "").toLowerCase();
 
-  // Close any open modals
+  // Close any open modals and tours
   [explorerModal, theoryModal, profileModal, quizModal, editProfileModal, aiCopilotModal, legalModal].forEach(m => m?.classList.add("hidden"));
+  tutorialManager.destroyTour();
 
   const termsPage = document.getElementById("physix-terms-page");
   const privacyPage = document.getElementById("physix-privacy-page");
@@ -5309,6 +5545,19 @@ export function handleRoute(path = window.location.pathname, hash = window.locat
     const parts = cleanPath.split("/").filter(Boolean);
     const expId = parts[1] || "projectile";
     openExperimentDetailsPage(expId);
+  } else if (cleanPath.startsWith("/simulations/") || cleanPath.startsWith("/simulation/")) {
+    const parts = cleanPath.split("/").filter(Boolean);
+    const expId = parts[1] || "projectile";
+    document.body.classList.remove("on-homepage");
+    document.body.classList.remove("on-standalone-page");
+    physixHome?.classList.add("hidden");
+    let mappedId = expId;
+    if (expId === "diffraction-grating" || expId === "diffraction") mappedId = "diffraction";
+    else if (expId === "optical-fibre" || expId === "optical") mappedId = "optical";
+    else if (expId === "colour-sensor") mappedId = "colour-sensor";
+    else if (expId === "sandbox" || expId === "physics-sandbox") mappedId = "sandbox";
+    else mappedId = "projectile";
+    switchExperiment(mappedId, false);
   } else if (cleanPath.endsWith("/terms")) {
     document.body.classList.remove("on-homepage");
     document.body.classList.add("on-standalone-page");
@@ -5328,12 +5577,14 @@ export function handleRoute(path = window.location.pathname, hash = window.locat
     expPage?.classList.remove("hidden");
     initExperimentsPage();
     window.scrollTo({ top: 0, behavior: "instant" });
-  } else if (cleanHash === "#sandbox" || cleanHash === "#optical" || cleanHash === "#colour-sensor" || cleanHash === "#projectile") {
+  } else if (cleanHash === "#diffraction" || cleanHash === "#diffraction-grating" || cleanHash === "#sandbox" || cleanHash === "#optical" || cleanHash === "#colour-sensor" || cleanHash === "#projectile") {
     // Direct link to simulation
     document.body.classList.remove("on-homepage");
     document.body.classList.remove("on-standalone-page");
     physixHome?.classList.add("hidden");
-    switchExperiment(cleanHash.replace("#", ""));
+    let mapped = cleanHash.replace("#", "");
+    if (mapped === "diffraction-grating") mapped = "diffraction";
+    switchExperiment(mapped, false);
   } else {
     // Default to Homepage
     document.body.classList.remove("on-standalone-page");
@@ -5373,6 +5624,7 @@ window.addEventListener("popstate", () => {
 });
 
 export function showHomePage() {
+  tutorialManager.destroyTour();
   document.body.classList.add("on-homepage");
   if (physixHome) {
     physixHome.classList.remove("hidden");
@@ -5422,9 +5674,8 @@ if (navLogo) {
   navLogo.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
-    // Strip any experiment hash (e.g. #sandbox) so the router cannot re-enter a simulation
-    if (window.location.hash) {
-      window.history.replaceState({}, "", window.location.pathname || "/");
+    if (window.location.hash || window.location.pathname !== "/") {
+      window.history.pushState({}, "", "/");
     }
     handleRoute("/", "");
   });
@@ -5435,6 +5686,30 @@ if (navLogo) {
 // ==========================================
 initContentProtection();
 initCelebrations();
+
+// Initialize Tutorial / Guided Onboarding System
+tutorialManager.init({
+  getActiveUserId,
+  showToast
+});
+
+const btnReplayTutorial = document.getElementById("btn-replay-tutorial");
+btnReplayTutorial?.addEventListener("click", () => {
+  tutorialManager.startTutorial(activeExperimentId, true);
+});
+
+document.querySelectorAll("[data-tour-exp]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const targetExp = btn.getAttribute("data-tour-exp");
+    helpModal?.classList.add("hidden");
+    if (targetExp && targetExp !== activeExperimentId) {
+      switchExperiment(targetExp, true);
+    }
+    setTimeout(() => {
+      tutorialManager.startTutorial(targetExp || activeExperimentId, true);
+    }, 250);
+  });
+});
 
 // Initialize PWA / Offline System
 initPwaSystem().then(() => {
@@ -5467,19 +5742,23 @@ onNetworkChange((isOnline, quality) => {
 const initialPath = window.location.pathname.toLowerCase();
 const initialHash = (window.location.hash || "").toLowerCase();
 
-if (initialPath.startsWith("/experiment/") || initialPath.endsWith("/terms") || initialPath.endsWith("/privacy") || initialPath.endsWith("/experiments") || initialPath.endsWith("/simulations")) {
+if (initialPath.startsWith("/experiment/") || initialPath.startsWith("/simulations/") || initialPath.startsWith("/simulation/") || initialPath.endsWith("/terms") || initialPath.endsWith("/privacy") || initialPath.endsWith("/experiments") || initialPath.endsWith("/simulations")) {
   document.body.classList.remove("on-homepage");
-  document.body.classList.add("on-standalone-page");
+  if (!initialPath.startsWith("/simulations/") && !initialPath.startsWith("/simulation/")) {
+    document.body.classList.add("on-standalone-page");
+  }
   physixHome?.classList.add("hidden");
   handleRoute(initialPath, initialHash);
   initSplashScreen(() => {
     handleRoute(initialPath, initialHash);
   });
-} else if (initialHash === "#sandbox" || initialHash === "#optical" || initialHash === "#colour-sensor" || initialHash === "#projectile") {
+} else if (initialHash === "#diffraction" || initialHash === "#diffraction-grating" || initialHash === "#sandbox" || initialHash === "#optical" || initialHash === "#colour-sensor" || initialHash === "#projectile") {
   document.body.classList.remove("on-homepage");
   physixHome?.classList.add("hidden");
   initSplashScreen(() => {
-    switchExperiment(initialHash.replace("#", ""));
+    let target = initialHash.replace("#", "");
+    if (target === "diffraction-grating") target = "diffraction";
+    switchExperiment(target, false);
   });
 } else {
   document.body.classList.add("on-homepage");

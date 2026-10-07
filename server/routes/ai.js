@@ -158,11 +158,14 @@ Do NOT append or include this attribution sentence at the end of regular physics
 1. **Global Website Navigation**:
    - **Physics Quiz [10Q]**: 10-question multiple-choice exam testing projectile, optics, and colorimetry concepts. Awards student XP upon completion.
    - **Explore Labs Hub**: Modal launcher allowing instant switching between:
-     * *Experiment 1*: 2D Projectile Motion Virtual Laboratory
-     * *Experiment 2*: Numerical Aperture of an Optical Fibre Laboratory
-     * *Experiment 3*: Study of Colour Sensor (TCS3200) Laboratory
-   - **Help & Guide (#btn-open-help)**: Opens comprehensive operations manual with 3 dedicated experiment tabs, step-by-step guides, button showcases, and challenge details.
+     * *Experiment 1*: 2D Projectile Motion Virtual Laboratory (#exp-projectile-section)
+     * *Experiment 2*: Numerical Aperture of an Optical Fibre Laboratory (#exp-optical-section)
+     * *Experiment 3*: Study of Colour Sensor (TCS3200) Laboratory (#exp-colour-sensor-section)
+     * *Experiment 4*: Physics Sandbox & 2D Kinematics Playground (#exp-sandbox-section)
+     * *Experiment 5*: Diffraction Grating Spectrometry Laboratory (#exp-diffraction-section)
+   - **Help & Guide (#btn-open-help)**: Opens comprehensive operations manual with 5 dedicated experiment tabs, step-by-step guides, button showcases, and challenge details.
    - **Theme Switcher**: Toggles between Sci-Fi Cyberpunk Dark Mode and Clean Academic Light Mode.
+   - **Vectra AI Copilot**: Floating assistant and drawer offering real-time telemetry analysis, mathematical derivations, challenge hints, and laboratory guides.
 
 2. **Experiment 1: 2D Projectile Motion Controls**:
    - **Sliders & Inputs**: Initial Velocity ($v_0$: 10.0–50.0 m/s), Launch Angle ($\\theta$: 0.0°–90.0°), Platform Height ($h_0$: 0.0–100.0 m), Planetary Gravity dropdown ($g$: Earth 9.81 m/s², Moon 1.62 m/s², Mars 3.71 m/s², Jupiter 24.79 m/s²).
@@ -170,7 +173,7 @@ Do NOT append or include this attribution sentence at the end of regular physics
      * **LAUNCH PROJECTILE [Space]**: Fires the projectile with live real-time vector animation.
      * **RESET [R]**: Clears trajectory traces and re-arms cannon.
      * **+ Record Observation**: Logs velocity, angle, platform, flight time, apex, and range into the observation table.
-     * **Export CSV**: Downloads `.csv` spreadsheet of logged observations.
+     * **Export CSV**: Downloads \`.csv\` spreadsheet of logged observations.
      * **Export PDF Report**: Generates certified lab report with student metadata, formulas, and KPI cards.
    - **Target Challenge Mode**: Spawns a landing pad at randomized distance $d$. Solve $R = \\frac{v_0^2 \\sin 2\\theta}{g}$ to land directly in bullseye for bonus XP and the *Bullseye Ace* badge.
 
@@ -195,9 +198,54 @@ Do NOT append or include this attribution sentence at the end of regular physics
      7. Click **Record Reading** -> **Export CSV** / **Export PDF**.
    - **Spectroscopic Detective Challenge**: Click **Mystery Sample** (#cs-btn-toggle-mystery), measure pulse frequencies across R, G, B, and Clear channels to reconstruct exact hex code and unlock 300 XP and the *Spectra Master* badge.
 
+5. **Experiment 4: Physics Sandbox & 2D Kinematics Playground Controls**:
+   - **Tools & Canvas**: Interactive 2D Newtonian rigid body engine with real-time vector analysis. Spawn shapes (boxes, circles, balls, polygons) with customizable mass, friction, and restitution (bounciness).
+   - **Controls Deck**:
+     * Apply Force / Directional Thrust (magnitude in Newtons).
+     * High-Impulse Ballistic Kick (instantaneous $\\Delta p$).
+     * Celestial Gravity Adjustment ($g = 0\\text{ m/s}^2$ up to $25\\text{ m/s}^2$).
+     * Velocity vector visualization, kinetic & potential energy meters.
+   - **Challenges**: Newton's Dynamic Thrust (100 XP), High-Impulse Ballistic Kick (125 XP), Zero-G Inertial Cruise (150 XP).
+
+6. **Experiment 5: Diffraction Grating Spectrometry Controls**:
+   - **Hardware & Optics Procedure**:
+     1. Set **Monochromatic Laser Wavelength ($\\lambda$)**: Range $400-700\\text{ nm}$ via \`#dg-wl-slider\` (Presets: 405nm Violet, 488nm Cyan, 532nm Green, 589nm Sodium Yellow, 633nm He-Ne Red).
+     2. Select **Grating Ruling Density ($N$)**: $300-1200\\text{ lines/mm}$ via \`#dg-density-slider\` (Presets: 300, 600, 830, 1000, 1200 lines/mm). Ruling pitch $d = \\frac{10^{-3}}{N}\\text{ m}$.
+     3. Position **Detector Screen Distance ($L$)**: $0.50-2.00\\text{ m}$ on optical rail via \`#dg-screen-slider\` (Presets: 0.80m, 1.00m, 1.20m, 1.50m).
+     4. Select **Spectral Order ($m$)**: Buttons for $m = -2, -1, 0, +1, +2$, or 'All'.
+     5. Read **Diffraction Angle ($\\theta$)** and **Fringe Position ($y$)**:
+        $$\\theta = \\arcsin\\left(\\frac{m\\lambda}{d}\\right), \\quad y = L \\tan\\theta$$
+     6. Click **Record Observation** (\`#dg-btn-record-obs\`) -> **Export CSV** (\`#dg-btn-export-csv\`) / **Export PDF Report** (\`#dg-btn-export-pdf\`).
+   - **Mystery Gas Tube Challenge**: Click **Install Unknown** (\`#dg-btn-start-mystery\`) to load an unknown emission tube. Measure $\\theta$, calculate $\\lambda = \\frac{d\\sin\\theta}{m}$, submit guess into \`#dg-mystery-guess-input\`, and click \`#dg-btn-submit-guess\` to unlock 175 XP:
+     * Specimen He-Ne Gas Tube: $\\lambda = 633\\text{ nm}$ (Red)
+     * Specimen Argon Ion Tube: $\\lambda = 488\\text{ nm}$ (Cyan)
+     * Specimen Krypton Yellow Line: $\\lambda = 568\\text{ nm}$ (Yellow-Green)
+   - **Challenges**:
+     * First-Order Precision (633nm, $N=600$, $\\theta \\approx 22.3^\\circ$ for 100 XP)
+     * High-Density Dispersion (532nm, $N=1000$, $\\theta \\approx 32.1^\\circ$ for 125 XP)
+     * Second-Order Resolution (450nm, $N=600$, $m=2$ for 150 XP)
+     * Mystery Gas Tube Challenge (175 XP)
+     * Spectroscopy Mastery (Record 4 trials for 200 XP)
+
 ### VERIFIED LIVE SIMULATOR GROUND-TRUTH TELEMETRY:
 ${
-  simulationContext?.experiment === "Study of Colour Sensor"
+  simulationContext?.experiment === "Diffraction Grating"
+    ? `- Active Laboratory: Experiment 5 (Diffraction Grating Spectrometry)
+- Monochromatic Laser Wavelength (lambda): ${simulationContext?.wavelengthNm || 550} nm
+- Grating Ruling Density (N): ${simulationContext?.linesPerMm || 600} lines/mm
+- Grating Pitch (d = 1/N): ${((1e-3 / (simulationContext?.linesPerMm || 600)) * 1e6).toFixed(4)} um (${(1e-3 / (simulationContext?.linesPerMm || 600)).toExponential(4)} m)
+- Detector Screen Distance (L): ${Number(simulationContext?.screenDistanceM || 1.0).toFixed(2)} m
+- Selected Diffraction Order (m): ${simulationContext?.selectedOrder === "all" ? "All Orders" : simulationContext?.selectedOrder || 1}
+- Diffraction Angle (theta = arcsin(m*lambda/d)): ${Number(simulationContext?.thetaDeg || 0).toFixed(2)} deg
+- Screen Fringe Position (y = L * tan(theta)): ${Number(simulationContext?.yPosCm || 0).toFixed(2)} cm
+- Angular Dispersion (D = m / (d * cos(theta))): ${Number(simulationContext?.dispersion || 0).toFixed(4)} rad/um
+- Maximum Observable Order (m_max = floor(d / lambda)): +/- ${simulationContext?.maxOrder || 3}
+- Mystery Tube Mode: ${simulationContext?.isMysteryMode ? "ACTIVE (Unknown gas specimen installed)" : "Standard Calibrated Laser"}
+- Recorded Observation Trials: ${simulationContext?.observationsCount || 0}`
+    : simulationContext?.experiment === "Physics Sandbox"
+    ? `- Active Laboratory: Experiment 4 (Physics Sandbox & 2D Kinematics Playground)
+- Interactive 2D Newtonian rigid body engine with real-time vector analysis.`
+    : simulationContext?.experiment === "Study of Colour Sensor"
     ? `- Active Laboratory: Experiment 3 (Study of Colour Sensor TCS3200)
 - Power Supply: ${simulationContext?.powerSupplyOn ? "ON (5V DC)" : "OFF"}
 - White LED Ring: ${simulationContext?.ledArrayActive ? "ACTIVE (4-LED Array)" : "OFF"}
@@ -254,6 +302,26 @@ ${
 5. **Target Aiming Ballistics**:
    - To hit a target at distance d, solve for theta: \\tan\\theta = \\frac{v_0^2 \\pm \\sqrt{v_0^4 - g(g d^2 - 2 v_0^2 h_0)}}{g d}
    - For h0 = 0: \\sin(2\\theta) = \\frac{d \\cdot g}{v_0^2}. Two complementary angles exist (low flat trajectory vs high lofted arc).
+6. **Wave Optics & Fraunhofer Diffraction Grating**:
+   - **Grating Equation**: Constructive interference path difference condition for principal spectral maxima:
+     $$d \\sin\\theta = m\\lambda \\implies \\lambda = \\frac{d \\sin\\theta}{m}$$
+     where $d = 1/N$ is grating pitch ($N$ in lines/m), $\\theta$ is diffraction angle, and $m \\in \\{0, \\pm 1, \\pm 2, \\dots\\}$ is the spectral order.
+   - **Maximum Observable Order ($m_{max}$)**: Because $|\\sin\\theta| \\le 1$:
+     $$m_{max} = \\left\\lfloor \\frac{d}{\\lambda} \\right\\rfloor$$
+     Orders with $|m| > m_{max}$ are physically impossible and cannot emerge from the grating.
+   - **Fringe Screen Displacement ($y$)**: On a flat screen at distance $L$ normal to the grating:
+     $$y = L \\tan\\theta$$
+   - **Angular Dispersion ($D$)**: Measures the angular separation between spectral components:
+     $$D = \\frac{d\\theta}{d\\lambda} = \\frac{m}{d \\cos\\theta}$$
+     Dispersion increases directly with order $m$ and grating line density $N$ (smaller $d$).
+   - **Resolving Power ($R$)**:
+     $$R = \\frac{\\lambda}{\\Delta\\lambda} = m \\cdot N_{total}$$
+     Higher total illuminated lines $N_{total}$ yield sharper, narrower principal maxima.
+   - **Central Maximum ($m=0$)**: At $\\theta = 0$, all wavelengths interfere constructively in phase. It exhibits no dispersion and appears as an undiffracted direct beam.
+7. **Newtonian Mechanics & Impulse Physics (Sandbox)**:
+   - **Verlet Integration**: Position-based numeric integration for high stability: $x(t+\\Delta t) = 2x(t) - x(t-\\Delta t) + a(t)\\Delta t^2$.
+   - **Impulse-Momentum Theorem**: Instantaneous velocity change under force impulse: $J = \\int F\\, dt = \\Delta p = m(v_f - v_i)$.
+   - **Coefficient of Restitution ($e$)**: Relative velocity ratio before and after collision: $e = \\frac{v_{2f} - v_{1f}}{v_{1i} - v_{2i}}$. $e=1$ (elastic), $e=0$ (perfectly inelastic).
 
 ### OUTPUT FORMAT:
 - Present operational instructions and mathematical solutions with clear headings, explicit button names, step-by-step substitution, and boxed/bold final results with SI units.
@@ -268,6 +336,52 @@ export function generateLocalPhysicsResponse(userMessage = "", context = {}) {
 
   const msg = userMessage.toLowerCase();
 
+  // General Experiments Catalog & Platform Overview
+  if (
+    msg.includes("what experiment") ||
+    msg.includes("list experiment") ||
+    msg.includes("all experiment") ||
+    msg.includes("which experiment") ||
+    msg.includes("available experiment") ||
+    msg.includes("experiments available") ||
+    msg.includes("tell me about the experiment") ||
+    msg.includes("about the experiments") ||
+    msg.includes("experiments in physix") ||
+    msg.includes("what labs") ||
+    msg.includes("list labs")
+  ) {
+    return `### PhysiX Virtual Physics Laboratory Catalog
+
+PhysiX hosts **5 fully interactive real-time simulation laboratories** powered by high-precision computational engines:
+
+#### 1. Experiment 1: 2D Projectile Motion Virtual Laboratory (\`#exp-projectile-section\`)
+- **Domain**: Classical Newtonian Mechanics & Ballistics
+- **Core Physics**: Parabolic trajectory equations $y(x) = h_0 + x\\tan\\theta - \\frac{g x^2}{2 v_0^2 \\cos^2\\theta}$, time of flight $T$, maximum apex $H_{max}$, range $R$, and planetary gravity comparison (Earth, Moon, Mars, Jupiter).
+- **Interactive Deck**: Sliders for initial velocity $v_0$ (10–50 m/s), launch angle $\\theta$ (0–90°), platform cliff height $h_0$ (0–100 m), and **Target Challenge Mode**.
+
+#### 2. Experiment 2: Determination of Numerical Aperture of an Optical Fibre (\`#exp-optical-section\`)
+- **Domain**: Fiber Optics, Waveguides & Photonics
+- **Core Physics**: Acceptance cone geometry, total internal reflection, numerical aperture $NA = \\frac{W}{\\sqrt{4L^2 + W^2}} = \\sin\\theta_a$, and normalized frequency $V$-number.
+- **Interactive Deck**: Optical bench with laser source switches, tunable wavelength (650nm, 532nm, 405nm, 850nm), movable screen distance $L$ (1–10 cm), spot diameter measurement $W$, and the **40s Rapid Calibration Challenge**.
+
+#### 3. Experiment 3: Study of Colour Sensor (TCS3200) & Spectral Response (\`#exp-colour-sensor-section\`)
+- **Domain**: Optoelectronics, Photodiode Arrays & Colorimetry
+- **Core Physics**: Light-to-frequency conversion $f_{out} \\propto I_{ph}$, $8\\times 8$ photodiode matrix, S2/S3 pin filtering (Red, Green, Blue, Clear), S0/S1 scaling (2%, 20%, 100%), inverse-square distance attenuation $E \\propto 1/d^2$, and CIE chromaticity coordinates ($r, g, b$).
+- **Interactive Deck**: Calibrated color chips, standoff rail distance slider (5–30 mm), and the **Spectroscopic Detective (Mystery Sample) Challenge**.
+
+#### 4. Experiment 4: Physics Sandbox & 2D Kinematics Playground (\`#exp-sandbox-section\`)
+- **Domain**: Newtonian Rigid Body Kinetics & Impulse Mechanics
+- **Core Physics**: Matter.js Verlet integration, rigid body collisions, coefficient of restitution $e$, static/kinetic friction, dynamic continuous thrust, and high-impulse kicks ($F = \\Delta p / \\Delta t$).
+- **Interactive Deck**: Shape spawners, force arrows, variable gravity slider (0–25 m/s²), Zero-G mode, and challenges (**Newton's Dynamic Thrust**, **High-Impulse Kick**, **Zero-G Inertial Cruise**).
+
+#### 5. Experiment 5: Diffraction Grating Spectrometry Laboratory (\`#exp-diffraction-section\`)
+- **Domain**: Wave Optics, Multi-Slit Fraunhofer Interference & Spectroscopy
+- **Core Physics**: Grating equation $d\\sin\\theta = m\\lambda$, grating pitch $d = 1/N$, spectral orders $m = 0, \\pm 1, \\pm 2$, maximum observable order $m_{max} = \\lfloor d/\\lambda \\rfloor$, angular dispersion $D = \\frac{m}{d\\cos\\theta}$, and detector fringe displacement $y = L\\tan\\theta$.
+- **Interactive Deck**: Dual-canvas optical bench & screen detector, tunable laser wavelength $\\lambda$ (400–700 nm), grating ruling density $N$ (300–1200 lines/mm), screen rail distance $L$ (0.50–2.00 m), and the **Mystery Gas Tube Challenge** (He-Ne 633nm, Argon 488nm, Krypton 568nm).
+
+You can switch between any of these laboratories using the **Explore Labs Hub** or the top lab selector banner!`;
+  }
+
   // Website & Lab Operations Guide
   if (
     msg.includes("how to use") ||
@@ -279,6 +393,39 @@ export function generateLocalPhysicsResponse(userMessage = "", context = {}) {
     msg.includes("tutorial") ||
     msg.includes("instructions")
   ) {
+    if (context?.experiment === "Diffraction Grating" || msg.includes("diffraction") || msg.includes("grating") || msg.includes("spectrometer") || msg.includes("spectral") || msg.includes("slit")) {
+      return `### How to Operate Experiment 5: Diffraction Grating Spectrometry Laboratory
+
+#### Step-by-Step Operating Instructions:
+1. **Tune Laser Wavelength ($\\lambda$)**: Use the Monochromatic Laser Wavelength slider (\`#dg-wl-slider\`) to select a wavelength between **400 nm** and **700 nm**, or click one of the quick laser presets:
+   - **405nm Violet**
+   - **488nm Cyan**
+   - **532nm Green**
+   - **589nm Sodium Yellow**
+   - **633nm He-Ne Red**
+2. **Set Grating Density ($N$)**: Adjust the Grating Density slider (\`#dg-density-slider\`) from **300 lines/mm** to **1200 lines/mm** (presets: **300**, **600**, **830**, **1000**, **1200 lines/mm**).
+   - Slit pitch $d = \\frac{1}{N \\times 10^3}\\text{ m}$. For $N = 600\\text{ lines/mm}$, $d \\approx 1.667\\ \\mu\\text{m}$.
+3. **Position Detector Screen ($L$)**: Adjust the optical bench rail screen slider (\`#dg-screen-slider\`) from **0.50 m** to **2.00 m** (presets: **0.80m**, **1.00m**, **1.20m**, **1.50m**).
+4. **Select Diffraction Order ($m$)**: Click the order selector buttons ($m = -2, -1, 0, +1, +2$, or **All**) to isolate specific beams and inspect angular deflection $\\theta$ and screen displacement $y = L\\tan\\theta$.
+5. **Record Observations**: Click **Record Observation** (\`#dg-btn-record-obs\`) to log Trial, Nominal $\\lambda$, Density $N$, Pitch $d$, Order $m$, Angle $\\theta$, Screen $L$, Fringe $y$, and Calculated $\\lambda$.
+6. **Export Certified Report**: Click **CSV** (\`#dg-btn-export-csv\`) or **PDF** (\`#dg-btn-export-pdf\`) to download your experimental data.
+
+#### Challenges:
+- Click **Install Unknown** in the **Mystery Gas Tube Challenge** card to test atomic emission lines (He-Ne 633nm, Argon 488nm, Krypton 568nm) and earn **175 XP**!`;
+    }
+
+    if (context?.experiment === "Physics Sandbox" || msg.includes("sandbox") || msg.includes("playground")) {
+      return `### How to Operate Experiment 4: Physics Sandbox & 2D Kinematics Playground
+
+#### Step-by-Step Operating Instructions:
+1. **Spawn Rigid Bodies**: Use the spawn controls to add circles, boxes, and custom masses onto the 2D physics canvas.
+2. **Configure Physical Properties**: Select an object to adjust its mass ($m$), coefficient of restitution ($e$), and surface friction.
+3. **Interact in Real-Time**: Click and drag any body to launch or position it in the canvas.
+4. **Apply Forces & Impulses**: Use the Control Deck to apply sustained directional thrust ($F$) or instantaneous ballistic kicks ($J = \\Delta p$).
+5. **Adjust Celestial Gravity**: Use the gravity slider to simulate environments from Zero-G ($0\\text{ m/s}^2$) up to Jupiter ($24.8\\text{ m/s}^2$).
+6. **Complete Challenges**: Unlock bonus XP by completing **Dynamic Thrust** (100 XP), **Ballistic Kick** (125 XP), and **Zero-G Inertial Cruise** (150 XP)!`;
+    }
+
     if (context?.experiment === "Study of Colour Sensor" || msg.includes("colour") || msg.includes("color") || msg.includes("tcs3200")) {
       return `### How to Operate Experiment 3: Study of Colour Sensor (TCS3200)
 
@@ -342,7 +489,7 @@ export function generateLocalPhysicsResponse(userMessage = "", context = {}) {
 - Click the **Export PDF Report** button.
 - Generates a certified laboratory report including:
   * Student Name, ID, Course, and Timestamp metadata.
-  * KPI summary cards ($v_0, \\theta, h_0, g, H_{max}, R, T$ or $NA, \\theta_a, d, f_{out}$).
+  * KPI summary cards ($v_0, \\theta, h_0, g, H_{max}, R, T$ or $NA, \\theta_a, d, f_{out}$ or $\\lambda, N, d, \\theta, y, D$).
   * Analytical governing physics formulas.
   * Formatted tabular log of all recorded observations.
 - Ready for printing or academic submission!`;
@@ -358,6 +505,27 @@ export function generateLocalPhysicsResponse(userMessage = "", context = {}) {
     msg.includes("quiz") ||
     msg.includes("mystery")
   ) {
+    if (context?.experiment === "Diffraction Grating" || msg.includes("diffraction") || msg.includes("gas tube") || msg.includes("unknown tube")) {
+      return `### Diffraction Grating Challenges & Mystery Gas Tube Guide
+
+#### 1. Challenge 1: First-Order Precision (100 XP)
+- **Goal**: Align laser to **633 nm** (Red) with $N = 600\\text{ lines/mm}$ and measure first-order angle $\\theta \\approx 22.3^\\circ$.
+
+#### 2. Challenge 2: High-Density Dispersion (125 XP)
+- **Goal**: Configure 532 nm (Green) at $N = 1000\\text{ lines/mm}$ to observe wide angular dispersion ($\\theta \\approx 32.1^\\circ$).
+
+#### 3. Challenge 3: Second-Order Resolution (150 XP)
+- **Goal**: Isolate second-order maximum ($m = 2$) with $\\lambda = 450\\text{ nm}$ and $N = 600\\text{ lines/mm}$.
+
+#### 4. Challenge 4: Mystery Gas Tube Identification (175 XP)
+- **Goal**: Click **Install Unknown** (\`#dg-btn-start-mystery\`). Measure diffraction angle $\\theta$ and calculate unknown emission wavelength:
+  $$\\lambda = \\frac{d \\sin\\theta}{m}$$
+- Input the computed wavelength in nm and click **Verify** to identify the atomic gas!
+
+#### 5. Challenge 5: Spectroscopy Mastery (200 XP)
+- **Goal**: Log at least 4 observation trials across multiple orders and wavelengths into the Observation Table.`;
+    }
+
     return `### PhysiX Gamification, Challenges & XP Guide
 
 #### 1. Target Challenge Mode (Experiment 1: Projectile Motion)
@@ -373,8 +541,15 @@ export function generateLocalPhysicsResponse(userMessage = "", context = {}) {
 - **Objective**: Click **Mystery Sample** to load an unknown chemical specimen. Analyze output frequencies across Red, Green, Blue, and Clear filters to determine the exact color hex code.
 - **Reward**: **300 Student XP** and the *Spectra Master* badge.
 
-#### 4. Physics Quiz (10 Questions)
-- Click **Physics Quiz [10Q]** in the top navigation bar to test your conceptual knowledge across mechanics, wave optics, and sensor electronics to level up your student rank from *Apprentice* to *Master Physicist*!`;
+#### 4. Wave Optics & Mystery Gas Tube Challenges (Experiment 5: Diffraction Grating)
+- **Objective**: Determine unknown atomic emission lines (He-Ne 633nm, Argon 488nm, Krypton 568nm) via $\\lambda = \\frac{d\\sin\\theta}{m}$ and master multi-slit dispersion.
+- **Reward**: **175 Student XP** and wave optics badges.
+
+#### 5. Newtonian Mechanics Challenges (Experiment 4: Physics Sandbox)
+- **Dynamic Thrust (100 XP)**, **High-Impulse Kick (125 XP)**, and **Zero-G Inertial Cruise (150 XP)**.
+
+#### 6. Physics Quiz (10 Questions)
+- Click **Physics Quiz [10Q]** in the top navigation bar to test your conceptual knowledge across mechanics, wave optics, and sensor electronics to level up your student rank!`;
   }
 
   // Machine Turn-On / Hardware Switch Specific Queries
@@ -397,7 +572,10 @@ export function generateLocalPhysicsResponse(userMessage = "", context = {}) {
 #### Experiment 3: TCS3200 Colour Sensor
 1. **Main Power**: Click **Main Power** (\`#cs-btn-power-switch\`) to supply 5V DC to the internal photodiode array and pulse oscillator.
 2. **White LEDs**: Click **White LEDs** (\`#cs-btn-illum-switch\`) to activate the 4-LED spotlight ring for reflective specimen illumination.
-*Note*: The LED array requires Main Power to be active.`;
+*Note*: The LED array requires Main Power to be active.
+
+#### Experiment 5: Diffraction Grating Bench
+- The solid-state laser is energized and aligned to the optical bench automatically. Adjust wavelength via \`#dg-wl-slider\` or click preset wavelength buttons (405nm, 488nm, 532nm, 589nm, 633nm).`;
   }
 
   // Colour Sensor & Tristimulus Colorimetry Queries
@@ -486,6 +664,127 @@ $$\\theta_a = \\arcsin(NA)$$
 - Move the screen closer (smaller $L$) to decrease spot diameter $W$.
 - Move the screen farther (larger $L$) to expand spot diameter $W$.
 - Select wavelengths (**650nm**, **532nm**, **405nm**, **850nm**) to observe chromatic dispersion.`;
+  }
+
+  // Mystery Gas Tube Challenge Queries
+  if (
+    msg.includes("mystery gas") ||
+    msg.includes("gas tube") ||
+    msg.includes("unknown gas") ||
+    msg.includes("mystery tube") ||
+    msg.includes("neon") ||
+    msg.includes("argon") ||
+    msg.includes("krypton") ||
+    (msg.includes("mystery") && (context?.experiment === "Diffraction Grating" || msg.includes("diffraction") || msg.includes("tube")))
+  ) {
+    return `### Mystery Gas Tube Challenge Guide by **${AI_NAME}**
+
+#### Objective:
+Determine the unknown atomic emission wavelength $\\lambda$ of a sealed discharge gas tube using the diffraction grating equation:
+$$\\lambda = \\frac{d \\sin\\theta}{m}$$
+
+#### Step-by-Step Solution Procedure:
+1. Click **Install Unknown** (\`#dg-btn-start-mystery\`) in the Mystery Gas Tube Challenge Card. An unknown discharge specimen tube is loaded onto the optical bench.
+2. Note the Grating Line Density $N$ (e.g. $600\\text{ lines/mm} \\implies d = 1.6667\\ \\mu\\text{m} = 1.6667 \\times 10^{-6}\\text{ m}$).
+3. Read the measured diffraction angle $\\theta$ from the Live Telemetry HUD or screen displacement $y$.
+4. Calculate unknown wavelength:
+   $$\\lambda = \\frac{d \\sin\\theta}{m}$$
+5. Convert meters to nanometers ($\\text{nm} = \\text{meters} \\times 10^9$).
+6. Enter your computed wavelength (e.g., \`633\`) into the input field (\`#dg-mystery-guess-input\`) and click **Verify** (\`#dg-btn-submit-guess\`) to earn **175 Student XP**!
+
+#### Reference Atomic Gas Discharge Specimens in PhysiX:
+| Specimen ID | Atomic Emission Element | True Wavelength ($\\lambda$) | Spectral Color | $\\theta$ at $N=600$ ($m=1$) |
+| :--- | :--- | :--- | :--- | :--- |
+| **neon** | Helium-Neon (He-Ne) Gas Tube | **$633\\text{ nm}$** | Laser Crimson Red | **$22.32^\\circ$** |
+| **argon** | Argon Ion ($Ar^+$) Tube | **$488\\text{ nm}$** | Cyan / Turquoise | **$17.03^\\circ$** |
+| **krypton** | Krypton Ion Gas Line | **$568\\text{ nm}$** | Pure Amber Yellow | **$19.93^\\circ$** |`;
+  }
+
+  // Experiment 5: Diffraction Grating & Wave Optics Queries
+  if (
+    context?.experiment === "Diffraction Grating" ||
+    msg.includes("diffraction") ||
+    msg.includes("grating") ||
+    msg.includes("wavelength") ||
+    msg.includes("spectrometer") ||
+    msg.includes("spectroscopy") ||
+    msg.includes("spectral order") ||
+    msg.includes("spectral line") ||
+    msg.includes("dispersion") ||
+    msg.includes("fraunhofer") ||
+    msg.includes("fringe") ||
+    msg.includes("slit spacing") ||
+    msg.includes("lines per mm")
+  ) {
+    const wl = Number(context?.wavelengthNm || 550);
+    const N = Number(context?.linesPerMm || 600);
+    const d = context?.gratingSpacingD ? Number(context.gratingSpacingD) : (1 / (N * 1000));
+    const dUm = (d * 1e6).toFixed(4);
+    const L = Number(context?.screenDistanceM || 1.0);
+    const m = context?.selectedOrder === "all" ? 1 : Number(context?.selectedOrder ?? 1);
+    const theta = typeof context?.thetaDeg === "number" ? context.thetaDeg : 19.27;
+    const yCm = typeof context?.yPosCm === "number" ? context.yPosCm : 34.96;
+    const disp = typeof context?.dispersion === "number" ? context.dispersion : 0.635;
+    const maxM = Math.floor(d / (wl * 1e-9));
+
+    return `### Diffraction Grating Spectrometry Analysis by **${AI_NAME}**
+
+#### 1. Governing Fraunhofer Multi-Slit Grating Equation
+When monochromatic laser light of wavelength $\\lambda$ passes through a transmission grating with slit spacing (pitch) $d$, coherent waves from each slit interfere constructively to form sharp principal spectral maxima:
+$$d \\sin\\theta = m\\lambda \\implies \\lambda = \\frac{d \\sin\\theta}{m}$$
+- $d$: Grating ruling spacing (pitch) $= \\frac{1}{N \\times 10^3}\\text{ meters}$ (for $N\\text{ lines/mm}$).
+- $\\theta$: Angular deviation of the $m$-th diffraction maximum from the incident beam.
+- $m$: Integer spectral diffraction order ($m = 0, \\pm 1, \\pm 2, \\dots$).
+- $\\lambda$: Monochromatic light wavelength in meters (or nanometers $\\times 10^{-9}$).
+
+#### 2. Live Laboratory Telemetry & Computed Values
+- **Incident Laser Wavelength ($\\lambda$)**: **${wl}\\text{ nm}$** (${wl < 450 ? "Violet" : wl < 495 ? "Cyan/Blue" : wl < 570 ? "Green" : wl < 590 ? "Yellow" : "Red"})
+- **Grating Ruling Density ($N$)**: **${N}\\text{ lines/mm}$**
+- **Grating Pitch ($d = 1/N$)**: **${dUm}\\ \\mu\\text{m}$** (${d.toExponential(4)}\\text{ m})
+- **Optical Bench Screen Distance ($L$)**: **${L.toFixed(2)}\\text{ m}$**
+- **Active Spectral Order ($m$)**: **${m > 0 ? "+" + m : m}**
+- **Diffraction Angle ($\\theta = \\arcsin(m\\lambda / d)$)**: **${theta.toFixed(2)}^\\circ**
+- **Screen Fringe Position ($y = L\\tan\\theta$)**: **${yCm.toFixed(2)}\\text{ cm}$** from central maximum ($m=0$)
+- **Maximum Observable Order ($m_{max} = \\lfloor d/\\lambda \\rfloor$)**: **$\\pm ${maxM}**
+- **Angular Dispersion ($D = \\frac{m}{d\\cos\\theta}$)**: **${disp.toFixed(4)}\\text{ rad/}\\mu\\text{m}$**
+
+#### 3. Key Theoretical Relationships
+- **Fringe Position on Screen**: $y_m = L \\tan\\theta_m$. Measuring distance $y$ on the detector screen directly yields $\\theta = \\arctan(y / L)$.
+- **Angular Dispersion ($D$)**:
+  $$D = \\frac{d\\theta}{d\\lambda} = \\frac{m}{d \\cos\\theta}$$
+  Higher grating density $N$ (smaller pitch $d$) spreads spectral orders wider apart across the screen.
+- **Maximum Observable Order ($m_{max}$)**: Because $|\\sin\\theta| \\le 1.0$, the highest theoretical order is:
+  $$m_{max} = \\left\\lfloor \\frac{d}{\\lambda} \\right\\rfloor = \\left\\lfloor \\frac{${dUm} \\times 10^{-6}\\text{ m}}{${wl} \\times 10^{-9}\\text{ m}} \\right\\rfloor = \\pm ${maxM}$$
+  Orders beyond $\\pm ${maxM}$ are evanescent waves and cannot physically propagate.`;
+  }
+
+  // Experiment 4: Physics Sandbox Queries
+  if (
+    context?.experiment === "Physics Sandbox" ||
+    msg.includes("sandbox") ||
+    msg.includes("playground") ||
+    msg.includes("rigid body") ||
+    msg.includes("zero-g") ||
+    msg.includes("thrust") ||
+    msg.includes("restitution")
+  ) {
+    return `### Physics Sandbox & 2D Kinematics Playground Guide by **${AI_NAME}**
+
+#### 1. Overview & Computational Engine
+The **PhysiX Sandbox** is an interactive 2D Newtonian physics playground powered by a custom Verlet numerical integration engine. It allows unconstrained experimentation with rigid body mechanics, collisions, impulses, and celestial gravitational fields.
+
+#### 2. Apparatus & Tools Deck:
+- **Object Spawner**: Add Circles, Rectangles, or Polygons to the canvas. Set custom mass ($m$), static friction ($\\mu_s$), kinetic friction ($\\mu_k$), and coefficient of restitution ($e$, bounciness).
+- **Interactive Drag & Toss**: Click and fling any rigid body with the mouse or touch interface to impart initial velocity vectors ($v_x, v_y$).
+- **Dynamic Continuous Thrust**: Apply sustained directional force ($F$ in Newtons) to test Newton's second law $\\Sigma F = ma$.
+- **High-Impulse Ballistic Kick**: Apply instantaneous momentum transfer:
+  $$J = \\int F\\, dt = \\Delta p = m(v_f - v_i)$$
+- **Gravity & Environment Slider**: Adjust $g$ continuously from $0.0\\text{ m/s}^2$ (Zero-G space station) to $25.0\\text{ m/s}^2$ (Jupiter supergravity).
+
+#### 3. Sandbox Gamification Challenges:
+1. **Newton's Dynamic Thrust (100 XP)**: Accelerate a body using continuous thrust force.
+2. **High-Impulse Ballistic Kick (125 XP)**: Impart a momentum impulse to launch a mass across the arena.
+3. **Zero-G Inertial Cruise (150 XP)**: Enable Zero-G and maintain steady velocity without collision for 3 seconds to demonstrate Newton's first law of inertia.`;
   }
 
   const gt = calculateTrajectoryGroundTruth(context);

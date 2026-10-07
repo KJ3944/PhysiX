@@ -875,5 +875,391 @@ export const EXPERIMENT_DETAILS = {
         </ol>
       </div>
     `
+  },
+  diffraction: {
+    id: "diffraction",
+    title: "Diffraction of Light using Diffraction Grating",
+    category: "Optics & Wave Phenomena",
+    shortDescription: "Explore how a diffraction grating separates light into different orders and observe how wavelength and grating spacing affect diffraction.",
+    difficulty: "Undergraduate Wave Optics Laboratory",
+    duration: "45 Minutes",
+    engine: "Fourier Wave Optics & Fraunhofer Multi-Slit Interference Solver",
+    accentColor: "#a855f7",
+    aim: `<p class="manual-aim-text">To study the diffraction of monochromatic light through a diffraction grating, observe the formation of principal maxima for different orders, verify the grating equation <strong>d sin θ = mλ</strong>, determine the wavelength of incident spectral lines, and analyze angular dispersion as a function of grating line density.</p>`,
+    theory: `
+      <div class="theory-block">
+        <h3>1. Principle of Multi-Slit Fraunhofer Diffraction</h3>
+        <p>A diffraction grating consists of a periodic array of a large number of equally spaced, identical parallel slits or rulings (N lines per unit length) separated by an opaque width. When a monochromatic collimated plane wave of wavelength λ is normally incident upon the grating, each transparent ruling acts as a secondary coherent wave source in accordance with the Huygens-Fresnel principle.</p>
+        <p>The secondary wavelets emerging from adjacent slits travel path lengths that differ by an optical path difference (OPD) given by:</p>
+        <div class="math-callout">Δ = d · sin(θ)</div>
+        <p>Where <strong>d</strong> is the grating spacing (distance between corresponding points of adjacent slits) and <strong>θ</strong> is the diffraction angle relative to the incident optical axis.</p>
+      </div>
+
+      <div class="theory-block">
+        <h3>2. The Principal Maxima Condition (Grating Equation)</h3>
+        <p>Constructive interference of wavelets from all N rulings occurs whenever the optical path difference between adjacent slits is an integral multiple of the wavelength (mλ). This establishes the fundamental <strong>Grating Equation</strong>:</p>
+        <div class="math-callout formula-highlight">d · sin(θ) = m · λ &nbsp;&nbsp;⟹&nbsp;&nbsp; sin(θ) = (m · λ) / d</div>
+        <p>Where:</p>
+        <ul class="manual-list">
+          <li><strong>d = 1 / N:</strong> Grating spacing (e.g. for N = 600 lines/mm, d = 1 / (600 × 10³) m = 1.667 μm).</li>
+          <li><strong>θ:</strong> Diffraction angle of the emerging principal maximum.</li>
+          <li><strong>m = 0, ±1, ±2, ±3...:</strong> Order of diffraction.</li>
+          <li><strong>λ:</strong> Optical wavelength of the incident light beam.</li>
+        </ul>
+        <p>The central maximum corresponds to m = 0 (θ = 0°), where all waves arrive in phase regardless of wavelength. Non-zero orders (m = ±1, ±2...) produce symmetrical maxima on both sides of the central axis.</p>
+      </div>
+
+      <div class="theory-block">
+        <h3>3. Cutoff & Maximum Observable Order</h3>
+        <p>Because the sine of any real physical angle cannot exceed unity (|sin θ| ≤ 1), the maximum permissible diffraction order m<sub>max</sub> is strictly bounded by:</p>
+        <div class="math-callout">|m| · λ / d ≤ 1 &nbsp;&nbsp;⟹&nbsp;&nbsp; m<sub>max</sub> = ⌊ d / λ ⌋</div>
+        <p>Orders exceeding m<sub>max</sub> are non-propagating evanescent states and cannot be observed on a physical screen.</p>
+      </div>
+
+      <div class="theory-block">
+        <h3>4. Angular Dispersion & Resolving Power</h3>
+        <p>The rate of change of diffraction angle with respect to wavelength is defined as the <strong>angular dispersion (D)</strong>:</p>
+        <div class="math-callout">D = dθ / dλ = m / [d · cos(θ)]</div>
+        <p>This demonstrates that angular dispersion increases with higher diffraction order (m) and higher line density N (smaller slit spacing d).</p>
+      </div>
+    `,
+    howToPerform: `
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-badge">1</div>
+          <div class="step-info">
+            <h4>Launch Simulator & Activate Laser</h4>
+            <p>Click <strong>Start Simulator</strong>. Ensure the laser source power toggle is switched ON with normal incident alignment onto the grating element.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">2</div>
+          <div class="step-info">
+            <h4>Configure Grating Density (N)</h4>
+            <p>Set the grating density slider to <strong>600 lines/mm</strong> (or use quick presets: 300, 600, 1000 lines/mm). Note the computed slit pitch d = 1.667 μm.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">3</div>
+          <div class="step-info">
+            <h4>Select Incident Wavelength (λ)</h4>
+            <p>Adjust the tunable laser wavelength slider between 400 nm (violet) and 700 nm (deep red), or pick standard presets (e.g. 532 nm Green, 633 nm He-Ne Red).</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">4</div>
+          <div class="step-info">
+            <h4>Set Screen Distance (L) & Observe Pattern</h4>
+            <p>Adjust the screen distance L (e.g. 1.00 m). Observe the bright central maximum (m=0) and symmetrical principal maxima (m=±1, ±2) on the detector screen.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">5</div>
+          <div class="step-info">
+            <h4>Measure Fringe Positions & Angles</h4>
+            <p>Select different orders (m = +1, -1, +2). Inspect the digital telemetry for diffraction angle θ and linear screen displacement y = L · tan(θ).</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">6</div>
+          <div class="step-info">
+            <h4>Commit Data & Verify Grating Equation</h4>
+            <p>Click <strong>Record Observation</strong> to log the trial. Verify that the calculated wavelength λ_calc = (d · sin θ) / m matches the nominal laser wavelength within experimental accuracy.</p>
+          </div>
+        </div>
+      </div>
+    `,
+    procedure: `
+      <ol class="manual-ordered-list">
+        <li><strong>Optical Alignment:</strong> Mount the monochromatic laser source and transmission diffraction grating normally on the optical rail. Position the observation screen at distance L = 1.00 m.</li>
+        <li><strong>Zero Order Verification:</strong> Turn ON the laser. Verify that the central undeviated maximum (m = 0) strikes the center mark (y = 0 cm) of the screen at angle θ = 0.0°.</li>
+        <li><strong>First-Order Measurements:</strong> Set grating density N = 600 lines/mm and wavelength λ = 632.8 nm (He-Ne red). Measure the angular deflection θ₁ and screen displacement y₁ of the first-order principal maxima (m = +1 and m = -1).</li>
+        <li><strong>Second-Order Measurements:</strong> Identify the second-order maxima (m = ±2), verify that the angle satisfies sin θ₂ = 2λ / d, and check for spatial symmetry.</li>
+        <li><strong>Wavelength Dependence:</strong> Keep grating density N constant. Vary the laser wavelength to 532 nm (Green) and 450 nm (Blue). Observe how shorter wavelengths result in smaller diffraction angles.</li>
+        <li><strong>Grating Density Dependence:</strong> Keep wavelength λ = 550 nm constant. Increase grating density from 300 to 1000 lines/mm and record the dramatic expansion in angular dispersion.</li>
+        <li><strong>Log Trials:</strong> Record at least 4 observation trials across multiple orders to compute mean wavelength and percentage deviation.</li>
+      </ol>
+    `,
+    observationTable: `
+      <div class="table-responsive">
+        <table class="manual-table">
+          <thead>
+            <tr>
+              <th>Trial</th>
+              <th>Laser λ (nm)</th>
+              <th>Grating N (/mm)</th>
+              <th>Pitch d (μm)</th>
+              <th>Order m</th>
+              <th>Diffraction Angle θ</th>
+              <th>Screen L (m)</th>
+              <th>Fringe y (cm)</th>
+              <th>Computed λ (nm)</th>
+              <th>Error %</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>#1</td>
+              <td>632.8 nm (Red)</td>
+              <td>600 /mm</td>
+              <td>1.667 μm</td>
+              <td>+1</td>
+              <td>22.31°</td>
+              <td>1.00 m</td>
+              <td>41.03 cm</td>
+              <td>632.8 nm</td>
+              <td>0.00%</td>
+            </tr>
+            <tr>
+              <td>#2</td>
+              <td>532.0 nm (Green)</td>
+              <td>600 /mm</td>
+              <td>1.667 μm</td>
+              <td>+1</td>
+              <td>18.61°</td>
+              <td>1.00 m</td>
+              <td>33.67 cm</td>
+              <td>532.0 nm</td>
+              <td>0.00%</td>
+            </tr>
+            <tr>
+              <td>#3</td>
+              <td>450.0 nm (Blue)</td>
+              <td>600 /mm</td>
+              <td>1.667 μm</td>
+              <td>+2</td>
+              <td>32.68°</td>
+              <td>1.00 m</td>
+              <td>64.15 cm</td>
+              <td>450.0 nm</td>
+              <td>0.00%</td>
+            </tr>
+            <tr>
+              <td>#4</td>
+              <td>532.0 nm (Green)</td>
+              <td>1000 /mm</td>
+              <td>1.000 μm</td>
+              <td>+1</td>
+              <td>32.14°</td>
+              <td>1.00 m</td>
+              <td>62.82 cm</td>
+              <td>532.0 nm</td>
+              <td>0.00%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="obs-notes">
+        <h4>Key Experimental Observations:</h4>
+        <ul class="manual-list">
+          <li><strong>Spectral Order Symmetry:</strong> Positive orders (m = +1, +2) and negative orders (m = -1, -2) form at strictly identical angular separations on opposite sides of the central maximum.</li>
+          <li><strong>Dispersion Characteristics:</strong> Red light (longer wavelength) diffracts at larger angles than violet/blue light (shorter wavelength), in stark contrast to prism refraction.</li>
+        </ul>
+      </div>
+    `,
+    result: `
+      <div class="result-box">
+        <h4>Experimental Conclusions:</h4>
+        <ol class="manual-ordered-list">
+          <li>The diffraction grating produces discrete, sharp principal maxima satisfying the grating equation <strong>d sin θ = mλ</strong>.</li>
+          <li>The diffraction angle increases monotonically with optical wavelength and with grating ruling density.</li>
+          <li>The calculated wavelengths from diffraction angle measurements exhibit strict mathematical consistency with nominal laser specifications (< 0.5% deviation).</li>
+          <li>Higher orders provide greater angular dispersion D = m / (d cos θ) but exhibit lower intensity in accordance with the single-slit diffraction envelope.</li>
+        </ol>
+      </div>
+    `
+  },
+  "diffraction-grating": {
+    id: "diffraction-grating",
+    title: "Diffraction of Light using Diffraction Grating",
+    category: "Optics & Wave Phenomena",
+    shortDescription: "Explore how a diffraction grating separates light into different orders and observe how wavelength and grating spacing affect diffraction.",
+    difficulty: "Undergraduate Wave Optics Laboratory",
+    duration: "45 Minutes",
+    engine: "Fourier Wave Optics & Fraunhofer Multi-Slit Interference Solver",
+    accentColor: "#a855f7",
+    aim: `<p class="manual-aim-text">To study the diffraction of monochromatic light through a diffraction grating, observe the formation of principal maxima for different orders, verify the grating equation <strong>d sin θ = mλ</strong>, determine the wavelength of incident spectral lines, and analyze angular dispersion as a function of grating line density.</p>`,
+    theory: `
+      <div class="theory-block">
+        <h3>1. Principle of Multi-Slit Fraunhofer Diffraction</h3>
+        <p>A diffraction grating consists of a periodic array of a large number of equally spaced, identical parallel slits or rulings (N lines per unit length) separated by an opaque width. When a monochromatic collimated plane wave of wavelength λ is normally incident upon the grating, each transparent ruling acts as a secondary coherent wave source in accordance with the Huygens-Fresnel principle.</p>
+        <p>The secondary wavelets emerging from adjacent slits travel path lengths that differ by an optical path difference (OPD) given by:</p>
+        <div class="math-callout">Δ = d · sin(θ)</div>
+        <p>Where <strong>d</strong> is the grating spacing (distance between corresponding points of adjacent slits) and <strong>θ</strong> is the diffraction angle relative to the incident optical axis.</p>
+      </div>
+
+      <div class="theory-block">
+        <h3>2. The Principal Maxima Condition (Grating Equation)</h3>
+        <p>Constructive interference of wavelets from all N rulings occurs whenever the optical path difference between adjacent slits is an integral multiple of the wavelength (mλ). This establishes the fundamental <strong>Grating Equation</strong>:</p>
+        <div class="math-callout formula-highlight">d · sin(θ) = m · λ &nbsp;&nbsp;⟹&nbsp;&nbsp; sin(θ) = (m · λ) / d</div>
+        <p>Where:</p>
+        <ul class="manual-list">
+          <li><strong>d = 1 / N:</strong> Grating spacing (e.g. for N = 600 lines/mm, d = 1 / (600 × 10³) m = 1.667 μm).</li>
+          <li><strong>θ:</strong> Diffraction angle of the emerging principal maximum.</li>
+          <li><strong>m = 0, ±1, ±2, ±3...:</strong> Order of diffraction.</li>
+          <li><strong>λ:</strong> Optical wavelength of the incident light beam.</li>
+        </ul>
+        <p>The central maximum corresponds to m = 0 (θ = 0°), where all waves arrive in phase regardless of wavelength. Non-zero orders (m = ±1, ±2...) produce symmetrical maxima on both sides of the central axis.</p>
+      </div>
+
+      <div class="theory-block">
+        <h3>3. Cutoff & Maximum Observable Order</h3>
+        <p>Because the sine of any real physical angle cannot exceed unity (|sin θ| ≤ 1), the maximum permissible diffraction order m<sub>max</sub> is strictly bounded by:</p>
+        <div class="math-callout">|m| · λ / d ≤ 1 &nbsp;&nbsp;⟹&nbsp;&nbsp; m<sub>max</sub> = ⌊ d / λ ⌋</div>
+        <p>Orders exceeding m<sub>max</sub> are non-propagating evanescent states and cannot be observed on a physical screen.</p>
+      </div>
+
+      <div class="theory-block">
+        <h3>4. Angular Dispersion & Resolving Power</h3>
+        <p>The rate of change of diffraction angle with respect to wavelength is defined as the <strong>angular dispersion (D)</strong>:</p>
+        <div class="math-callout">D = dθ / dλ = m / [d · cos(θ)]</div>
+        <p>This demonstrates that angular dispersion increases with higher diffraction order (m) and higher line density N (smaller slit spacing d).</p>
+      </div>
+    `,
+    howToPerform: `
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-badge">1</div>
+          <div class="step-info">
+            <h4>Launch Simulator & Activate Laser</h4>
+            <p>Click <strong>Start Simulator</strong>. Ensure the laser source power toggle is switched ON with normal incident alignment onto the grating element.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">2</div>
+          <div class="step-info">
+            <h4>Configure Grating Density (N)</h4>
+            <p>Set the grating density slider to <strong>600 lines/mm</strong> (or use quick presets: 300, 600, 1000 lines/mm). Note the computed slit pitch d = 1.667 μm.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">3</div>
+          <div class="step-info">
+            <h4>Select Incident Wavelength (λ)</h4>
+            <p>Adjust the tunable laser wavelength slider between 400 nm (violet) and 700 nm (deep red), or pick standard presets (e.g. 532 nm Green, 633 nm He-Ne Red).</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">4</div>
+          <div class="step-info">
+            <h4>Set Screen Distance (L) & Observe Pattern</h4>
+            <p>Adjust the screen distance L (e.g. 1.00 m). Observe the bright central maximum (m=0) and symmetrical principal maxima (m=±1, ±2) on the detector screen.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">5</div>
+          <div class="step-info">
+            <h4>Measure Fringe Positions & Angles</h4>
+            <p>Select different orders (m = +1, -1, +2). Inspect the digital telemetry for diffraction angle θ and linear screen displacement y = L · tan(θ).</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">6</div>
+          <div class="step-info">
+            <h4>Commit Data & Verify Grating Equation</h4>
+            <p>Click <strong>Record Observation</strong> to log the trial. Verify that the calculated wavelength λ_calc = (d · sin θ) / m matches the nominal laser wavelength within experimental accuracy.</p>
+          </div>
+        </div>
+      </div>
+    `,
+    procedure: `
+      <ol class="manual-ordered-list">
+        <li><strong>Optical Alignment:</strong> Mount the monochromatic laser source and transmission diffraction grating normally on the optical rail. Position the observation screen at distance L = 1.00 m.</li>
+        <li><strong>Zero Order Verification:</strong> Turn ON the laser. Verify that the central undeviated maximum (m = 0) strikes the center mark (y = 0 cm) of the screen at angle θ = 0.0°.</li>
+        <li><strong>First-Order Measurements:</strong> Set grating density N = 600 lines/mm and wavelength λ = 632.8 nm (He-Ne red). Measure the angular deflection θ₁ and screen displacement y₁ of the first-order principal maxima (m = +1 and m = -1).</li>
+        <li><strong>Second-Order Measurements:</strong> Identify the second-order maxima (m = ±2), verify that the angle satisfies sin θ₂ = 2λ / d, and check for spatial symmetry.</li>
+        <li><strong>Wavelength Dependence:</strong> Keep grating density N constant. Vary the laser wavelength to 532 nm (Green) and 450 nm (Blue). Observe how shorter wavelengths result in smaller diffraction angles.</li>
+        <li><strong>Grating Density Dependence:</strong> Keep wavelength λ = 550 nm constant. Increase grating density from 300 to 1000 lines/mm and record the dramatic expansion in angular dispersion.</li>
+        <li><strong>Log Trials:</strong> Record at least 4 observation trials across multiple orders to compute mean wavelength and percentage deviation.</li>
+      </ol>
+    `,
+    observationTable: `
+      <div class="table-responsive">
+        <table class="manual-table">
+          <thead>
+            <tr>
+              <th>Trial</th>
+              <th>Laser λ (nm)</th>
+              <th>Grating N (/mm)</th>
+              <th>Pitch d (μm)</th>
+              <th>Order m</th>
+              <th>Diffraction Angle θ</th>
+              <th>Screen L (m)</th>
+              <th>Fringe y (cm)</th>
+              <th>Computed λ (nm)</th>
+              <th>Error %</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>#1</td>
+              <td>632.8 nm (Red)</td>
+              <td>600 /mm</td>
+              <td>1.667 μm</td>
+              <td>+1</td>
+              <td>22.31°</td>
+              <td>1.00 m</td>
+              <td>41.03 cm</td>
+              <td>632.8 nm</td>
+              <td>0.00%</td>
+            </tr>
+            <tr>
+              <td>#2</td>
+              <td>532.0 nm (Green)</td>
+              <td>600 /mm</td>
+              <td>1.667 μm</td>
+              <td>+1</td>
+              <td>18.61°</td>
+              <td>1.00 m</td>
+              <td>33.67 cm</td>
+              <td>532.0 nm</td>
+              <td>0.00%</td>
+            </tr>
+            <tr>
+              <td>#3</td>
+              <td>450.0 nm (Blue)</td>
+              <td>600 /mm</td>
+              <td>1.667 μm</td>
+              <td>+2</td>
+              <td>32.68°</td>
+              <td>1.00 m</td>
+              <td>64.15 cm</td>
+              <td>450.0 nm</td>
+              <td>0.00%</td>
+            </tr>
+            <tr>
+              <td>#4</td>
+              <td>532.0 nm (Green)</td>
+              <td>1000 /mm</td>
+              <td>1.000 μm</td>
+              <td>+1</td>
+              <td>32.14°</td>
+              <td>1.00 m</td>
+              <td>62.82 cm</td>
+              <td>532.0 nm</td>
+              <td>0.00%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="obs-notes">
+        <h4>Key Experimental Observations:</h4>
+        <ul class="manual-list">
+          <li><strong>Spectral Order Symmetry:</strong> Positive orders (m = +1, +2) and negative orders (m = -1, -2) form at strictly identical angular separations on opposite sides of the central maximum.</li>
+          <li><strong>Dispersion Characteristics:</strong> Red light (longer wavelength) diffracts at larger angles than violet/blue light (shorter wavelength), in stark contrast to prism refraction.</li>
+        </ul>
+      </div>
+    `,
+    result: `
+      <div class="result-box">
+        <h4>Experimental Conclusions:</h4>
+        <ol class="manual-ordered-list">
+          <li>The diffraction grating produces discrete, sharp principal maxima satisfying the grating equation <strong>d sin θ = mλ</strong>.</li>
+          <li>The diffraction angle increases monotonically with optical wavelength and with grating ruling density.</li>
+          <li>The calculated wavelengths from diffraction angle measurements exhibit strict mathematical consistency with nominal laser specifications (< 0.5% deviation).</li>
+          <li>Higher orders provide greater angular dispersion D = m / (d cos θ) but exhibit lower intensity in accordance with the single-slit diffraction envelope.</li>
+        </ol>
+      </div>
+    `
   }
 };
