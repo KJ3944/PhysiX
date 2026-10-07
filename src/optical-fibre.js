@@ -52,6 +52,29 @@ export function createOpticalFibreExperiment(callbacks = {}) {
     },
 
     // Challenge States
+    trainer: {
+      voltage: 5.0,
+      voltageIndex: 1,
+      voltageSteps: [3.3, 5.0, 9.0, 12.0],
+      waveform: "sine",
+      freqKhz: 4700,
+      freqIndex: 2,
+      freqSteps: [100, 1000, 4700, 10000],
+      freqLabels: ["100 kHz", "1.0 MHz", "4.7 MHz", "10.0 MHz"],
+      amplitudeV: 3.2,
+      ampIndex: 2,
+      ampSteps: [1.0, 2.0, 3.2, 5.0],
+      modulation: "am",
+      scopeCh1: true,
+      scopeCh2: true,
+      scopeRunning: true,
+      scopeGrid: true,
+      scopeTimebase: 1.0,
+      timeOffset: 0,
+      wlIndex: 0,
+      wlPresets: [650, 532, 450, 850, 1310, 1550]
+    },
+
     challenges: {
       spotMatch: { completed: false, xp: 100, targetDiameter: 2.0 },
       rapidCalib: { completed: false, xp: 125, currentStep: 0, targetSteps: [1.5, 2.5, 3.5], timerSeconds: 40, timerInterval: null, isRunning: false },
@@ -64,6 +87,11 @@ export function createOpticalFibreExperiment(callbacks = {}) {
   let benchCtx = null;
   let screenCanvas = null;
   let screenCtx = null;
+  let scopeCanvas = null;
+  let scopeCtx = null;
+  let spectralCanvas = null;
+  let spectralCtx = null;
+  let scopeAnimId = null;
 
   const BENCH_LOGICAL_W = 800;
   const BENCH_LOGICAL_H = 380;
@@ -72,10 +100,10 @@ export function createOpticalFibreExperiment(callbacks = {}) {
 
   // Clickable interactive bounding boxes on the bench canvas (in logical coordinates)
   const clickRegions = {
-    powerSwitch: { x: 50, y: 236, w: 42, h: 42 },
-    laserSwitch: { x: 100, y: 236, w: 42, h: 42 },
-    cableCoupler: { x: 175, y: 230, w: 35, h: 40 },
-    jigClamp: { x: 235, y: 155, w: 35, h: 40 }
+    powerSwitch: { x: 36, y: 212, w: 40, h: 40 },
+    laserSwitch: { x: 88, y: 212, w: 40, h: 40 },
+    cableCoupler: { x: 168, y: 212, w: 38, h: 40 },
+    jigClamp: { x: 230, y: 165, w: 40, h: 75 }
   };
 
   // Concentric ring diameters in cm
@@ -318,246 +346,677 @@ export function createOpticalFibreExperiment(callbacks = {}) {
       }
     }
 
-    // 3. Dark Blue Optical Trainer Console Module (Left side)
-    const kitX = 40;
-    const kitY = railY - 170;
-    const kitW = 145;
-    const kitH = 170;
+    // 3. REALISTIC PHOTOREALISTIC OPTICAL TRAINER KIT CONSOLE MODULE (Left side)
+    const kitX = 24;
+    const kitY = railY - 185;
+    const kitW = 166;
+    const kitH = 185;
+    const btnY = kitY + 122; // Horizontal centerline for buttons and optical port (y = 247)
+    const tipY = btnY;       // Exact matching centerline for the jig clamp (y = 247)
 
-    // Dark Blue Console Chassis
-    const kitGrad = ctx.createLinearGradient(kitX, kitY, kitX + kitW, kitY + kitH);
-    kitGrad.addColorStop(0, "#1e3a8a");
-    kitGrad.addColorStop(0.4, "#0f172a");
-    kitGrad.addColorStop(1, "#172554");
+    ctx.save();
+
+    // Console Chassis Drop Shadow on Bench & Rail
+    ctx.shadowColor = "rgba(0, 0, 0, 0.75)";
+    ctx.shadowBlur = 18;
+    ctx.shadowOffsetY = 6;
+
+    // Dark Anodized Brushed Metal Console Body
+    const kitGrad = ctx.createLinearGradient(kitX, kitY, kitX, kitY + kitH);
+    kitGrad.addColorStop(0, "#2a313d");
+    kitGrad.addColorStop(0.25, "#1c222c");
+    kitGrad.addColorStop(0.65, "#141820");
+    kitGrad.addColorStop(1, "#0d1016");
 
     ctx.fillStyle = kitGrad;
-    ctx.fillRect(kitX, kitY, kitW, kitH);
-    ctx.strokeStyle = state.powerSupplyOn ? "#38bdf8" : "#2563eb";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(kitX, kitY, kitW, kitH);
+    ctx.beginPath();
+    ctx.roundRect(kitX, kitY, kitW, kitH, 10);
+    ctx.fill();
 
-    // Console Title Banner
-    ctx.fillStyle = "#38bdf8";
-    ctx.font = "bold 11px 'Outfit', sans-serif";
+    // Outer Chamfered Bezel Rim
+    ctx.shadowColor = "transparent";
+    ctx.strokeStyle = state.powerSupplyOn ? "#475569" : "#334155";
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+
+    // Subtle brushed metal horizontal micro-sheen
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.025)";
+    ctx.lineWidth = 1;
+    for (let ly = kitY + 4; ly < kitY + kitH - 4; ly += 3) {
+      ctx.beginPath();
+      ctx.moveTo(kitX + 6, ly);
+      ctx.lineTo(kitX + kitW - 6, ly);
+      ctx.stroke();
+    }
+
+    // 4 Precision Countersunk Hex Socket Cap Screws in Corners
+    const boltOffsets = [
+      { bx: kitX + 9, by: kitY + 9 },
+      { bx: kitX + kitW - 9, by: kitY + 9 },
+      { bx: kitX + 9, by: kitY + kitH - 9 },
+      { bx: kitX + kitW - 9, by: kitY + kitH - 9 }
+    ];
+
+    boltOffsets.forEach(({ bx, by }) => {
+      // Metallic outer washer ring
+      const boltGrad = ctx.createRadialGradient(bx - 1, by - 1, 1, bx, by, 5);
+      boltGrad.addColorStop(0, "#cbd5e1");
+      boltGrad.addColorStop(0.5, "#64748b");
+      boltGrad.addColorStop(1, "#1e293b");
+      ctx.fillStyle = boltGrad;
+      ctx.beginPath();
+      ctx.arc(bx, by, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Recessed dark hex socket hole
+      ctx.fillStyle = "#090d16";
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const ang = (i * Math.PI) / 3;
+        const hx = bx + 2.2 * Math.cos(ang);
+        const hy = by + 2.2 * Math.sin(ang);
+        if (i === 0) ctx.moveTo(hx, hy);
+        else ctx.lineTo(hx, hy);
+      }
+      ctx.closePath();
+      ctx.fill();
+    });
+
+    // Silkscreen Console Title
+    ctx.fillStyle = "#cbd5e1";
+    ctx.font = "bold 10px 'Outfit', 'Space Grotesk', sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("OPTICAL TRAINER", kitX + kitW / 2, kitY + 20);
+    ctx.fillText("OPTICAL TRAINER KIT", kitX + kitW / 2, kitY + 18);
 
-    // Digital OLED Parameter Display Box (Shows reading in Light Mode when isLight is active)
-    ctx.fillStyle = isLight ? "#ffffff" : "#020617";
-    ctx.fillRect(kitX + 12, kitY + 32, kitW - 24, 46);
-    ctx.strokeStyle = state.powerSupplyOn ? (isLight ? "#0284c7" : "rgba(6, 182, 212, 0.6)") : (isLight ? "#bae6fd" : "rgba(255, 255, 255, 0.1)");
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(kitX + 12, kitY + 32, kitW - 24, 46);
+    // Metallic dividing hairline
+    ctx.strokeStyle = "rgba(148, 163, 184, 0.25)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(kitX + 16, kitY + 23);
+    ctx.lineTo(kitX + kitW - 16, kitY + 23);
+    ctx.stroke();
+
+    // High-Tech Digital Parameter Display Box (OLED Screen)
+    const oledX = kitX + 14;
+    const oledY = kitY + 28;
+    const oledW = kitW - 28;
+    const oledH = 34;
+
+    ctx.fillStyle = isLight ? "#ffffff" : "#05080f";
+    ctx.fillRect(oledX, oledY, oledW, oledH);
+    ctx.strokeStyle = state.powerSupplyOn ? (isLight ? "#0284c7" : "rgba(56, 189, 248, 0.5)") : "#1e293b";
+    ctx.lineWidth = 1.2;
+    ctx.strokeRect(oledX, oledY, oledW, oledH);
+
+    // Anti-reflective glare gradient on OLED glass
+    const glareGrad = ctx.createLinearGradient(oledX, oledY, oledX, oledY + oledH * 0.5);
+    glareGrad.addColorStop(0, "rgba(255, 255, 255, 0.07)");
+    glareGrad.addColorStop(1, "transparent");
+    ctx.fillStyle = glareGrad;
+    ctx.fillRect(oledX, oledY, oledW, oledH * 0.5);
 
     if (state.powerSupplyOn) {
       ctx.fillStyle = isLight ? "#0284c7" : palette.ledHex;
-      ctx.font = "bold 10px 'JetBrains Mono', monospace";
+      ctx.font = "bold 9.5px 'JetBrains Mono', monospace";
       ctx.textAlign = "left";
-      ctx.fillText(`λ: ${state.wavelengthNm} nm`, kitX + 18, kitY + 47);
-      ctx.fillStyle = state.lightSourceActive ? (isLight ? "#059669" : "#4ade80") : (isLight ? "#64748b" : "#94a3b8");
-      ctx.font = "9px 'JetBrains Mono', monospace";
-      ctx.fillText(`LASER: ${state.lightSourceActive ? "ACTIVE (5mW)" : "STANDBY"}`, kitX + 18, kitY + 66);
+      ctx.fillText(`λ: ${state.wavelengthNm} nm`, oledX + 6, oledY + 14);
+
+      ctx.fillStyle = state.lightSourceActive ? (isLight ? "#059669" : "#4ade80") : "#94a3b8";
+      ctx.font = "8.5px 'JetBrains Mono', monospace";
+      ctx.fillText(`LASER: ${state.lightSourceActive ? "5.0mW ON" : "STANDBY"}`, oledX + 6, oledY + 27);
     } else {
-      ctx.fillStyle = isLight ? "#64748b" : "#475569";
-      ctx.font = "bold 10px 'JetBrains Mono', monospace";
+      ctx.fillStyle = "#334155";
+      ctx.font = "bold 9px 'JetBrains Mono', monospace";
       ctx.textAlign = "center";
-      ctx.fillText("POWER OFF", kitX + kitW / 2, kitY + 56);
+      ctx.fillText("SYSTEM OFF", oledX + oledW / 2, oledY + 21);
     }
 
-    // Power Rocker Switch (Clickable area)
-    const pwrX = clickRegions.powerSwitch.x;
-    const pwrY = clickRegions.powerSwitch.y;
-    const pwrW = clickRegions.powerSwitch.w;
-    const pwrH = clickRegions.powerSwitch.h;
+    // --- SECTION 1: POWER SECTION ---
+    const pwrCenterX = 56;
+    const pwrCenterY = btnY;
+    const pwrR = 16;
 
-    ctx.fillStyle = state.powerSupplyOn ? "#059669" : "#1e293b";
-    ctx.fillRect(pwrX, pwrY, pwrW, pwrH);
-    ctx.strokeStyle = state.powerSupplyOn ? "#10b981" : "#3b82f6";
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(pwrX, pwrY, pwrW, pwrH);
+    // Label: POWER SECTION
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "bold 7px 'Outfit', sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("POWER", pwrCenterX, kitY + 74);
+    ctx.fillText("SECTION", pwrCenterX, kitY + 82);
 
+    // Power Indicator LED
+    const pwrLedY = kitY + 93;
+    // Chrome socket
+    ctx.fillStyle = "#1e293b";
     ctx.beginPath();
-    ctx.arc(pwrX + 12, pwrY + 14, 4, 0, Math.PI * 2);
-    ctx.fillStyle = state.powerSupplyOn ? "#10b981" : "#ef4444";
+    ctx.arc(pwrCenterX, pwrLedY, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#475569";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    if (state.powerSupplyOn) {
+      // Radiant Green Glow Aura
+      const pwrGlow = ctx.createRadialGradient(pwrCenterX, pwrLedY, 0, pwrCenterX, pwrLedY, 12);
+      pwrGlow.addColorStop(0, "rgba(34, 197, 94, 0.7)");
+      pwrGlow.addColorStop(0.5, "rgba(34, 197, 94, 0.25)");
+      pwrGlow.addColorStop(1, "transparent");
+      ctx.fillStyle = pwrGlow;
+      ctx.beginPath();
+      ctx.arc(pwrCenterX, pwrLedY, 12, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Green LED Dome
+      const ledGrad = ctx.createRadialGradient(pwrCenterX - 1, pwrLedY - 1, 0.5, pwrCenterX, pwrLedY, 3.5);
+      ledGrad.addColorStop(0, "#bbf7d0");
+      ledGrad.addColorStop(0.5, "#22c55e");
+      ledGrad.addColorStop(1, "#15803d");
+      ctx.fillStyle = ledGrad;
+    } else {
+      ctx.fillStyle = "#064e3b";
+    }
+    ctx.beginPath();
+    ctx.arc(pwrCenterX, pwrLedY, 3.5, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 9px 'Outfit', sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("PWR", pwrX + pwrW / 2, pwrY + 30);
-
-    // Laser Toggle Button (Clickable area)
-    const lsrX = clickRegions.laserSwitch.x;
-    const lsrY = clickRegions.laserSwitch.y;
-    const lsrW = clickRegions.laserSwitch.w;
-    const lsrH = clickRegions.laserSwitch.h;
-
-    ctx.fillStyle = state.lightSourceActive ? "rgba(239, 68, 68, 0.3)" : "#1e293b";
-    ctx.fillRect(lsrX, lsrY, lsrW, lsrH);
-    ctx.strokeStyle = state.lightSourceActive ? palette.primaryHex : "#3b82f6";
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(lsrX, lsrY, lsrW, lsrH);
-
+    // Power Button (Machined Outer Bezel + Deep Recessed Concave Dish)
+    // Outer Bezel Ring
+    const pwrBezelGrad = ctx.createLinearGradient(pwrCenterX - pwrR, pwrCenterY - pwrR, pwrCenterX + pwrR, pwrCenterY + pwrR);
+    pwrBezelGrad.addColorStop(0, "#94a3b8");
+    pwrBezelGrad.addColorStop(0.4, "#475569");
+    pwrBezelGrad.addColorStop(0.8, "#1e293b");
+    pwrBezelGrad.addColorStop(1, "#64748b");
+    ctx.fillStyle = pwrBezelGrad;
     ctx.beginPath();
-    ctx.arc(lsrX + 12, lsrY + 14, 4, 0, Math.PI * 2);
-    ctx.fillStyle = state.lightSourceActive ? palette.primaryHex : "#60a5fa";
+    ctx.arc(pwrCenterX, pwrCenterY, pwrR + 3, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 9px 'Outfit', sans-serif";
+    // Recessed Concave Dish
+    const pwrDishGrad = ctx.createRadialGradient(pwrCenterX, pwrCenterY, 2, pwrCenterX, pwrCenterY, pwrR);
+    pwrDishGrad.addColorStop(0, "#0c1017");
+    pwrDishGrad.addColorStop(0.65, "#151b24");
+    pwrDishGrad.addColorStop(1, "#252e3e");
+    ctx.fillStyle = pwrDishGrad;
+    ctx.beginPath();
+    ctx.arc(pwrCenterX, pwrCenterY, pwrR, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = state.powerSupplyOn ? "rgba(34, 197, 94, 0.8)" : "rgba(255, 255, 255, 0.15)";
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    // Power Glyph `⏻`
+    ctx.save();
+    ctx.strokeStyle = state.powerSupplyOn ? "#22c55e" : "#64748b";
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    if (state.powerSupplyOn) {
+      ctx.shadowColor = "#22c55e";
+      ctx.shadowBlur = 8;
+    }
+    ctx.beginPath();
+    ctx.arc(pwrCenterX, pwrCenterY + 1, 7, -Math.PI * 0.72, Math.PI * 0.72, false);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(pwrCenterX, pwrCenterY - 7);
+    ctx.lineTo(pwrCenterX, pwrCenterY);
+    ctx.stroke();
+    ctx.restore();
+
+    // Label below: POWER
+    ctx.fillStyle = "#cbd5e1";
+    ctx.font = "bold 8px 'Outfit', sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("LASER", lsrX + lsrW / 2, lsrY + 30);
+    ctx.fillText("POWER", pwrCenterX, kitY + 149);
 
-    // Optical Output FC/PC Connector Port (Socket on kit right side)
-    const portX = kitX + kitW;
-    const portY = kitY + 115;
+    // --- SECTION 2: LASER CONTROLS ---
+    const lsrCenterX = 108;
+    const lsrCenterY = btnY;
+    const lsrR = 16;
 
-    // Metal chassis flange
-    ctx.fillStyle = "#1e3a8a";
-    ctx.fillRect(portX - 4, portY - 14, 8, 28);
-    ctx.strokeStyle = "#38bdf8";
-    ctx.strokeRect(portX - 4, portY - 14, 8, 28);
+    // Label: LASER CONTROLS
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "bold 7px 'Outfit', sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("LASER", lsrCenterX, kitY + 74);
+    ctx.fillText("CONTROLS", lsrCenterX, kitY + 82);
 
-    // Central cylindrical output barrel
-    ctx.fillStyle = "#334155";
-    ctx.fillRect(portX + 4, portY - 9, 10, 18);
-    ctx.strokeStyle = "#93c5fd";
-    ctx.strokeRect(portX + 4, portY - 9, 10, 18);
+    // Laser Indicator LED
+    const lsrLedY = kitY + 93;
+    ctx.fillStyle = "#1e293b";
+    ctx.beginPath();
+    ctx.arc(lsrCenterX, lsrLedY, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#475569";
+    ctx.lineWidth = 1;
+    ctx.stroke();
 
-    // 4. Precision NA Measurement Jig (at scaleZeroX)
+    if (state.lightSourceActive) {
+      // Radiant Red Glow Aura
+      const lsrGlow = ctx.createRadialGradient(lsrCenterX, lsrLedY, 0, lsrCenterX, lsrLedY, 12);
+      lsrGlow.addColorStop(0, "rgba(239, 68, 68, 0.8)");
+      lsrGlow.addColorStop(0.5, "rgba(239, 68, 68, 0.3)");
+      lsrGlow.addColorStop(1, "transparent");
+      ctx.fillStyle = lsrGlow;
+      ctx.beginPath();
+      ctx.arc(lsrCenterX, lsrLedY, 12, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Red LED Dome
+      const ledGrad2 = ctx.createRadialGradient(lsrCenterX - 1, lsrLedY - 1, 0.5, lsrCenterX, lsrLedY, 3.5);
+      ledGrad2.addColorStop(0, "#fecaca");
+      ledGrad2.addColorStop(0.5, "#ef4444");
+      ledGrad2.addColorStop(1, "#991b1b");
+      ctx.fillStyle = ledGrad2;
+    } else {
+      ctx.fillStyle = "#450a0a";
+    }
+    ctx.beginPath();
+    ctx.arc(lsrCenterX, lsrLedY, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Laser Hazard Triangle Glyph
+    const triY = kitY + 101;
+    ctx.strokeStyle = state.lightSourceActive ? "#f59e0b" : "#64748b";
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(lsrCenterX, triY);
+    ctx.lineTo(lsrCenterX - 5, triY + 8);
+    ctx.lineTo(lsrCenterX + 5, triY + 8);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.fillStyle = state.lightSourceActive ? "#fbbf24" : "#475569";
+    ctx.beginPath();
+    ctx.arc(lsrCenterX, triY + 6.2, 0.8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Laser Concave Button
+    // Outer Bezel Ring
+    const lsrBezelGrad = ctx.createLinearGradient(lsrCenterX - lsrR, lsrCenterY - lsrR, lsrCenterX + lsrR, lsrCenterY + lsrR);
+    lsrBezelGrad.addColorStop(0, "#94a3b8");
+    lsrBezelGrad.addColorStop(0.4, "#475569");
+    lsrBezelGrad.addColorStop(0.8, "#1e293b");
+    lsrBezelGrad.addColorStop(1, "#64748b");
+    ctx.fillStyle = lsrBezelGrad;
+    ctx.beginPath();
+    ctx.arc(lsrCenterX, lsrCenterY, lsrR + 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Concave Dish
+    if (state.lightSourceActive) {
+      ctx.save();
+      ctx.shadowColor = "#ef4444";
+      ctx.shadowBlur = 12;
+      const lsrActiveDish = ctx.createRadialGradient(lsrCenterX, lsrCenterY, 2, lsrCenterX, lsrCenterY, lsrR);
+      lsrActiveDish.addColorStop(0, "#b91c1c");
+      lsrActiveDish.addColorStop(0.65, "#ef4444");
+      lsrActiveDish.addColorStop(1, "#7f1d1d");
+      ctx.fillStyle = lsrActiveDish;
+      ctx.beginPath();
+      ctx.arc(lsrCenterX, lsrCenterY, lsrR, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    } else {
+      const lsrDishGrad = ctx.createRadialGradient(lsrCenterX, lsrCenterY, 2, lsrCenterX, lsrCenterY, lsrR);
+      lsrDishGrad.addColorStop(0, "#0c1017");
+      lsrDishGrad.addColorStop(0.65, "#151b24");
+      lsrDishGrad.addColorStop(1, "#252e3e");
+      ctx.fillStyle = lsrDishGrad;
+      ctx.beginPath();
+      ctx.arc(lsrCenterX, lsrCenterY, lsrR, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.strokeStyle = state.lightSourceActive ? "#f87171" : "rgba(239, 68, 68, 0.4)";
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    // Centered LASER text
+    ctx.fillStyle = state.lightSourceActive ? "#ffffff" : "#94a3b8";
+    ctx.font = "bold 8px 'Orbitron', 'Outfit', sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("LASER", lsrCenterX, lsrCenterY);
+    ctx.textBaseline = "alphabetic";
+
+    // --- SECTION 3: EMITTER PORT (LASER OUT / EMITTER) ---
+    const portCenterX = kitX + kitW - 14;
+    const portCenterY = btnY;
+
+    // Label: EMITTER PORT
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "bold 6.5px 'Outfit', sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("EMITTER", portCenterX - 2, kitY + 74);
+    ctx.fillText("PORT", portCenterX - 2, kitY + 82);
+
+    ctx.fillStyle = "#64748b";
+    ctx.font = "bold 6.5px 'JetBrains Mono', monospace";
+    ctx.fillText("LASER OUT", portCenterX - 2, kitY + 93);
+
+    // Square Flange Plate
+    const flangeW = 28;
+    const flangeH = 32;
+    const flangeX = portCenterX - flangeW / 2 - 2;
+    const flangeY = portCenterY - flangeH / 2;
+
+    const flangeGrad = ctx.createLinearGradient(flangeX, flangeY, flangeX + flangeW, flangeY + flangeH);
+    flangeGrad.addColorStop(0, "#475569");
+    flangeGrad.addColorStop(0.5, "#334155");
+    flangeGrad.addColorStop(1, "#1e293b");
+    ctx.fillStyle = flangeGrad;
+    ctx.beginPath();
+    ctx.roundRect(flangeX, flangeY, flangeW, flangeH, 3);
+    ctx.fill();
+    ctx.strokeStyle = "#64748b";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // 4 Corner Screws on Flange
+    [
+      { sx: flangeX + 3.5, sy: flangeY + 3.5 },
+      { sx: flangeX + flangeW - 3.5, sy: flangeY + 3.5 },
+      { sx: flangeX + 3.5, sy: flangeY + flangeH - 3.5 },
+      { sx: flangeX + flangeW - 3.5, sy: flangeY + flangeH - 3.5 }
+    ].forEach(({ sx, sy }) => {
+      ctx.fillStyle = "#94a3b8";
+      ctx.beginPath();
+      ctx.arc(sx, sy, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#0f172a";
+      ctx.beginPath();
+      ctx.arc(sx, sy, 0.8, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Circular Threaded Barrel Collar
+    const collarGrad = ctx.createLinearGradient(portCenterX - 11, portCenterY - 11, portCenterX + 11, portCenterY + 11);
+    collarGrad.addColorStop(0, "#cbd5e1");
+    collarGrad.addColorStop(0.4, "#64748b");
+    collarGrad.addColorStop(0.8, "#1e293b");
+    collarGrad.addColorStop(1, "#94a3b8");
+    ctx.fillStyle = collarGrad;
+    ctx.beginPath();
+    ctx.arc(portCenterX - 2, portCenterY, 11, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#94a3b8";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Concentric inner collar ring
+    ctx.fillStyle = "#1e293b";
+    ctx.beginPath();
+    ctx.arc(portCenterX - 2, portCenterY, 7.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Central dark optical aperture hole
+    ctx.fillStyle = "#030712";
+    ctx.beginPath();
+    ctx.arc(portCenterX - 2, portCenterY, 4.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Active Laser Beam Flare inside Aperture when Powered & Laser ON
+    if (state.powerSupplyOn && state.lightSourceActive) {
+      ctx.save();
+      const beamGlow = ctx.createRadialGradient(portCenterX - 2, portCenterY, 0, portCenterX - 2, portCenterY, 8);
+      beamGlow.addColorStop(0, "#ffffff");
+      beamGlow.addColorStop(0.4, palette.primaryHex);
+      beamGlow.addColorStop(1, "transparent");
+      ctx.fillStyle = beamGlow;
+      ctx.beginPath();
+      ctx.arc(portCenterX - 2, portCenterY, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Label below: EMITTER
+    ctx.fillStyle = "#cbd5e1";
+    ctx.font = "bold 7px 'Outfit', sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("EMITTER", portCenterX - 2, kitY + 149);
+
+    // Connected Strain-Relief Boot at Emitter Port
+    const bootStartX = portCenterX + 7;
+    if (state.fibreInputConnected) {
+      // Metallic FC Knurled Lock Nut
+      ctx.fillStyle = "#94a3b8";
+      ctx.fillRect(bootStartX - 2, portCenterY - 6.5, 5, 13);
+      ctx.strokeStyle = "#e2e8f0";
+      ctx.strokeRect(bootStartX - 2, portCenterY - 6.5, 5, 13);
+
+      // Black Flexible Rubber Boot with Strain-Relief Ribs
+      ctx.fillStyle = "#0f172a";
+      ctx.fillRect(bootStartX + 3, portCenterY - 4.5, 12, 9);
+      ctx.strokeStyle = "#38bdf8";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(bootStartX + 3, portCenterY - 4.5, 12, 9);
+
+      // Rib lines
+      ctx.strokeStyle = "#475569";
+      for (let rx = bootStartX + 6; rx <= bootStartX + 12; rx += 3) {
+        ctx.beginPath();
+        ctx.moveTo(rx, portCenterY - 4);
+        ctx.lineTo(rx, portCenterY + 4);
+        ctx.stroke();
+      }
+    }
+
+    ctx.restore(); // Restore chassis save state
+
+    // --- 4. PRECISION NA MEASUREMENT JIG CLAMP (at scaleZeroX) ---
     const jigX = scaleZeroX - 16;
-    const jigY = railY - 130;
-    const jigW = 22;
-    const jigH = 130;
+    const jigY = railY - 145;
+    const jigW = 28;
+    const jigH = 145;
 
-    // Dark Blue & Steel Mount
-    const jigGrad = ctx.createLinearGradient(jigX, jigY, jigX + jigW, jigY);
-    jigGrad.addColorStop(0, "#1e3a8a");
-    jigGrad.addColorStop(0.5, "#334155");
-    jigGrad.addColorStop(1, "#0f172a");
+    // Solid Vertical Steel Riser Post Anchored on Rail Slider
+    const postGrad = ctx.createLinearGradient(jigX, jigY, jigX + jigW, jigY);
+    postGrad.addColorStop(0, "#475569");
+    postGrad.addColorStop(0.3, "#94a3b8");
+    postGrad.addColorStop(0.7, "#64748b");
+    postGrad.addColorStop(1, "#334155");
 
-    ctx.fillStyle = jigGrad;
-    ctx.fillRect(jigX, jigY, jigW, jigH);
-    ctx.strokeStyle = "#0284c7";
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(jigX, jigY, jigW, jigH);
+    ctx.fillStyle = postGrad;
+    ctx.fillRect(jigX + 6, jigY + 25, jigW - 12, jigH - 25);
+    ctx.strokeStyle = "#1e293b";
+    ctx.lineWidth = 1.2;
+    ctx.strokeRect(jigX + 6, jigY + 25, jigW - 12, jigH - 25);
 
-    // Output Collimation Ferrule
-    const tipX = scaleZeroX;
-    const tipY = jigY + 45;
+    // Label: JIG CLAMP
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "bold 8px 'Outfit', sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("JIG CLAMP", scaleZeroX - 2, tipY - 48);
 
+    // Stainless Steel Clamp Block
+    const clampBlockW = 34;
+    const clampBlockH = 22;
+    const clampBlockX = scaleZeroX - clampBlockW / 2 - 2;
+    const clampBlockY = tipY - clampBlockH / 2;
+
+    const clampGrad = ctx.createLinearGradient(clampBlockX, clampBlockY, clampBlockX + clampBlockW, clampBlockY + clampBlockH);
+    clampGrad.addColorStop(0, "#94a3b8");
+    clampGrad.addColorStop(0.3, "#cbd5e1");
+    clampGrad.addColorStop(0.7, "#64748b");
+    clampGrad.addColorStop(1, "#334155");
+    ctx.fillStyle = clampGrad;
+    ctx.beginPath();
+    ctx.roundRect(clampBlockX, clampBlockY, clampBlockW, clampBlockH, 2);
+    ctx.fill();
+    ctx.strokeStyle = "#cbd5e1";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Horizontal Center V-Groove Channel through Clamp
     ctx.fillStyle = "#0f172a";
-    ctx.fillRect(jigX + jigW, tipY - 5, 14, 10);
-    ctx.strokeStyle = "#f59e0b";
-    ctx.strokeRect(jigX + jigW, tipY - 5, 14, 10);
+    ctx.fillRect(clampBlockX, tipY - 2.5, clampBlockW, 5);
 
-    // Jig Thumbscrew Clamp
-    ctx.fillStyle = state.fibreOutputMounted ? "#10b981" : "#f59e0b";
-    ctx.fillRect(jigX + 4, jigY - 12, 14, 12);
-    ctx.strokeStyle = "#ffffff";
-    ctx.strokeRect(jigX + 4, jigY - 12, 14, 12);
+    // Vertical Threaded Screw Shaft
+    const shaftW = 6;
+    const shaftH = 14;
+    const shaftX = scaleZeroX - shaftW / 2 - 2;
+    const knobY = state.fibreOutputMounted ? tipY - 32 : tipY - 40;
+    const shaftY = knobY + 12;
 
-    // 5. HIGH-FIDELITY OPTICAL FIBRE PATCH CABLE (3D Layered Tube with Strain Reliefs)
-    const cableStartPt = { x: portX + 14, y: portY };
-    const cableEndPt = { x: jigX, y: tipY };
+    ctx.fillStyle = "#cbd5e1";
+    ctx.fillRect(shaftX, shaftY, shaftW, clampBlockY - shaftY);
+    ctx.strokeStyle = "#64748b";
+    ctx.lineWidth = 0.8;
+    for (let ty = shaftY + 2; ty < clampBlockY; ty += 2) {
+      ctx.beginPath();
+      ctx.moveTo(shaftX, ty);
+      ctx.lineTo(shaftX + shaftW, ty + 1);
+      ctx.stroke();
+    }
+
+    // Cylindrical Knurled Stainless Steel Thumbscrew Knob
+    const knobW = 20;
+    const knobH = 14;
+    const knobX = scaleZeroX - knobW / 2 - 2;
+
+    const knobGrad = ctx.createLinearGradient(knobX, knobY, knobX + knobW, knobY);
+    knobGrad.addColorStop(0, "#94a3b8");
+    knobGrad.addColorStop(0.2, "#cbd5e1");
+    knobGrad.addColorStop(0.8, "#475569");
+    knobGrad.addColorStop(1, "#1e293b");
+
+    ctx.fillStyle = knobGrad;
+    ctx.beginPath();
+    ctx.roundRect(knobX, knobY, knobW, knobH, 2);
+    ctx.fill();
+    ctx.strokeStyle = state.fibreOutputMounted ? "#22c55e" : "#e2e8f0";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Knurling Texture: vertical milled grip ridges
+    ctx.strokeStyle = "rgba(15, 23, 42, 0.4)";
+    ctx.lineWidth = 1;
+    for (let kx = knobX + 2; kx < knobX + knobW - 1; kx += 2) {
+      ctx.beginPath();
+      ctx.moveTo(kx, knobY + 1);
+      ctx.lineTo(kx, knobY + knobH - 1);
+      ctx.stroke();
+    }
+
+    // Output Collimation Ferrule at Output Tip
+    const ferruleW = 12;
+    const ferruleH = 8;
+    const ferruleX = clampBlockX + clampBlockW;
+    const ferruleY = tipY - ferruleH / 2;
+
+    ctx.fillStyle = "#cbd5e1";
+    ctx.fillRect(ferruleX, ferruleY, ferruleW, ferruleH);
+    ctx.strokeStyle = "#334155";
+    ctx.strokeRect(ferruleX, ferruleY, ferruleW, ferruleH);
+
+    // Cleaved Fiber Core Tip (Emission aperture)
+    ctx.fillStyle = "#020617";
+    ctx.fillRect(ferruleX + ferruleW - 1, tipY - 2, 2, 4);
+
+    // --- 5. HIGH-FIDELITY OPTICAL FIBRE PATCH CABLE ---
+    const cableStartPt = { x: bootStartX + 15, y: portCenterY };
+    const cableEndPt = { x: clampBlockX, y: tipY };
 
     if (state.fibreInputConnected && state.fibreOutputMounted) {
-      // Natural physical catenary / S-curve control points
-      const cp1 = { x: cableStartPt.x + 35, y: cableStartPt.y + 60 };
-      const cp2 = { x: cableEndPt.x - 35, y: cableEndPt.y + 70 };
+      // Natural physical catenary S-curve control points
+      const cp1 = { x: cableStartPt.x + 24, y: cableStartPt.y + 60 };
+      const cp2 = { x: cableEndPt.x - 24, y: cableEndPt.y + 65 };
 
-      // 1. Soft Drop Shadow cast on rail bench
+      // 1. Soft Drop Shadow cast onto the optical bench
+      ctx.save();
       ctx.beginPath();
       ctx.moveTo(cableStartPt.x, cableStartPt.y + 6);
       ctx.bezierCurveTo(cp1.x, cp1.y + 12, cp2.x, cp2.y + 12, cableEndPt.x, cableEndPt.y + 6);
-      ctx.strokeStyle = isLight ? "rgba(2, 132, 199, 0.15)" : "rgba(0, 0, 0, 0.4)";
-      ctx.lineWidth = 8;
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
+      ctx.lineWidth = 9;
+      ctx.stroke();
+      ctx.restore();
+
+      // 2. High-Visibility Protective Polymer Buffer Jacket (Rich Orange)
+      ctx.beginPath();
+      ctx.moveTo(cableStartPt.x, cableStartPt.y);
+      ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, cableEndPt.x, cableEndPt.y);
+      ctx.strokeStyle = "#ea580c";
+      ctx.lineWidth = 6.5;
+      ctx.lineCap = "round";
       ctx.stroke();
 
-      // 2. Outer Protective Yellow Polymer Buffer Jacket
+      // Secondary brighter amber layer
       ctx.beginPath();
       ctx.moveTo(cableStartPt.x, cableStartPt.y);
       ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, cableEndPt.x, cableEndPt.y);
       ctx.strokeStyle = "#f59e0b";
-      ctx.lineWidth = 6;
-      ctx.lineCap = "round";
+      ctx.lineWidth = 4.5;
       ctx.stroke();
 
-      // 3. Specular 3D Cylindrical Highlight Curve
+      // 3. 3D Cylindrical Specular Highlight Along Upper Crest
       ctx.beginPath();
       ctx.moveTo(cableStartPt.x, cableStartPt.y - 1.5);
       ctx.bezierCurveTo(cp1.x, cp1.y - 1.5, cp2.x, cp2.y - 1.5, cableEndPt.x, cableEndPt.y - 1.5);
-      ctx.strokeStyle = "rgba(254, 240, 138, 0.75)";
+      ctx.strokeStyle = "rgba(254, 240, 138, 0.85)";
       ctx.lineWidth = 1.6;
       ctx.stroke();
 
       // 4. Glowing Active Internal Optical Core Ray
       if (state.lightSourceActive && state.powerSupplyOn) {
+        ctx.save();
         ctx.beginPath();
         ctx.moveTo(cableStartPt.x, cableStartPt.y);
         ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, cableEndPt.x, cableEndPt.y);
         ctx.strokeStyle = palette.primaryHex;
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 3.2;
+        ctx.shadowColor = palette.primaryHex;
+        ctx.shadowBlur = 10;
         ctx.stroke();
 
-        // High-intensity white laser core line
+        // High-intensity white laser single-mode core
         ctx.beginPath();
         ctx.moveTo(cableStartPt.x, cableStartPt.y);
         ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, cableEndPt.x, cableEndPt.y);
         ctx.strokeStyle = "#ffffff";
-        ctx.lineWidth = 1.2;
+        ctx.lineWidth = 1.4;
         ctx.stroke();
+        ctx.restore();
       }
 
-      // Strain relief rubber boot at trainer port
-      ctx.fillStyle = "#1e3a8a";
-      ctx.fillRect(cableStartPt.x - 2, cableStartPt.y - 4, 8, 8);
-      ctx.strokeStyle = "#38bdf8";
-      ctx.strokeRect(cableStartPt.x - 2, cableStartPt.y - 4, 8, 8);
-
-      // Strain relief boot at jig mount
-      ctx.fillStyle = "#1e3a8a";
-      ctx.fillRect(cableEndPt.x - 6, cableEndPt.y - 4, 8, 8);
-      ctx.strokeStyle = "#38bdf8";
-      ctx.strokeRect(cableEndPt.x - 6, cableEndPt.y - 4, 8, 8);
+      // Cable Label: FIBER CABLE under the loop
+      ctx.fillStyle = "#64748b";
+      ctx.font = "bold 7px 'JetBrains Mono', monospace";
+      ctx.textAlign = "center";
+      ctx.fillText("FIBER CABLE", (cableStartPt.x + cableEndPt.x) / 2, Math.max(cp1.y, cp2.y) + 16);
 
     } else if (state.fibreInputConnected && !state.fibreOutputMounted) {
-      // Cable connected to port, but unmounted from jig (dangles downward)
+      // Dangles downward from port
       ctx.beginPath();
       ctx.moveTo(cableStartPt.x, cableStartPt.y);
       ctx.bezierCurveTo(
-        cableStartPt.x + 30, cableStartPt.y + 40,
-        cableStartPt.x + 50, cableStartPt.y + 90,
-        cableStartPt.x + 45, cableStartPt.y + 110
+        cableStartPt.x + 25, cableStartPt.y + 40,
+        cableStartPt.x + 35, cableStartPt.y + 85,
+        cableStartPt.x + 30, cableStartPt.y + 105
       );
-      ctx.strokeStyle = "#f59e0b";
+      ctx.strokeStyle = "#ea580c";
       ctx.lineWidth = 6;
       ctx.stroke();
 
-      // Dangling metallic ferrule
       ctx.fillStyle = "#cbd5e1";
-      ctx.fillRect(cableStartPt.x + 42, cableStartPt.y + 110, 8, 14);
-      ctx.strokeStyle = "#f59e0b";
-      ctx.strokeRect(cableStartPt.x + 42, cableStartPt.y + 110, 8, 14);
+      ctx.fillRect(cableStartPt.x + 27, cableStartPt.y + 105, 7, 14);
+      ctx.strokeStyle = "#475569";
+      ctx.strokeRect(cableStartPt.x + 27, cableStartPt.y + 105, 7, 14);
 
     } else if (!state.fibreInputConnected && state.fibreOutputMounted) {
-      // Mounted in jig, but unplugged from port
+      // Dangles downward from jig
       ctx.beginPath();
       ctx.moveTo(cableEndPt.x, cableEndPt.y);
       ctx.bezierCurveTo(
-        cableEndPt.x - 30, cableEndPt.y + 40,
-        cableEndPt.x - 45, cableEndPt.y + 85,
-        cableEndPt.x - 40, cableEndPt.y + 110
+        cableEndPt.x - 25, cableEndPt.y + 40,
+        cableEndPt.x - 35, cableEndPt.y + 85,
+        cableEndPt.x - 30, cableEndPt.y + 105
       );
-      ctx.strokeStyle = "#f59e0b";
+      ctx.strokeStyle = "#ea580c";
       ctx.lineWidth = 6;
       ctx.stroke();
 
-      // Dangling metallic FC connector
-      ctx.fillStyle = "#1e3a8a";
-      ctx.fillRect(cableEndPt.x - 46, cableEndPt.y + 110, 12, 14);
+      ctx.fillStyle = "#94a3b8";
+      ctx.fillRect(cableEndPt.x - 34, cableEndPt.y + 105, 9, 14);
       ctx.strokeStyle = "#38bdf8";
-      ctx.strokeRect(cableEndPt.x - 46, cableEndPt.y + 110, 12, 14);
+      ctx.strokeRect(cableEndPt.x - 34, cableEndPt.y + 105, 9, 14);
     }
 
     // 6. Moveable Screen Carrier Slider on Rail (Dark Blue Slider)
@@ -835,6 +1294,389 @@ export function createOpticalFibreExperiment(callbacks = {}) {
     updateProcedureRibbonDom();
   }
 
+
+  // ==========================================
+  // REALISTIC HARDWARE AUDIO FEEDBACK & TACTILE RESPONSES
+  // ==========================================
+  function playClickAudio(type = "click") {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const actx = new AudioCtx();
+      const osc = actx.createOscillator();
+      const gain = actx.createGain();
+      osc.connect(gain);
+      gain.connect(actx.destination);
+      const now = actx.currentTime;
+      if (type === "toggle" || type === "rocker") {
+        osc.frequency.setValueAtTime(360, now);
+        osc.frequency.exponentialRampToValueAtTime(90, now + 0.05);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      } else {
+        osc.frequency.setValueAtTime(750, now);
+        osc.frequency.exponentialRampToValueAtTime(220, now + 0.03);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+        osc.start(now);
+        osc.stop(now + 0.03);
+      }
+    } catch (e) {}
+  }
+
+  // ==========================================
+  // REAL-TIME DIGITAL OSCILLOSCOPE ENGINE
+  // ==========================================
+  function renderScopeCanvas() {
+    if (!scopeCanvas) scopeCanvas = document.getElementById("of-scope-canvas");
+    if (!scopeCanvas) return;
+    if (!scopeCtx) scopeCtx = scopeCanvas.getContext("2d");
+    const ctx = scopeCtx;
+    const w = scopeCanvas.width;
+    const h = scopeCanvas.height;
+
+    // Dark CRT screen background
+    ctx.fillStyle = "#020713";
+    ctx.fillRect(0, 0, w, h);
+
+    // Reticle Grid (10x8 divisions)
+    if (state.trainer.scopeGrid) {
+      ctx.strokeStyle = "rgba(34, 197, 94, 0.16)";
+      ctx.lineWidth = 1;
+      const numX = 10;
+      const numY = 8;
+      const stepX = w / numX;
+      const stepY = h / numY;
+      for (let i = 1; i < numX; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * stepX + 0.5, 0);
+        ctx.lineTo(i * stepX + 0.5, h);
+        ctx.stroke();
+      }
+      for (let j = 1; j < numY; j++) {
+        ctx.beginPath();
+        ctx.moveTo(0, j * stepY + 0.5);
+        ctx.lineTo(w, j * stepY + 0.5);
+        ctx.stroke();
+      }
+      // Center crosshairs
+      ctx.strokeStyle = "rgba(34, 197, 94, 0.32)";
+      ctx.beginPath();
+      ctx.moveTo(w / 2 + 0.5, 0);
+      ctx.lineTo(w / 2 + 0.5, h);
+      ctx.moveTo(0, h / 2 + 0.5);
+      ctx.lineTo(w, h / 2 + 0.5);
+      ctx.stroke();
+    }
+
+    if (!state.powerSupplyOn) {
+      // Zero voltage flatline on power off
+      ctx.strokeStyle = "rgba(100, 116, 139, 0.4)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(0, h / 2);
+      ctx.lineTo(w, h / 2);
+      ctx.stroke();
+
+      ctx.fillStyle = "#64748b";
+      ctx.font = "bold 9px 'JetBrains Mono', monospace";
+      ctx.textAlign = "center";
+      ctx.fillText("STANDBY • POWER OFF", w / 2, h / 2 - 8);
+      return;
+    }
+
+    const midY = h / 2;
+    const ampPx = (state.trainer.amplitudeV / 5.0) * (h * 0.34);
+    const freqFactor = (state.trainer.freqKhz / 4700) * 0.045 * state.trainer.scopeTimebase;
+    const t = state.trainer.timeOffset;
+
+    function getWaveformVal(angle, form) {
+      const a = (angle % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+      if (form === "square") {
+        return a < Math.PI ? 1 : -1;
+      } else if (form === "pulse") {
+        return a < (Math.PI * 0.4) ? 1 : -0.25;
+      } else if (form === "triangle") {
+        return a < Math.PI ? -1 + (2 * a) / Math.PI : 1 - (2 * (a - Math.PI)) / Math.PI;
+      }
+      return Math.sin(a);
+    }
+
+    // Channel 1: Transmitter (Neon Green #22c55e)
+    if (state.trainer.scopeCh1) {
+      ctx.beginPath();
+      ctx.strokeStyle = "#22c55e";
+      ctx.lineWidth = 1.8;
+      ctx.shadowColor = "#22c55e";
+      ctx.shadowBlur = 4;
+
+      for (let x = 0; x < w; x++) {
+        let angle = x * freqFactor * 2.6 + t;
+        let v = getWaveformVal(angle, state.trainer.waveform);
+        if (state.trainer.modulation === "am") {
+          v *= (0.7 + 0.3 * Math.sin(angle * 0.15));
+        } else if (state.trainer.modulation === "fm") {
+          angle += 0.8 * Math.sin(x * 0.03);
+          v = getWaveformVal(angle, state.trainer.waveform);
+        } else if (state.trainer.modulation === "pwm") {
+          const duty = 0.5 + 0.3 * Math.sin(angle * 0.1);
+          v = ((angle % (Math.PI * 2)) / (Math.PI * 2)) < duty ? 1 : -0.5;
+        }
+        const y = midY - v * ampPx;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+
+    // Channel 2: Receiver (Neon Cyan #06b6d4)
+    if (state.trainer.scopeCh2) {
+      ctx.beginPath();
+      ctx.strokeStyle = "#06b6d4";
+      ctx.lineWidth = 1.6;
+      ctx.shadowColor = "#06b6d4";
+      ctx.shadowBlur = 4;
+
+      const isCoupled = state.fibreInputConnected && state.lightSourceActive;
+      const phaseLag = 0.85;
+
+      for (let x = 0; x < w; x++) {
+        let y = midY;
+        if (isCoupled) {
+          let angle = x * freqFactor * 2.6 + t - phaseLag;
+          let v = getWaveformVal(angle, state.trainer.waveform);
+          if (state.trainer.modulation === "am") {
+            v *= (0.7 + 0.3 * Math.sin(angle * 0.15));
+          } else if (state.trainer.modulation === "fm") {
+            angle += 0.8 * Math.sin(x * 0.03);
+            v = getWaveformVal(angle, state.trainer.waveform);
+          } else if (state.trainer.modulation === "pwm") {
+            const duty = 0.5 + 0.3 * Math.sin(angle * 0.1);
+            v = ((angle % (Math.PI * 2)) / (Math.PI * 2)) < duty ? 1 : -0.5;
+          }
+          y = midY - v * (ampPx * 0.84); // Slight optical attenuation
+        } else {
+          // Photodetector dark thermal noise
+          y = midY + (Math.sin(x * 0.9 + t * 4) * 1.5);
+        }
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+  }
+
+  // ==========================================
+  // REAL-TIME SPECTRAL EMISSION ANALYZER
+  // ==========================================
+  function renderSpectralCanvas() {
+    if (!spectralCanvas) spectralCanvas = document.getElementById("of-spectral-canvas");
+    if (!spectralCanvas) return;
+    if (!spectralCtx) spectralCtx = spectralCanvas.getContext("2d");
+    const ctx = spectralCtx;
+    const w = spectralCanvas.width;
+    const h = spectralCanvas.height;
+
+    ctx.fillStyle = "#020617";
+    ctx.fillRect(0, 0, w, h);
+
+    if (!state.powerSupplyOn) {
+      ctx.strokeStyle = "#334155";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, h - 5);
+      ctx.lineTo(w, h - 5);
+      ctx.stroke();
+      return;
+    }
+
+    // Grid baseline
+    ctx.strokeStyle = "rgba(56, 189, 248, 0.18)";
+    ctx.lineWidth = 0.8;
+    for (let x = 10; x < w; x += 15) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, h);
+      ctx.stroke();
+    }
+
+    // Map wavelength (400-1000nm) to horizontal position
+    const minWl = 400;
+    const maxWl = 1000;
+    const centerNorm = (state.wavelengthNm - minWl) / (maxWl - minWl);
+    const peakX = Math.max(15, Math.min(w - 15, centerNorm * w));
+    const peakY = state.lightSourceActive ? 8 : h - 10;
+    const sigma = 8.5;
+
+    const grad = ctx.createLinearGradient(peakX - 25, 0, peakX + 25, 0);
+    if (state.wavelengthNm < 500) {
+      grad.addColorStop(0, "rgba(59, 130, 246, 0.08)");
+      grad.addColorStop(0.5, "rgba(56, 189, 248, 0.8)");
+      grad.addColorStop(1, "rgba(59, 130, 246, 0.08)");
+    } else if (state.wavelengthNm < 600) {
+      grad.addColorStop(0, "rgba(16, 185, 129, 0.08)");
+      grad.addColorStop(0.5, "rgba(52, 211, 153, 0.85)");
+      grad.addColorStop(1, "rgba(16, 185, 129, 0.08)");
+    } else {
+      grad.addColorStop(0, "rgba(239, 68, 68, 0.08)");
+      grad.addColorStop(0.5, "rgba(248, 113, 113, 0.85)");
+      grad.addColorStop(1, "rgba(239, 68, 68, 0.08)");
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    for (let x = 0; x <= w; x += 2) {
+      const dist = (x - peakX) / sigma;
+      const intensity = Math.exp(-0.5 * dist * dist);
+      const y = h - (h - peakY) * intensity;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(w, h);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    ctx.strokeStyle = state.wavelengthNm < 500 ? "#38bdf8" : (state.wavelengthNm < 600 ? "#34d399" : "#f87171");
+    ctx.lineWidth = 1.8;
+    ctx.stroke();
+  }
+
+  function startScopeAnimation() {
+    if (scopeAnimId) cancelAnimationFrame(scopeAnimId);
+
+    function loop() {
+      if (state.trainer.scopeRunning && state.powerSupplyOn) {
+        state.trainer.timeOffset += 0.08 * (state.trainer.freqKhz / 2500);
+      }
+      renderScopeCanvas();
+      renderSpectralCanvas();
+      scopeAnimId = requestAnimationFrame(loop);
+    }
+    scopeAnimId = requestAnimationFrame(loop);
+  }
+
+  // ==========================================
+  // HARDWARE TRAINER ACTION HANDLERS
+  // ==========================================
+  function setTrainerWaveform(wave) {
+    state.trainer.waveform = wave;
+    playClickAudio("click");
+
+    document.querySelectorAll(".func-wave-btn").forEach(btn => {
+      if (btn.getAttribute("data-wave") === wave) btn.classList.add("active");
+      else btn.classList.remove("active");
+    });
+
+    document.getElementById("of-ind-sine")?.querySelector(".radio-led-pip")?.classList.toggle("active", wave === "sine");
+    document.getElementById("of-ind-square")?.querySelector(".radio-led-pip")?.classList.toggle("active", wave === "square" || wave === "pulse");
+    document.getElementById("of-ind-triangle")?.querySelector(".radio-led-pip")?.classList.toggle("active", wave === "triangle");
+
+    const waveTag = document.getElementById("of-scope-wave-tag");
+    if (waveTag) waveTag.textContent = wave.charAt(0).toUpperCase() + wave.slice(1, 3);
+  }
+
+  function cycleVoltage() {
+    playClickAudio("click");
+    state.trainer.voltageIndex = (state.trainer.voltageIndex + 1) % state.trainer.voltageSteps.length;
+    state.trainer.voltage = state.trainer.voltageSteps[state.trainer.voltageIndex];
+
+    const knob = document.getElementById("of-knob-voltage");
+    if (knob) knob.style.transform = `rotate(${(state.trainer.voltageIndex * 70) - 70}deg)`;
+
+    const voltReadout = document.getElementById("of-voltage-readout");
+    if (voltReadout) voltReadout.textContent = `${state.trainer.voltage.toFixed(1)}V`;
+  }
+
+  function cycleFrequency() {
+    playClickAudio("click");
+    state.trainer.freqIndex = (state.trainer.freqIndex + 1) % state.trainer.freqSteps.length;
+    state.trainer.freqKhz = state.trainer.freqSteps[state.trainer.freqIndex];
+
+    const knob = document.getElementById("of-knob-freq");
+    if (knob) knob.style.transform = `rotate(${(state.trainer.freqIndex * 60) - 90}deg)`;
+
+    const label = state.trainer.freqLabels[state.trainer.freqIndex];
+    const freqReadout = document.getElementById("of-freq-readout");
+    const freqTag = document.getElementById("of-scope-freq-tag");
+    if (freqReadout) freqReadout.textContent = label;
+    if (freqTag) freqTag.textContent = `@ ${label}`;
+  }
+
+  function cycleAmplitude() {
+    playClickAudio("click");
+    state.trainer.ampIndex = (state.trainer.ampIndex + 1) % state.trainer.ampSteps.length;
+    state.trainer.amplitudeV = state.trainer.ampSteps[state.trainer.ampIndex];
+
+    const knob = document.getElementById("of-knob-amp");
+    if (knob) knob.style.transform = `rotate(${(state.trainer.ampIndex * 70) - 70}deg)`;
+
+    const ampReadout = document.getElementById("of-amp-readout");
+    if (ampReadout) ampReadout.textContent = `${state.trainer.amplitudeV.toFixed(1)} V`;
+  }
+
+  function cycleWavelength() {
+    playClickAudio("click");
+    state.trainer.wlIndex = (state.trainer.wlIndex + 1) % state.trainer.wlPresets.length;
+    const wl = state.trainer.wlPresets[state.trainer.wlIndex];
+    setWavelength(wl);
+
+    const knob = document.getElementById("of-knob-wavelength");
+    if (knob) knob.style.transform = `rotate(${(state.trainer.wlIndex * 60) - 60}deg)`;
+  }
+
+  function setTrainerModulation(mod) {
+    playClickAudio("click");
+    state.trainer.modulation = mod;
+
+    document.querySelectorAll(".mod-pill-btn").forEach(btn => {
+      if (btn.getAttribute("data-mod") === mod) btn.classList.add("active");
+      else btn.classList.remove("active");
+    });
+  }
+
+  function toggleScopeRun() {
+    playClickAudio("click");
+    state.trainer.scopeRunning = !state.trainer.scopeRunning;
+    const btn = document.getElementById("of-btn-scope-run");
+    if (btn) btn.classList.toggle("active", state.trainer.scopeRunning);
+  }
+
+  function toggleScopePhase() {
+    playClickAudio("click");
+    state.trainer.scopeCh2 = !state.trainer.scopeCh2;
+    const btn = document.getElementById("of-btn-scope-rq");
+    if (btn) btn.classList.toggle("active", state.trainer.scopeCh2);
+  }
+
+  function cycleScopeTimebase() {
+    playClickAudio("click");
+    state.trainer.scopeTimebase = state.trainer.scopeTimebase === 1.0 ? 2.0 : (state.trainer.scopeTimebase === 2.0 ? 0.5 : 1.0);
+    const btn = document.getElementById("of-btn-scope-scale");
+    if (btn) btn.classList.toggle("active", state.trainer.scopeTimebase !== 1.0);
+  }
+
+  function toggleScopeCh1() {
+    playClickAudio("click");
+    state.trainer.scopeCh1 = !state.trainer.scopeCh1;
+    document.getElementById("of-scope-btn-ch1")?.classList.toggle("active", state.trainer.scopeCh1);
+  }
+
+  function toggleScopeCh2() {
+    playClickAudio("click");
+    state.trainer.scopeCh2 = !state.trainer.scopeCh2;
+    document.getElementById("of-scope-btn-ch2")?.classList.toggle("active", state.trainer.scopeCh2);
+  }
+
+  function toggleScopeGrid() {
+    playClickAudio("click");
+    state.trainer.scopeGrid = !state.trainer.scopeGrid;
+    document.getElementById("of-scope-btn-grid")?.classList.toggle("active", state.trainer.scopeGrid);
+  }
+
   function updateHardwareSwitchesDom() {
     const pwrBtn = document.getElementById("of-btn-power-switch");
     const pwrState = document.getElementById("of-state-power");
@@ -843,6 +1685,8 @@ export function createOpticalFibreExperiment(callbacks = {}) {
     const lsrBtn = document.getElementById("of-btn-laser-switch");
     const lsrState = document.getElementById("of-state-laser");
     const lsrLed = document.getElementById("of-led-laser");
+    const lsrFault = document.getElementById("of-led-fault");
+    const hazardSign = document.getElementById("of-hazard-sign");
 
     const cableBtn = document.getElementById("of-btn-cable-toggle");
     const cableState = document.getElementById("of-state-cable");
@@ -850,21 +1694,110 @@ export function createOpticalFibreExperiment(callbacks = {}) {
     const jigBtn = document.getElementById("of-btn-jig-toggle");
     const jigState = document.getElementById("of-state-jig");
 
-    if (pwrBtn) pwrBtn.className = `of-hw-switch of-power-switch ${state.powerSupplyOn ? "active" : ""}`;
+    const voltReadout = document.getElementById("of-voltage-readout");
+    const freqReadout = document.getElementById("of-freq-readout");
+    const ampReadout = document.getElementById("of-amp-readout");
+    const waveTag = document.getElementById("of-scope-wave-tag");
+    const freqTag = document.getElementById("of-scope-freq-tag");
+    const spectralPeak = document.getElementById("of-spectral-peak-tag");
+
+    // Power rocker switch & LED
+    if (pwrBtn) {
+      if (state.powerSupplyOn) pwrBtn.classList.add("active");
+      else pwrBtn.classList.remove("active");
+    }
     if (pwrState) pwrState.textContent = state.powerSupplyOn ? "ON" : "OFF";
-    if (pwrLed) pwrLed.className = `hw-switch-led ${state.powerSupplyOn ? "led-green" : "led-off"}`;
+    if (pwrLed) {
+      if (state.powerSupplyOn) pwrLed.classList.add("active");
+      else pwrLed.classList.remove("active");
+    }
 
-    if (lsrBtn) lsrBtn.className = `of-hw-switch of-laser-switch ${state.lightSourceActive ? "active" : ""}`;
+    // Laser emitter, indicator LED & hazard badge
+    const isLaserActive = state.lightSourceActive && state.powerSupplyOn;
+    if (lsrBtn) {
+      if (isLaserActive) {
+        lsrBtn.classList.add("active");
+        lsrBtn.classList.add("active-laser-glow");
+      } else {
+        lsrBtn.classList.remove("active");
+        lsrBtn.classList.remove("active-laser-glow");
+      }
+    }
     if (lsrState) lsrState.textContent = state.lightSourceActive ? "ON" : "OFF";
-    if (lsrLed) lsrLed.className = `hw-switch-led ${state.lightSourceActive ? "led-red" : "led-off"}`;
+    if (lsrLed) {
+      if (isLaserActive) lsrLed.classList.add("active");
+      else lsrLed.classList.remove("active");
+    }
+    if (lsrFault) {
+      if (isLaserActive) lsrFault.classList.add("active");
+      else lsrFault.classList.remove("active");
+    }
+    if (hazardSign) {
+      if (isLaserActive) hazardSign.classList.add("active-hazard");
+      else hazardSign.classList.remove("active-hazard");
+    }
 
-    if (cableBtn) cableBtn.className = `of-hw-switch of-cable-switch ${state.fibreInputConnected ? "active" : ""}`;
-    if (cableState) cableState.textContent = state.fibreInputConnected ? "Coupled" : "Unplugged";
+    // Fiber cable spool glowing and coupling state on the realistic chassis
+    const kitChassis = document.querySelector(".kit-chassis");
+    if (kitChassis) {
+      kitChassis.classList.toggle("cable-emitter-connected", Boolean(state.fibreInputConnected));
+      kitChassis.classList.toggle("cable-receiver-connected", Boolean(state.fibreOutputMounted));
+      kitChassis.classList.toggle("laser-on", Boolean(isLaserActive && state.fibreInputConnected));
+      kitChassis.classList.toggle("laser-active-chassis", Boolean(isLaserActive));
+      kitChassis.classList.toggle("cable-unplugged", !state.fibreInputConnected);
+    }
+    const clampAssembly = document.querySelector(".jig-clamp-assembly");
+    if (clampAssembly) {
+      clampAssembly.classList.toggle("clamped", Boolean(state.fibreOutputMounted));
+    }
 
-    if (jigBtn) jigBtn.className = `of-hw-switch of-jig-switch ${state.fibreOutputMounted ? "active" : ""}`;
+    if (cableBtn) {
+      if (isLaserActive && state.fibreInputConnected) {
+        cableBtn.classList.add("laser-glowing");
+        if (state.wavelengthNm < 500) {
+          cableBtn.classList.remove("wl-green");
+          cableBtn.classList.add("wl-blue");
+        } else if (state.wavelengthNm < 600) {
+          cableBtn.classList.remove("wl-blue");
+          cableBtn.classList.add("wl-green");
+        } else {
+          cableBtn.classList.remove("wl-blue", "wl-green");
+        }
+      } else {
+        cableBtn.classList.remove("laser-glowing", "wl-blue", "wl-green");
+      }
+    }
+    if (cableState) {
+      cableState.textContent = state.fibreInputConnected ? "Coupled" : "Unplugged";
+      cableState.style.color = state.fibreInputConnected ? "#10b981" : "#ef4444";
+    }
+
+    // Jig clamp
+    if (jigBtn) {
+      if (state.fibreOutputMounted) jigBtn.classList.add("active");
+      else jigBtn.classList.remove("active");
+    }
     if (jigState) jigState.textContent = state.fibreOutputMounted ? "Locked" : "Unlocked";
 
-    // Wavelength chip buttons
+    // Refresh dynamic fiber cable geometry coordinates
+    updateFiberCableGeometry();
+
+    // Telemetry readouts
+    if (voltReadout) voltReadout.textContent = `${state.trainer.voltage.toFixed(1)}V`;
+    if (freqReadout) freqReadout.textContent = state.trainer.freqLabels[state.trainer.freqIndex];
+    if (ampReadout) ampReadout.textContent = `${state.trainer.amplitudeV.toFixed(1)} V`;
+    if (waveTag) waveTag.textContent = state.trainer.waveform.charAt(0).toUpperCase() + state.trainer.waveform.slice(1, 3);
+    if (freqTag) freqTag.textContent = `@ ${state.trainer.freqLabels[state.trainer.freqIndex]}`;
+    if (spectralPeak) spectralPeak.textContent = `${state.wavelengthNm}nm`;
+
+    // Wavelength tags
+    document.querySelectorAll(".wl-pos-tag").forEach(tag => {
+      const tagWl = Number(tag.getAttribute("data-wl"));
+      if (tagWl === state.wavelengthNm) tag.classList.add("active");
+      else tag.classList.remove("active");
+    });
+
+    // Legacy wavelength chip buttons
     document.querySelectorAll(".of-wl-chip").forEach(chip => {
       const wl = Number(chip.getAttribute("data-wl"));
       if (wl === state.wavelengthNm) chip.classList.add("active");
@@ -1519,6 +2452,7 @@ export function createOpticalFibreExperiment(callbacks = {}) {
   // HARDWARE TOGGLE ACTIONS
   // ==========================================
   function togglePower() {
+    playClickAudio(state.powerSupplyOn ? "power-off" : "power-on");
     state.powerSupplyOn = !state.powerSupplyOn;
     if (!state.powerSupplyOn) {
       state.lightSourceActive = false;
@@ -1529,24 +2463,49 @@ export function createOpticalFibreExperiment(callbacks = {}) {
 
   function toggleLaser() {
     if (!state.powerSupplyOn) {
+      playClickAudio("warning");
       showToast("Switch on Power Supply first!");
       return;
     }
+    playClickAudio(state.lightSourceActive ? "click-light" : "laser-hum");
     state.lightSourceActive = !state.lightSourceActive;
     showToast(state.lightSourceActive ? `Laser Active (${state.wavelengthNm}nm)` : "Laser Light Deactivated");
     renderAll();
   }
 
   function toggleCable() {
+    playClickAudio("click");
     state.fibreInputConnected = !state.fibreInputConnected;
-    showToast(state.fibreInputConnected ? "Fibre Patch Cord Coupled to Laser" : "Fibre Cable Disconnected");
+    if (!state.fibreInputConnected) {
+      state.fibreOutputMounted = false;
+      showToast("Fibre Cable Disconnected from Emitter Port");
+    } else {
+      showToast("Fibre Cable Connected to Emitter Port! Click Jig Clamp to connect to Receiver.");
+    }
     renderAll();
+    if (state.fibreInputConnected) {
+      updateFiberCableGeometry("seg1");
+    }
   }
 
   function toggleJig() {
-    state.fibreOutputMounted = !state.fibreOutputMounted;
-    showToast(state.fibreOutputMounted ? "Fibre Output Tip Clamped in Jig" : "Fibre Tip Unclamped");
-    renderAll();
+    playClickAudio("ratchet");
+    if (!state.fibreInputConnected) {
+      state.fibreInputConnected = true;
+      state.fibreOutputMounted = true;
+      showToast("Fibre Cable Attached to Emitter & Connected to Receiver Port!");
+      renderAll();
+      updateFiberCableGeometry("both");
+    } else {
+      state.fibreOutputMounted = !state.fibreOutputMounted;
+      showToast(state.fibreOutputMounted 
+        ? "Fibre Cable Clamped & Connected to Receiver Sensor Port!" 
+        : "Fibre Cable Unclamped from Receiver");
+      renderAll();
+      if (state.fibreOutputMounted) {
+        updateFiberCableGeometry("seg2");
+      }
+    }
   }
 
   function setWavelength(wl) {
@@ -1604,6 +2563,69 @@ export function createOpticalFibreExperiment(callbacks = {}) {
     document.getElementById("of-btn-laser-switch")?.addEventListener("click", toggleLaser);
     document.getElementById("of-btn-cable-toggle")?.addEventListener("click", toggleCable);
     document.getElementById("of-btn-jig-toggle")?.addEventListener("click", toggleJig);
+    document.getElementById("of-btn-sensor-toggle")?.addEventListener("click", toggleJig);
+
+    // Dynamic optical cable geometry resize observer
+    window.addEventListener("resize", () => updateFiberCableGeometry());
+    const kitChassisEl = document.querySelector(".kit-chassis");
+    if (kitChassisEl && window.ResizeObserver) {
+      new ResizeObserver(() => updateFiberCableGeometry()).observe(kitChassisEl);
+    }
+    setTimeout(() => updateFiberCableGeometry(), 120);
+
+    // Realistic Trainer Waveform Selectors
+    document.getElementById("of-btn-wave-sine")?.addEventListener("click", () => setTrainerWaveform("sine"));
+    document.getElementById("of-btn-wave-square")?.addEventListener("click", () => setTrainerWaveform("square"));
+    document.getElementById("of-btn-wave-pulse")?.addEventListener("click", () => setTrainerWaveform("pulse"));
+    document.getElementById("of-btn-wave-triangle")?.addEventListener("click", () => setTrainerWaveform("triangle"));
+
+    // Knobs
+    document.getElementById("of-knob-voltage")?.addEventListener("click", cycleVoltage);
+    document.getElementById("of-knob-freq")?.addEventListener("click", cycleFrequency);
+    document.getElementById("of-knob-amp")?.addEventListener("click", cycleAmplitude);
+    document.getElementById("of-knob-wavelength")?.addEventListener("click", cycleWavelength);
+    document.getElementById("of-knob-meas-volt")?.addEventListener("click", cycleVoltage);
+
+    // Modulation Buttons
+    document.getElementById("of-btn-mod-am")?.addEventListener("click", () => setTrainerModulation("am"));
+    document.getElementById("of-btn-mod-fm")?.addEventListener("click", () => setTrainerModulation("fm"));
+    document.getElementById("of-btn-mod-pwm")?.addEventListener("click", () => setTrainerModulation("pwm"));
+
+    // Digital Oscilloscope Buttons
+    document.getElementById("of-btn-scope-run")?.addEventListener("click", toggleScopeRun);
+    document.getElementById("of-btn-scope-rq")?.addEventListener("click", toggleScopePhase);
+    document.getElementById("of-btn-scope-scale")?.addEventListener("click", cycleScopeTimebase);
+    document.getElementById("of-scope-btn-ch1")?.addEventListener("click", toggleScopeCh1);
+    document.getElementById("of-scope-btn-ch2")?.addEventListener("click", toggleScopeCh2);
+    document.getElementById("of-scope-btn-math")?.addEventListener("click", () => {
+      state.trainer.scopeMath = !state.trainer.scopeMath;
+      document.getElementById("of-scope-btn-math")?.classList.toggle("active", state.trainer.scopeMath);
+    });
+    document.getElementById("of-scope-btn-grid")?.addEventListener("click", toggleScopeGrid);
+
+    // Spectral Toggle
+    document.getElementById("of-btn-spectral-toggle")?.addEventListener("click", () => {
+      playClickAudio("click");
+      state.trainer.spectralMode = state.trainer.spectralMode === "spectrum" ? "power" : "spectrum";
+      showToast(`Spectral Display Mode: ${state.trainer.spectralMode.toUpperCase()}`);
+    });
+
+    // TX Mode Button
+    document.getElementById("of-btn-tx-mode")?.addEventListener("click", () => {
+      playClickAudio("click");
+      showToast("Transmitter Mode: High-Coherence Semiconductor Laser Diode (SMA Coupled)");
+    });
+
+    // Wavelength Tag Click Handlers
+    document.querySelectorAll(".wl-pos-tag").forEach(tag => {
+      tag.addEventListener("click", () => {
+        const wl = Number(tag.getAttribute("data-wl"));
+        if (wl) {
+          playClickAudio("click");
+          setWavelength(wl);
+        }
+      });
+    });
 
     // Wavelength Selector Chips
     document.querySelectorAll(".of-wl-chip").forEach(chip => {

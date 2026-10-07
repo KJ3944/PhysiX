@@ -522,15 +522,15 @@
     "oyzXOlVh6waIwwKg8N0g4DUrO702": {
       "userId": "oyzXOlVh6waIwwKg8N0g4DUrO702",
       "profile": {
-        "name": "",
+        "name": "Jeshurun Selvakumar",
         "avatar": "quantum",
-        "handle": "",
-        "edu": "",
-        "occ": "",
-        "interests": "",
-        "bio": "",
+        "handle": "@jeshurunselvakumar",
+        "edu": "Undergraduate Student",
+        "occ": "MIT Physics Lab / Student",
+        "interests": "2D Kinematics, Planetary Gravity, Orbital Dynamics",
+        "bio": "Exploring 2D projectile kinematics, parabolic trajectories, vector breakdown components, and gravitational effects across the solar system.",
         "createdAt": "2026-09-21T16:15:28.210Z",
-        "updatedAt": "2026-09-21T16:25:33.550Z",
+        "updatedAt": "2026-10-06T15:25:16.544Z",
         "email": "jeshurunselvakumar640@gmail.com",
         "streak": 1,
         "highestStreak": 1,
@@ -553,10 +553,15 @@
       "flightLogs": [],
       "observations": [],
       "challenges": {},
-      "bonusXp": 1475,
+      "bonusXp": 2225,
       "badges": [
         "badge-profile-saved",
-        "badge-lab-veteran"
+        "badge-lab-veteran",
+        "badge-diffraction-calibrator",
+        "badge-high-dispersion",
+        "badge-second-order",
+        "badge-spectroscopy-sleuth",
+        "badge-diffraction-master"
       ],
       "quizHighScore": 0
     }

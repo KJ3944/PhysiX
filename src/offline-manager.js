@@ -160,6 +160,7 @@ async function registerServiceWorker() {
     });
 
     console.log("[PWA] Service Worker registered:", registration.scope);
+    registration.update().catch(() => {});
 
     // Handle updates
     registration.addEventListener("updatefound", () => {
@@ -167,9 +168,11 @@ async function registerServiceWorker() {
       if (!newWorker) return;
 
       newWorker.addEventListener("statechange", () => {
-        if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-          console.log("[PWA] New version available");
-          showToast("A new version of PhysiX is available. Refresh to update.");
+        if (newWorker.state === "installed") {
+          newWorker.postMessage("SKIP_WAITING");
+          if (navigator.serviceWorker.controller) {
+            console.log("[PWA] New version activated");
+          }
         }
       });
     });

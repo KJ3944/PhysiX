@@ -10,9 +10,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="/src/style.css" />
+  <link rel="stylesheet" href="/fonts/fonts.css" />
+  <link rel="stylesheet" href="/src/style.css?v=orbitron-v7" />
   <link id="light-mode-stylesheet" rel="stylesheet" href="/src/light-mode.css" disabled />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="apple-touch-icon" href="/favicon.svg" />
@@ -805,8 +806,8 @@
         </div>
       </section>
 
-      <!-- Search & Category Filters Bar -->
-      <div class="exp-filter-toolbar">
+      <!-- Top Search Bar Section (Matching Reference Diagram) -->
+      <div class="exp-search-section">
         <div class="exp-search-box">
           <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"></circle>
@@ -814,19 +815,85 @@
           </svg>
           <input type="search" id="exp-page-search-input" class="exp-search-input" placeholder="Search 14 laboratories by title, topic, or keyword (e.g. projectile, optical fibre, colour sensor, sandbox)..." aria-label="Search laboratories">
         </div>
-
-        <div class="exp-cat-pills" id="exp-page-cat-pills">
-          <button type="button" class="exp-cat-pill active" data-category="all">All Labs (14)</button>
-          <button type="button" class="exp-cat-pill" data-category="optics">Fiber Optics &amp; Lasers</button>
-          <button type="button" class="exp-cat-pill" data-category="wave">Wave Optics &amp; Interference</button>
-          <button type="button" class="exp-cat-pill" data-category="quantum">Quantum &amp; Solid State</button>
-          <button type="button" class="exp-cat-pill" data-category="sensors">Sensors, Devices &amp; Nano</button>
-        </div>
       </div>
 
-      <!-- Laboratory Cards Grid -->
-      <div id="exp-page-labs-grid" class="labs-grid exp-page-grid">
-        <!-- Populated automatically and synchronized with explorer cards -->
+      <!-- Integrated Dashboard Layout: Chapters Sidebar (Left) + Experiment List (Right) -->
+      <div class="exp-dashboard-layout">
+        <!-- Left Dock: CHAPTERS (Category Filters) -->
+        <aside class="exp-chapters-sidebar" aria-label="Experiment Chapters Filter">
+          <div class="chapters-capsule-header">
+            <div class="chapters-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="chapters-icon">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+              <span>CHAPTERS</span>
+            </div>
+            <span class="chapters-count-pill">5 Chapters</span>
+          </div>
+
+          <div class="exp-cat-pills chapters-pills-list" id="exp-page-cat-pills">
+            <button type="button" class="exp-cat-pill active" data-category="all">
+              <span class="pill-indicator"></span>
+              <span class="pill-title">All Labs</span>
+              <span class="pill-badge">14</span>
+            </button>
+            <button type="button" class="exp-cat-pill" data-category="optics">
+              <span class="pill-indicator"></span>
+              <span class="pill-title">Fiber Optics &amp; Lasers</span>
+            </button>
+            <button type="button" class="exp-cat-pill" data-category="wave">
+              <span class="pill-indicator"></span>
+              <span class="pill-title">Wave Optics &amp; Interference</span>
+            </button>
+            <button type="button" class="exp-cat-pill" data-category="quantum">
+              <span class="pill-indicator"></span>
+              <span class="pill-title">Quantum &amp; Solid State</span>
+            </button>
+            <button type="button" class="exp-cat-pill" data-category="sensors">
+              <span class="pill-indicator"></span>
+              <span class="pill-title">Sensors, Devices &amp; Nano</span>
+            </button>
+          </div>
+
+          <!-- Physical Connector Bridge to Experiment List (Matching Reference Architecture) -->
+          <div class="exp-sidebar-bridge" aria-hidden="true">
+            <svg class="bridge-svg" viewBox="0 0 44 104" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="bridgeBgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#11192e" />
+                  <stop offset="50%" stop-color="#0e1526" />
+                  <stop offset="100%" stop-color="#0a0f1d" />
+                </linearGradient>
+              </defs>
+              <!-- Seamless bridge body filled with matching panel background -->
+              <path d="M 0 0 A 14 14 0 0 0 14 14 L 30 14 A 14 14 0 0 0 44 0 L 44 104 A 14 14 0 0 0 30 90 L 14 90 A 14 14 0 0 0 0 104 Z" fill="url(#bridgeBgGrad)" />
+              <!-- Top continuous stroke with concave fillet curves -->
+              <path d="M 0 0 A 14 14 0 0 0 14 14 L 30 14 A 14 14 0 0 0 44 0" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1.2" stroke-linecap="round" fill="none" />
+              <!-- Bottom continuous stroke with concave fillet curves -->
+              <path d="M 44 104 A 14 14 0 0 0 30 90 L 14 90 A 14 14 0 0 0 0 104" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1.2" stroke-linecap="round" fill="none" />
+            </svg>
+          </div>
+        </aside>
+
+        <!-- Right Main Canvas: EXPERIMENT LIST Container -->
+        <div class="exp-list-card-container">
+          <div class="exp-list-header-bar">
+            <div class="exp-list-header-left">
+              <span class="exp-list-badge">EXPERIMENT LIST</span>
+              <h2 class="exp-list-heading">Interactive Laboratories</h2>
+            </div>
+            <div class="exp-list-status">
+              <span class="status-live-dot"></span>
+              <span>Real-Time Solvers Ready</span>
+            </div>
+          </div>
+
+          <!-- Laboratory Cards Grid -->
+          <div id="exp-page-labs-grid" class="labs-grid exp-page-grid">
+            <!-- Populated automatically and synchronized with explorer cards -->
+          </div>
+        </div>
       </div>
 
       <!-- Bottom Navigation Footer -->
@@ -1071,7 +1138,7 @@
         </svg>
         Theory & Formulas
       </button>
-      <button id="btn-open-quiz" class="nav-btn nav-btn-quiz">
+      <button id="btn-open-quiz" class="nav-btn nav-btn-quiz" data-tour="global-quiz">
         <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="9"></circle>
           <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
@@ -1093,6 +1160,12 @@
           <line x1="12" y1="17" x2="12.01" y2="17"></line>
         </svg>
         Help & Guide
+      </button>
+      <button id="btn-replay-tutorial" class="nav-btn nav-btn-tutorial" title="Launch Interactive Guided Tour for Current Lab">
+        <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+        Guided Tour
       </button>
       <button id="btn-toggle-theme" class="theme-sliding-switch" role="switch" aria-checked="false" title="Switch to Light Mode" aria-label="Toggle Light/Dark Mode">
         <span class="theme-switch-track">
@@ -1173,6 +1246,17 @@
         </svg>
         <span>Exp 4: Physics Sandbox</span>
         <span class="exp-pill-badge sandbox-pill-badge">PLAYGROUND</span>
+      </button>
+
+      <button type="button" id="btn-switch-exp-diffraction" class="exp-switch-btn" data-exp="diffraction">
+        <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2">
+          <line x1="4" y1="4" x2="4" y2="20"></line>
+          <line x1="8" y1="4" x2="8" y2="20"></line>
+          <line x1="12" y1="4" x2="12" y2="20"></line>
+          <line x1="16" y1="4" x2="16" y2="20"></line>
+          <line x1="20" y1="4" x2="20" y2="20"></line>
+        </svg>
+        <span>Exp 5: Diffraction Grating</span>
       </button>
     </div>
   </div>
@@ -1654,50 +1738,172 @@
           <canvas id="of-bench-canvas" width="800" height="380"></canvas>
         </div>
 
-        <!-- OPTICAL TRAINER HARDWARE CONTROLS DECK -->
-        <div class="of-hardware-deck">
-          <div class="of-deck-section">
-            <span class="of-deck-label">Trainer Hardware Switches</span>
-            <div class="of-deck-buttons">
-              <button type="button" id="of-btn-power-switch" class="of-hw-switch of-power-switch" title="Toggle Main Trainer Power">
-                <span class="hw-switch-led" id="of-led-power"></span>
-                <span class="hw-switch-text">Main Power</span>
-                <span class="hw-switch-state" id="of-state-power">OFF</span>
-              </button>
-              <button type="button" id="of-btn-laser-switch" class="of-hw-switch of-laser-switch" title="Toggle Laser Diode Emitter">
-                <span class="hw-switch-led" id="of-led-laser"></span>
-                <span class="hw-switch-text">Laser Emitter</span>
-                <span class="hw-switch-state" id="of-state-laser">OFF</span>
-              </button>
-              <button type="button" id="of-btn-cable-toggle" class="of-hw-switch of-cable-switch" title="Connect/Disconnect Optical Fibre Patch Cord">
-                <svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h5a3 3 0 0 1 3 3v1a3 3 0 0 0 3 3h7"></path></svg>
-                <span class="hw-switch-text">Fibre Cable</span>
-                <span class="hw-switch-state" id="of-state-cable">Unplugged</span>
-              </button>
-              <button type="button" id="of-btn-jig-toggle" class="of-hw-switch of-jig-switch" title="Lock/Unlock Fibre Tip in NA Measurement Jig">
-                <svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                <span class="hw-switch-text">Jig Clamp</span>
-                <span class="hw-switch-state" id="of-state-jig">Unlocked</span>
-              </button>
-            </div>
-          </div>
+        <!-- REALISTIC OPTICAL TRAINER KIT HARDWARE PANEL (REFERENCE DESIGN) -->
+        <div class="of-hardware-deck of-kit-panel" id="of-realistic-trainer">
+          <div class="kit-chassis">
+            <!-- 4 Corner Hex Bolt Fasteners -->
+            <div class="kit-bolt bolt-top-left"></div>
+            <div class="kit-bolt bolt-top-right"></div>
+            <div class="kit-bolt bolt-bottom-left"></div>
+            <div class="kit-bolt bolt-bottom-right"></div>
 
-          <div class="of-deck-section">
-            <span class="of-deck-label">Laser Wavelength (λ) & Spectral Emission</span>
-            <div class="of-wavelength-row">
-              <div class="of-wavelength-chips">
-                <button type="button" class="of-wl-chip active" data-wl="650">650 nm (Red)</button>
-                <button type="button" class="of-wl-chip" data-wl="532">532 nm (Green)</button>
-                <button type="button" class="of-wl-chip" data-wl="450">450 nm (Blue)</button>
-                <button type="button" class="of-wl-chip" data-wl="850">850 nm (Near-IR)</button>
-              </div>
-              <div class="of-wl-slider-box">
-                <span class="of-wl-readout">λ = <strong id="of-wavelength-val">650 nm</strong></span>
-                <input type="range" id="of-slider-wavelength" min="400" max="950" step="5" value="650" />
-              </div>
+            <!-- Header Title -->
+            <div class="kit-title-header">
+              <h2>OPTICAL TRAINER KIT</h2>
             </div>
-          </div>
-        </div>
+
+            <!-- Main Hardware Layout Row -->
+            <div class="kit-controls-row">
+              
+              <!-- SECTION 1: POWER SECTION -->
+              <div class="kit-section-col sec-power">
+                <span class="kit-label-top">POWER<br>SECTION</span>
+                <div class="kit-led-socket">
+                  <div class="kit-indicator-led led-green" id="of-led-power"></div>
+                </div>
+                <button type="button" id="of-btn-power-switch" class="concave-button btn-power" title="Toggle Main Trainer Power">
+                  <div class="concave-bezel">
+                    <div class="concave-dish">
+                      <svg class="concave-icon icon-power" viewBox="0 0 24 24" width="26" height="26">
+                        <path d="M12 2v10M18.36 6.64a9 9 0 1 1-12.73 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+                      </svg>
+                    </div>
+                  </div>
+                </button>
+                <span class="kit-label-bot">POWER</span>
+              </div>
+
+              <!-- SECTION 2: LASER CONTROLS -->
+              <div class="kit-section-col sec-laser">
+                <span class="kit-label-top">LASER<br>CONTROLS</span>
+                <div class="kit-led-socket">
+                  <div class="kit-indicator-led led-red" id="of-led-laser"></div>
+                </div>
+                <div class="laser-hazard-glyph" id="of-hazard-sign" title="Laser Radiation Hazard">
+                  <svg viewBox="0 0 24 24" width="20" height="20">
+                    <polygon points="12 2, 22 20, 2 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="M12 9v5M12 16.5v1.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <button type="button" id="of-btn-laser-switch" class="concave-button btn-laser" title="Toggle Laser Diode Emitter">
+                  <div class="concave-bezel">
+                    <div class="concave-dish">
+                      <span class="concave-text-laser">LASER</span>
+                    </div>
+                  </div>
+                </button>
+                <span class="kit-label-bot kit-label-empty">&nbsp;</span>
+              </div>
+
+              <!-- SECTION 3: EMITTER PORT -->
+              <div class="kit-section-col sec-emitter">
+                <span class="kit-label-top">EMITTER<br>PORT</span>
+                <span class="kit-sub-label">LASER OUT</span>
+                <div class="optical-port-assembly emitter-assembly" id="of-btn-cable-toggle" title="Click to Couple/Uncouple Optical Fiber Cable">
+                  <div class="flange-plate">
+                    <div class="flange-screw fs-tl"></div>
+                    <div class="flange-screw fs-tr"></div>
+                    <div class="flange-screw fs-bl"></div>
+                    <div class="flange-screw fs-br"></div>
+                    <div class="barrel-ring">
+                      <div class="barrel-core">
+                        <div class="port-aperture emitter-aperture" title="Laser Optical Output Aperture"></div>
+                        <div class="connector-boot boot-emitter" title="Coupled Optical Fiber Ferrule">
+                          <div class="boot-strain-lines"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <span class="kit-label-bot">EMITTER</span>
+              </div>
+
+              <!-- SECTION 4: JIG CLAMP -->
+              <div class="kit-section-col sec-jig">
+                <span class="kit-label-top">JIG<br>CLAMP</span>
+                <div class="jig-clamp-assembly" id="of-btn-jig-toggle" title="Click to Lock/Unlock Fiber Tip in Jig Clamp">
+                  <div class="thumbscrew-knob" id="of-thumbscrew-knob">
+                    <div class="knurled-head"></div>
+                    <div class="threaded-shaft"></div>
+                  </div>
+                  <div class="clamp-metal-block">
+                    <div class="clamp-groove"></div>
+                  </div>
+                </div>
+                <span class="kit-label-bot kit-label-empty">&nbsp;</span>
+              </div>
+
+              <!-- SECTION 5: RECEIVING PORT -->
+              <div class="kit-section-col sec-receiver">
+                <span class="kit-label-top">RECEIVING<br>PORT</span>
+                <span class="kit-sub-label">RECEIVER</span>
+                <div class="optical-port-assembly receiver-assembly" id="of-btn-sensor-toggle" title="Receiving Photodetector Sensor Port">
+                  <div class="flange-plate">
+                    <div class="flange-screw fs-tl"></div>
+                    <div class="flange-screw fs-tr"></div>
+                    <div class="flange-screw fs-bl"></div>
+                    <div class="flange-screw fs-br"></div>
+                    <div class="barrel-ring">
+                      <div class="barrel-core">
+                        <div class="port-aperture receiver-aperture" title="Photodetector Optical Receiver Port"></div>
+                        <div class="connector-boot boot-receiver" title="Mounted Optical Fiber Sensor Boot">
+                          <div class="boot-ribs"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <span class="kit-label-bot">SENSOR</span>
+              </div>
+
+            </div><!-- /.kit-controls-row -->
+
+            <!-- FIBER CABLE SVG OVERLAY (INTERACTIVE DYNAMIC SEGMENTS) -->
+            <svg class="kit-fiber-cable-svg" id="of-fiber-cable-svg" aria-hidden="true">
+              <defs>
+                <filter id="fiber-neon-bloom" x="-30%" y="-30%" width="160%" height="160%">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur1"/>
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur2"/>
+                  <feMerge>
+                    <feMergeNode in="blur2"/>
+                    <feMergeNode in="blur1"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <!-- SEGMENT 1: Emitter Port to Jig Clamp -->
+              <g class="fiber-cable-seg fiber-cable-seg-1" id="of-cable-seg-1">
+                <path class="fiber-cable-shadow" id="of-seg1-shadow" d="M0 0" />
+                <path class="fiber-cable-glow" id="of-seg1-glow" d="M0 0" />
+                <path class="fiber-cable-core" id="of-seg1-core" d="M0 0" />
+                <circle class="fiber-cable-tip-glow" id="of-seg1-tip" cx="0" cy="0" r="4.5" />
+              </g>
+
+              <!-- SEGMENT 2: Jig Clamp through to Receiving Port -->
+              <g class="fiber-cable-seg fiber-cable-seg-2" id="of-cable-seg-2">
+                <path class="fiber-cable-shadow" id="of-seg2-shadow" d="M0 0" />
+                <path class="fiber-cable-glow" id="of-seg2-glow" d="M0 0" />
+                <path class="fiber-cable-core" id="of-seg2-core" d="M0 0" />
+              </g>
+            </svg>
+
+            <!-- Cable Subtitle Label in Loop -->
+            <div class="fiber-cable-label" id="of-cable-text-label">FIBER CABLE</div>
+
+            <!-- State Synchronization for Accessibility, Audio & Testing -->
+            <div class="kit-sync-strip" aria-hidden="true" style="display:none;">
+              <span id="of-state-power">OFF</span>
+              <span id="of-state-laser">OFF</span>
+              <span id="of-state-cable">Coupled</span>
+              <span id="of-state-jig">Unlocked</span>
+              <span id="of-wavelength-val">650 nm</span>
+              <input type="range" id="of-slider-wavelength" min="400" max="950" step="5" value="650" />
+            </div>
+
+          </div><!-- /.kit-chassis -->
+        </div><!-- /.of-hardware-deck -->
+
 
         <div class="of-bench-footer">
           <span class="of-hint-text">
@@ -2054,23 +2260,73 @@
 
         <!-- HARDWARE CONTROLS & SPECIMEN PALETTE DECK -->
         <div class="cs-hardware-deck">
-          <div class="cs-deck-section">
-            <span class="cs-deck-label">Trainer Hardware Switches</span>
-            <div class="cs-deck-buttons">
-              <button type="button" id="cs-btn-power-switch" class="cs-hw-switch cs-power-switch" title="Toggle Main Trainer 5V Power">
-                <span class="hw-switch-led" id="cs-led-power"></span>
-                <span class="hw-switch-text">Main Power</span>
-                <span class="hw-switch-state" id="cs-state-power">OFF</span>
-              </button>
-              <button type="button" id="cs-btn-illum-switch" class="cs-hw-switch cs-illum-switch" title="Toggle 4x White LED Spotlight Array">
-                <span class="hw-switch-led" id="cs-led-illum"></span>
-                <span class="hw-switch-text">White LEDs</span>
-                <span class="hw-switch-state" id="cs-state-illum">OFF</span>
-              </button>
-              <button type="button" id="cs-btn-toggle-mystery" class="cs-hw-switch cs-mystery-btn" title="Toggle Mystery Compound Detective Specimen">
-                <svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                <span class="hw-switch-text">Mystery Sample</span>
-              </button>
+          <div class="cs-deck-section cs-controller-deck">
+            <div class="cs-controller-title">
+              <span class="cs-ctrl-brand">TCS3200 CONTROLLER</span>
+            </div>
+            <div class="cs-concave-switches-row">
+              <!-- POWER CONCAVE BUTTON -->
+              <div class="cs-switch-column">
+                <span class="cs-btn-lbl-top">POWER</span>
+                <button type="button" id="cs-btn-power-switch" class="cs-concave-hw-btn btn-power-concave" title="Toggle Main Trainer 5V Power">
+                  <div class="cs-concave-bezel">
+                    <div class="cs-concave-dish">
+                      <div class="cs-concave-ring ring-power">
+                        <span class="hw-switch-led" id="cs-led-power" style="display:none;"></span>
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round">
+                          <path d="M12 2v10M18.36 6.64a9 9 0 1 1-12.73 0"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+                <span class="cs-btn-lbl-bot" id="cs-state-power">OFF/ON</span>
+              </div>
+
+              <!-- WHITE LED CONCAVE BUTTON -->
+              <div class="cs-switch-column">
+                <span class="cs-btn-lbl-top">WHITE LED</span>
+                <button type="button" id="cs-btn-illum-switch" class="cs-concave-hw-btn btn-illum-concave" title="Toggle 4x White LED Spotlight Array">
+                  <div class="cs-concave-bezel">
+                    <div class="cs-concave-dish">
+                      <div class="cs-concave-ring ring-illum">
+                        <span class="hw-switch-led" id="cs-led-illum" style="display:none;"></span>
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+                          <circle cx="12" cy="12" r="5"/>
+                          <line x1="12" y1="1" x2="12" y2="3"/>
+                          <line x1="12" y1="21" x2="12" y2="23"/>
+                          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                          <line x1="1" y1="12" x2="3" y2="12"/>
+                          <line x1="21" y1="12" x2="23" y2="12"/>
+                          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+                <span class="cs-btn-lbl-bot" id="cs-state-illum">DARK</span>
+              </div>
+
+              <!-- MYSTERY SPECIMEN TOGGLE -->
+              <div class="cs-switch-column cs-col-mystery">
+                <span class="cs-btn-lbl-top">SPECIMEN</span>
+                <button type="button" id="cs-btn-toggle-mystery" class="cs-concave-hw-btn btn-mystery-concave" title="Toggle Mystery Detective Specimen">
+                  <div class="cs-concave-bezel">
+                    <div class="cs-concave-dish">
+                      <div class="cs-concave-ring ring-mystery">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+                <span class="cs-btn-lbl-bot">MYSTERY</span>
+              </div>
             </div>
           </div>
 
@@ -2494,317 +2750,10 @@
     <!-- Main Sandbox 3-Column Layout -->
     <div class="sandbox-dashboard">
 
-      <!-- LEFT COLUMN: Setup & Physics Controls (Spawner, Properties, Environment & Forces) -->
-      <aside class="sandbox-controls-col">
+      <!-- LEFT COLUMN: Interactive Simulation Viewport & Educational HUD -->
+      <aside class="sandbox-viewport-col">
 
-        <!-- 1. Object Creator / Spawner -->
-        <div class="sandbox-card">
-          <div class="sandbox-card-header">
-            <h3>
-              <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#a855f7;">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="16"></line>
-                <line x1="8" y1="12" x2="16" y2="12"></line>
-              </svg>
-              Spawn Objects
-            </h3>
-          </div>
-          <div class="sandbox-spawn-grid">
-            <button type="button" id="btn-add-ball" class="sandbox-tool-btn" title="Add Dynamic Rigid Ball">
-              <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="#00f0ff" stroke-width="2">
-                <circle cx="12" cy="12" r="9"></circle>
-              </svg>
-              <span>+ Ball</span>
-            </button>
-            <button type="button" id="btn-add-box" class="sandbox-tool-btn" title="Add Dynamic Rigid Box">
-              <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="#ffaa00" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-              </svg>
-              <span>+ Box</span>
-            </button>
-            <button type="button" id="btn-add-platform" class="sandbox-tool-btn" title="Add Immovable Static Platform">
-              <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
-                <rect x="2" y="8" width="20" height="8" rx="2"></rect>
-              </svg>
-              <span>+ Platform</span>
-            </button>
-          </div>
-
-          <!-- Objects Quick Switcher / Selector Pills -->
-          <div class="sandbox-pills-wrap">
-            <span class="sandbox-label-sm">SCENE OBJECTS:</span>
-            <div id="sandbox-objects-pills" class="sandbox-pills-list"></div>
-          </div>
-        </div>
-
-        <!-- 2. Selected Object Property Inspector -->
-        <div class="sandbox-card">
-          <div class="sandbox-card-header">
-            <div>
-              <h3 id="inspector-obj-name">Photon Ball</h3>
-              <span id="inspector-obj-type" class="inspector-badge">DYNAMIC BALL</span>
-            </div>
-            <button type="button" id="btn-delete-selected-obj" class="btn-delete-obj" title="Delete Selected Object">
-              <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Notice when a static platform is selected -->
-          <div id="inspector-static-notice" class="sandbox-notice hidden">
-            Static platform is anchored in space with infinite mass and zero velocity. Dynamic objects bounce off with friction.
-          </div>
-
-          <!-- Dynamic Object Properties Form -->
-          <div id="inspector-dynamic-props" class="sandbox-props-form">
-            <!-- Mass Slider -->
-            <div class="sandbox-field-group">
-              <div class="sandbox-field-header">
-                <label for="prop-mass">Mass (m)</label>
-                <strong id="val-prop-mass" class="sandbox-val-cyan">2.0 kg</strong>
-              </div>
-              <input type="range" id="prop-mass" min="0.2" max="25" step="0.1" value="2.0" class="sandbox-slider" />
-            </div>
-
-            <!-- Friction Slider -->
-            <div class="sandbox-field-group">
-              <div class="sandbox-field-header">
-                <label for="prop-friction">Friction Coeff (μ)</label>
-                <strong id="val-prop-friction" class="sandbox-val-amber">0.20</strong>
-              </div>
-              <input type="range" id="prop-friction" min="0.0" max="1.0" step="0.05" value="0.2" class="sandbox-slider" />
-            </div>
-
-            <!-- Restitution (Bounciness) -->
-            <div class="sandbox-field-group">
-              <div class="sandbox-field-header">
-                <label for="prop-restitution">Restitution (e)</label>
-                <strong id="val-prop-restitution" class="sandbox-val-purple">0.75</strong>
-              </div>
-              <input type="range" id="prop-restitution" min="0.0" max="1.0" step="0.05" value="0.75" class="sandbox-slider" />
-            </div>
-
-            <!-- Size Slider -->
-            <div class="sandbox-field-group">
-              <div class="sandbox-field-header">
-                <label for="prop-size">Size (Diameter / Side)</label>
-                <strong id="val-prop-size">1.2 m</strong>
-              </div>
-              <input type="range" id="prop-size" min="0.4" max="3.0" step="0.1" value="1.2" class="sandbox-slider" />
-            </div>
-
-            <!-- Initial Velocity Input -->
-            <div class="sandbox-field-row">
-              <div class="sandbox-field-col">
-                <label for="prop-vx">Init Vx (m/s)</label>
-                <input type="number" id="prop-vx" step="0.5" value="0" class="sandbox-num-input" />
-              </div>
-              <div class="sandbox-field-col">
-                <label for="prop-vy">Init Vy (m/s)</label>
-                <input type="number" id="prop-vy" step="0.5" value="0" class="sandbox-num-input" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3. Planetary Gravity Controls -->
-        <div class="sandbox-card">
-          <div class="sandbox-card-header">
-            <h3>
-              <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#10e7a8;">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="2" y1="12" x2="22" y2="12"></line>
-              </svg>
-              Planetary Gravity (g)
-            </h3>
-            <strong id="val-sandbox-gravity" class="sandbox-num-cyan">9.81 m/s²</strong>
-          </div>
-          <input type="range" id="sandbox-gravity" min="0" max="25" step="0.1" value="9.81" class="sandbox-slider" />
-          <div class="sandbox-range-labels">
-            <span>0 m/s² (Zero-G)</span>
-            <span>9.81 (Earth)</span>
-            <span>25 m/s²</span>
-          </div>
-
-          <div class="sandbox-planet-presets">
-            <button type="button" class="sandbox-planet-btn active" data-gravity="9.81" data-name="Earth">
-              🌍 Earth (9.81)
-            </button>
-            <button type="button" class="sandbox-planet-btn" data-gravity="1.62" data-name="Moon">
-              🌕 Moon (1.62)
-            </button>
-            <button type="button" class="sandbox-planet-btn" data-gravity="3.71" data-name="Mars">
-              🔴 Mars (3.71)
-            </button>
-            <button type="button" class="sandbox-planet-btn" data-gravity="0" data-name="Zero-G">
-              🛸 Zero-G (0.00)
-            </button>
-          </div>
-        </div>
-
-        <!-- 4. Force Application & Challenges Deck -->
-        <div class="sandbox-card" id="sandbox-forces-deck-card">
-          <div class="sandbox-card-header sandbox-tabbed-header">
-            <div class="sandbox-deck-tabs">
-              <button type="button" id="tab-sandbox-forces" class="sandbox-deck-tab-btn active" title="Apply External Forces & Impulses">
-                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="#ff3b69" stroke-width="2">
-                  <path d="M5 12h14"></path>
-                  <path d="m12 5 7 7-7 7"></path>
-                </svg>
-                <span>Apply Forces</span>
-              </button>
-              <button type="button" id="tab-sandbox-challenges" class="sandbox-deck-tab-btn" title="Newtonian Kinematics Challenges">
-                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                </svg>
-                <span>Challenges</span>
-                <span class="sandbox-deck-tab-badge" id="sb-tab-badge-count">0/3</span>
-              </button>
-            </div>
-            <strong id="val-force-magnitude" class="sandbox-val-rose">30 N</strong>
-          </div>
-
-          <!-- PANE 1: APPLY FORCES (Active by default) -->
-          <div id="pane-sandbox-forces" class="sandbox-tab-pane">
-            <!-- Magnitude Slider -->
-            <div class="sandbox-field-group">
-              <div class="sandbox-field-header">
-                <label for="input-force-magnitude">Force Magnitude (F)</label>
-                <span class="sandbox-text-dim">1N — 150N</span>
-              </div>
-              <input type="range" id="input-force-magnitude" min="5" max="150" step="5" value="30" class="sandbox-slider slider-rose" />
-            </div>
-
-            <!-- Directional Control Grid: ←, →, ↑, ↓ -->
-            <div class="sandbox-dpad-container">
-              <div class="sandbox-dpad-grid">
-                <button type="button" id="btn-force-up" class="dpad-btn dpad-up" title="Apply Upward Force (Thrust)">
-                  <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                  <span>↑</span>
-                </button>
-                <button type="button" id="btn-force-left" class="dpad-btn dpad-left" title="Apply Leftward Force">
-                  <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                  <span>←</span>
-                </button>
-                <button type="button" id="btn-apply-impulse" class="dpad-center-btn" title="Apply Quick Impulse Kick">
-                  <span>KICK</span>
-                </button>
-                <button type="button" id="btn-force-right" class="dpad-btn dpad-right" title="Apply Rightward Force">
-                  <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                  <span>→</span>
-                </button>
-                <button type="button" id="btn-force-down" class="dpad-btn dpad-down" title="Apply Downward Force">
-                  <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                  <span>↓</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="sandbox-force-actions">
-              <button type="button" id="btn-clear-forces" class="sandbox-btn-outline" title="Clear all active external forces">
-                Zero Forces
-              </button>
-            </div>
-
-            <!-- Educational flow banner: Force -> Acceleration -> Velocity -> Position -->
-            <div class="sandbox-force-flow">
-              <span class="flow-step">F</span>
-              <span class="flow-arrow">→</span>
-              <span class="flow-step">a = F/m</span>
-              <span class="flow-arrow">→</span>
-              <span class="flow-step">v = v + a·dt</span>
-              <span class="flow-arrow">→</span>
-              <span class="flow-step">x, y</span>
-            </div>
-          </div>
-
-          <!-- PANE 2: CHALLENGES (Hidden by default) -->
-          <div id="pane-sandbox-challenges" class="sandbox-tab-pane hidden">
-            <div class="sandbox-deck-challenges-list">
-              <!-- Challenge 1 Mini -->
-              <div class="sandbox-mini-challenge-item" id="sb-deck-ch-1">
-                <div class="mini-ch-header">
-                  <span class="mini-ch-title">1. Newton's Thrust</span>
-                  <span class="challenge-reward-pill">+100 XP</span>
-                </div>
-                <p class="mini-ch-desc">Apply continuous force (F ≥ 50N) to accelerate an object to speed |v| ≥ 12.0 m/s.</p>
-                <div class="mini-ch-footer">
-                  <span class="challenge-status-tag pending" id="sb-deck-tag-1">Target: |v| ≥ 12.0 m/s</span>
-                </div>
-              </div>
-
-              <!-- Challenge 2 Mini -->
-              <div class="sandbox-mini-challenge-item" id="sb-deck-ch-2">
-                <div class="mini-ch-header">
-                  <span class="mini-ch-title">2. Ballistic Kick</span>
-                  <span class="challenge-reward-pill">+125 XP</span>
-                </div>
-                <p class="mini-ch-desc">Deliver a high-force KICK impulse (F ≥ 80N) to impart kinetic energy KE ≥ 100.0 J.</p>
-                <div class="mini-ch-footer">
-                  <span class="challenge-status-tag pending" id="sb-deck-tag-2">Target: KE ≥ 100.0 J</span>
-                </div>
-              </div>
-
-              <!-- Challenge 3 Mini -->
-              <div class="sandbox-mini-challenge-item" id="sb-deck-ch-3">
-                <div class="mini-ch-header">
-                  <span class="mini-ch-title">3. Zero-G Drift</span>
-                  <span class="challenge-reward-pill">+150 XP</span>
-                </div>
-                <p class="mini-ch-desc">Set Zero-G (g = 0) and cruise unhindered at |v| ≥ 5.0 m/s for 3 continuous seconds.</p>
-                <div class="mini-ch-footer">
-                  <span class="challenge-status-tag pending" id="sb-deck-tag-3">0.0s / 3.0s</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </aside>
-
-      <!-- CENTER COLUMN: Interactive Canvas Simulation Viewport & Master Controls -->
-      <main class="sandbox-viewport-col">
-
-        <!-- 1. Simulation Master Controls Bar -->
-        <div class="sandbox-card sandbox-master-controls-card">
-          <div class="sandbox-sim-master-bar">
-            <div class="sandbox-sim-actions">
-              <button type="button" id="btn-sandbox-run" class="sandbox-btn-run" title="Start or Pause Physics Calculation">
-                <span class="run-icon svg-icon">
-                  <polygon points="5 3 19 12 5 21 5 3" fill="currentColor"></polygon>
-                </span>
-                <span class="run-text">Run</span>
-              </button>
-              <button type="button" id="btn-sandbox-reset" class="sandbox-btn-reset" title="Reset Simulation to Initial State">
-                <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                  <path d="M3 3v5h5"></path>
-                </svg>
-                <span>Reset</span>
-              </button>
-            </div>
-
-            <!-- Speed Multiplier -->
-            <div class="sandbox-speed-row">
-              <span class="sandbox-label-sm">SPEED:</span>
-              <div class="sandbox-speed-group">
-                <button type="button" class="sandbox-speed-btn" data-speed="0.25">0.25×</button>
-                <button type="button" class="sandbox-speed-btn" data-speed="0.5">0.5×</button>
-                <button type="button" class="sandbox-speed-btn active" data-speed="1.0">1×</button>
-                <button type="button" class="sandbox-speed-btn" data-speed="2.0">2×</button>
-              </div>
-            </div>
-
-            <div class="sandbox-viewport-status-pill">
-              <span class="live-dot"></span>
-              <span>SIMULATION ACTIVE</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 2. Simulation Canvas Viewport -->
+        <!-- 1. Interactive Simulation Viewport Card -->
         <div class="sandbox-viewport-card">
           <div class="sandbox-viewport-top">
             <div class="sandbox-live-indicator">
@@ -2835,7 +2784,7 @@
           </div>
         </div>
 
-        <!-- 3. Educational Feedback Area -->
+        <!-- 2. Educational Feedback Card -->
         <div class="sandbox-card sandbox-edu-card">
           <div class="edu-card-top">
             <span class="edu-badge">NEWTON'S SECOND LAW OF MOTION</span>
@@ -2848,75 +2797,410 @@
           </p>
         </div>
 
-      </main>
-
-      <!-- RIGHT COLUMN: Live Telemetry Measurements & Kinematic Graphs -->
-      <aside class="sandbox-telemetry-col">
-
-        <!-- 1. Live Physics Measurements (SI Units) -->
-        <div class="sandbox-card">
-          <div class="sandbox-card-header">
-            <h3>
-              <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="#10e7a8" stroke-width="2">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-              </svg>
-              Live Telemetry Readouts
-            </h3>
-          </div>
-
-          <div class="sandbox-telemetry-grid">
-            <div class="sandbox-tel-item">
-              <span class="tel-lbl">MASS (m)</span>
-              <span id="tel-mass" class="tel-val">2.00 kg</span>
-            </div>
-            <div class="sandbox-tel-item">
-              <span class="tel-lbl">POSITION (x, y)</span>
-              <span id="tel-position" class="tel-val">(4.50, 6.00) m</span>
-            </div>
-            <div class="sandbox-tel-item">
-              <span class="tel-lbl">VELOCITY (vx, vy)</span>
-              <span id="tel-velocity" class="tel-val">(0.00, 0.00) m/s</span>
-            </div>
-            <div class="sandbox-tel-item">
-              <span class="tel-lbl">SPEED (|v|)</span>
-              <span id="tel-speed" class="tel-val tel-cyan">0.00 m/s</span>
-            </div>
-            <div class="sandbox-tel-item">
-              <span class="tel-lbl">ACCELERATION (a)</span>
-              <span id="tel-acceleration" class="tel-val">(0.00, -9.81) m/s²</span>
-            </div>
-            <div class="sandbox-tel-item">
-              <span class="tel-lbl">NET FORCE (F_net)</span>
-              <span id="tel-net-force" class="tel-val tel-rose">19.6 N</span>
-            </div>
-            <div class="sandbox-tel-item span-full">
-              <span class="tel-lbl">KINETIC ENERGY (KE = ½mv²)</span>
-              <span id="tel-kinetic-energy" class="tel-val tel-green">0.0 J</span>
-            </div>
+        <!-- Preserved mini-deck elements for challenges integrity -->
+        <div class="hidden" aria-hidden="true">
+          <button type="button" id="tab-sandbox-forces"></button>
+          <button type="button" id="tab-sandbox-challenges"></button>
+          <span id="sb-tab-badge-count">0/3</span>
+          <div id="pane-sandbox-forces"></div>
+          <div id="pane-sandbox-challenges">
+            <div id="sb-deck-ch-1"><span id="sb-deck-tag-1"></span></div>
+            <div id="sb-deck-ch-2"><span id="sb-deck-tag-2"></span></div>
+            <div id="sb-deck-ch-3"><span id="sb-deck-tag-3"></span></div>
           </div>
         </div>
 
-        <!-- 2. Real-time Telemetry Graphs -->
-        <div class="sandbox-card">
-          <div class="sandbox-card-header">
-            <h3>
-              <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2">
-                <line x1="18" y1="20" x2="18" y2="10"></line>
-                <line x1="12" y1="20" x2="12" y2="4"></line>
-                <line x1="6" y1="20" x2="6" y2="14"></line>
+      </aside>
+
+      <!-- RIGHT COLUMN: VIRTUAL SANDBOX CONTROLLER HARDWARE CONSOLE -->
+      <aside class="sandbox-controller-col">
+        <!-- VIRTUAL SANDBOX CONTROLLER HARDWARE CONSOLE -->
+<!-- VIRTUAL SANDBOX CONTROLLER HARDWARE CONSOLE (BLACK, GREY, BLUE & VIOLET DARK THEME) -->
+<div class="sandbox-hardware-controller" id="sandbox-hardware-controller">
+  <!-- 4 Corner Countersunk Hex Socket Cap Screws -->
+  <div class="shc-hex-screw screw-tl"><div class="hex-hole"></div></div>
+  <div class="shc-hex-screw screw-tr"><div class="hex-hole"></div></div>
+  <div class="shc-hex-screw screw-bl"><div class="hex-hole"></div></div>
+  <div class="shc-hex-screw screw-br"><div class="hex-hole"></div></div>
+
+  <!-- TOP HEADER / MASTER BAR -->
+  <div class="shc-header-bar">
+    <!-- Console Brand Title (Blue / Violet Gradient) -->
+    <div class="shc-title-block">
+      <div class="shc-brand-title">VIRTUAL SANDBOX</div>
+      <div class="shc-brand-sub">CONTROLLER</div>
+    </div>
+
+    <!-- Master Simulation Actions: RUN (Green Concave) & RESET (Red Concave) -->
+    <div class="shc-master-actions">
+      <button type="button" id="btn-sandbox-run" class="shc-concave-btn shc-btn-run" title="Start or Pause Physics Calculation">
+        <span class="btn-recess"></span>
+        <span class="btn-dish"></span>
+        <span class="run-text">RUN</span>
+      </button>
+      <button type="button" id="btn-sandbox-reset" class="shc-concave-btn shc-btn-reset" title="Reset Simulation to Initial State">
+        <span class="btn-recess"></span>
+        <span class="btn-dish"></span>
+        <span class="reset-text">RESET</span>
+      </button>
+    </div>
+
+    <!-- Speed Multiplier Cluster -->
+    <div class="shc-speed-cluster">
+      <span class="shc-cluster-label">SPEED</span>
+      <div class="shc-speed-group">
+        <button type="button" class="shc-concave-btn shc-btn-speed sandbox-speed-btn" data-speed="0.25">
+          <span class="btn-recess"></span>
+          <span class="btn-dish"></span>
+          <span class="btn-label">0.25×</span>
+        </button>
+        <button type="button" class="shc-concave-btn shc-btn-speed sandbox-speed-btn" data-speed="0.5">
+          <span class="btn-recess"></span>
+          <span class="btn-dish"></span>
+          <span class="btn-label">0.5×</span>
+        </button>
+        <button type="button" class="shc-concave-btn shc-btn-speed sandbox-speed-btn active" data-speed="1.0">
+          <span class="btn-recess"></span>
+          <span class="btn-dish"></span>
+          <span class="btn-label">1×</span>
+        </button>
+        <button type="button" class="shc-concave-btn shc-btn-speed sandbox-speed-btn" data-speed="2.0">
+          <span class="btn-recess"></span>
+          <span class="btn-dish"></span>
+          <span class="btn-label">2×</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN TWO-COLUMN HARDWARE DECK -->
+  <div class="shc-deck-grid">
+    
+    <!-- LEFT HALF OF CONTROLLER -->
+    <div class="shc-deck-col shc-col-left">
+
+      <!-- 1. SPAWN OBJECTS & SCENE OBJECTS -->
+      <div class="shc-box shc-box-spawn">
+        <div class="shc-box-header">
+          <span class="shc-box-title">SPAWN OBJECTS</span>
+        </div>
+        <div class="shc-buttons-row shc-spawn-row">
+          <button type="button" id="btn-add-ball" class="shc-concave-btn shc-btn-concave" title="Spawn Dynamic Rigid Ball">
+            <span class="btn-recess"></span>
+            <span class="btn-dish"></span>
+            <span class="btn-label">BALL</span>
+          </button>
+          <button type="button" id="btn-add-box" class="shc-concave-btn shc-btn-concave" title="Spawn Dynamic Rigid Box">
+            <span class="btn-recess"></span>
+            <span class="btn-dish"></span>
+            <span class="btn-label">BOX</span>
+          </button>
+          <button type="button" id="btn-add-platform" class="shc-concave-btn shc-btn-concave" title="Spawn Static Platform">
+            <span class="btn-recess"></span>
+            <span class="btn-dish"></span>
+            <span class="btn-label">PLATFORM</span>
+          </button>
+        </div>
+
+        <!-- Scene Objects Section (Requested Layout) -->
+        <div class="shc-scene-section">
+          <div class="shc-scene-header-row">
+            <span class="shc-scene-title">Scene objects:</span>
+            <button type="button" id="btn-delete-selected-obj" class="btn-delete-obj" title="Delete Selected Object">
+              <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
               </svg>
-              Kinematic Graphs
-            </h3>
-            <div class="sandbox-graph-tabs">
-              <button type="button" id="tab-graph-pos" class="graph-tab-btn">Position</button>
-              <button type="button" id="tab-graph-vel" class="graph-tab-btn active">Velocity</button>
-              <button type="button" id="tab-graph-energy" class="graph-tab-btn">KE</button>
-            </div>
+            </button>
           </div>
-          <div class="sandbox-graph-wrap">
-            <canvas id="sandbox-graphs-canvas"></canvas>
+          <div id="sandbox-objects-pills" class="sandbox-pills-list shc-scene-objects-list"></div>
+        </div>
+      </div>
+
+      <!-- 2. PHYSICAL PROPERTIES -->
+      <div class="shc-box shc-box-props">
+        <div class="shc-box-header">
+          <span class="shc-box-title">PHYSICAL PROPERTIES</span>
+          <div class="shc-obj-meta">
+            <span id="inspector-obj-name" class="shc-meta-name">Photon Ball</span>
+            <span id="inspector-obj-type" class="inspector-badge">DYNAMIC BALL</span>
           </div>
         </div>
+
+        <!-- Static Platform Notice -->
+        <div id="inspector-static-notice" class="sandbox-notice hidden">
+          Static platform is anchored in space with infinite mass and zero velocity.
+        </div>
+
+        <!-- Dynamic Object Fader Sliders Form -->
+        <div id="inspector-dynamic-props" class="shc-faders-stack">
+          <!-- Mass (m) Slider -->
+          <div class="shc-slider-line">
+            <div class="shc-slider-label-col">
+              <label for="prop-mass">MASS (m)</label>
+              <span id="val-prop-mass" class="shc-num-val">2.0 kg</span>
+            </div>
+            <div class="shc-fader-track-container">
+              <div class="shc-fader-scale-ticks ticks-top"></div>
+              <input type="range" id="prop-mass" min="0.2" max="25" step="0.1" value="2.0" class="shc-knurled-slider" />
+              <div class="shc-fader-scale-ticks ticks-bottom"></div>
+            </div>
+          </div>
+
+          <!-- Friction Coeff (μ) Slider -->
+          <div class="shc-slider-line">
+            <div class="shc-slider-label-col">
+              <label for="prop-friction">FRICTION COEFF (μ)</label>
+              <span id="val-prop-friction" class="shc-num-val">0.20</span>
+            </div>
+            <div class="shc-fader-track-container">
+              <div class="shc-fader-scale-ticks ticks-top"></div>
+              <input type="range" id="prop-friction" min="0.0" max="1.0" step="0.05" value="0.2" class="shc-knurled-slider" />
+              <div class="shc-fader-scale-ticks ticks-bottom"></div>
+            </div>
+          </div>
+
+          <!-- Restitution (e) Slider -->
+          <div class="shc-slider-line">
+            <div class="shc-slider-label-col">
+              <label for="prop-restitution">RESTITUTION (e)</label>
+              <span id="val-prop-restitution" class="shc-num-val">0.75</span>
+            </div>
+            <div class="shc-fader-track-container">
+              <div class="shc-fader-scale-ticks ticks-top"></div>
+              <input type="range" id="prop-restitution" min="0.0" max="1.0" step="0.05" value="0.75" class="shc-knurled-slider" />
+              <div class="shc-fader-scale-ticks ticks-bottom"></div>
+            </div>
+          </div>
+
+          <!-- Size Slider -->
+          <div class="shc-slider-line">
+            <div class="shc-slider-label-col">
+              <label for="prop-size">SIZE</label>
+              <span id="val-prop-size" class="shc-num-val">1.2 m</span>
+            </div>
+            <div class="shc-fader-track-container">
+              <div class="shc-fader-scale-ticks ticks-top"></div>
+              <input type="range" id="prop-size" min="0.4" max="3.0" step="0.1" value="1.2" class="shc-knurled-slider" />
+              <div class="shc-fader-scale-ticks ticks-bottom"></div>
+            </div>
+          </div>
+
+          <!-- Initial Velocity Compact Drawer -->
+          <div class="shc-init-vel-row">
+            <div class="shc-vel-input-wrap">
+              <label for="prop-vx">Init Vx (m/s):</label>
+              <input type="number" id="prop-vx" step="0.5" value="0" class="sandbox-num-input shc-vel-num" />
+            </div>
+            <div class="shc-vel-input-wrap">
+              <label for="prop-vy">Init Vy (m/s):</label>
+              <input type="number" id="prop-vy" step="0.5" value="0" class="sandbox-num-input shc-vel-num" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. PLANETARY GRAVITY (g) -->
+      <div class="shc-box shc-box-gravity">
+        <div class="shc-box-header">
+          <span class="shc-box-title">PLANETARY GRAVITY (g)</span>
+          <span id="val-sandbox-gravity" class="shc-num-val">9.81 m/s²</span>
+        </div>
+
+        <!-- Gravity Fader Slider -->
+        <div class="shc-fader-track-container shc-gravity-fader-wrap">
+          <div class="shc-fader-scale-ticks ticks-top"></div>
+          <input type="range" id="sandbox-gravity" min="0" max="25" step="0.1" value="9.81" class="shc-knurled-slider" />
+          <div class="shc-fader-scale-ticks ticks-bottom"></div>
+        </div>
+
+        <!-- Planet Preset Concave Buttons -->
+        <div class="shc-buttons-row shc-planet-row">
+          <button type="button" class="shc-concave-btn shc-btn-concave sandbox-planet-btn active" data-gravity="9.81" data-name="Earth">
+            <span class="btn-recess"></span>
+            <span class="btn-dish"></span>
+            <span class="btn-label">EARTH</span>
+          </button>
+          <button type="button" class="shc-concave-btn shc-btn-concave sandbox-planet-btn" data-gravity="1.62" data-name="Moon">
+            <span class="btn-recess"></span>
+            <span class="btn-dish"></span>
+            <span class="btn-label">MOON</span>
+          </button>
+          <button type="button" class="shc-concave-btn shc-btn-concave sandbox-planet-btn" data-gravity="3.71" data-name="Mars">
+            <span class="btn-recess"></span>
+            <span class="btn-dish"></span>
+            <span class="btn-label">MARS</span>
+          </button>
+          <button type="button" class="shc-concave-btn shc-btn-concave sandbox-planet-btn" data-gravity="0" data-name="Zero-G">
+            <span class="btn-recess"></span>
+            <span class="btn-dish"></span>
+            <span class="btn-label">ZERO-G</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT HALF OF CONTROLLER -->
+    <div class="shc-deck-col shc-col-right">
+
+      <!-- 4. FORCE MAGNITUDE & APPLICATION -->
+      <div class="shc-box shc-box-force">
+        <div class="shc-box-header">
+          <span class="shc-box-title">FORCE MAGNITUDE</span>
+          <span id="val-force-magnitude" class="shc-num-val">30 N</span>
+        </div>
+
+        <!-- Force Magnitude Fader Slider -->
+        <div class="shc-fader-track-container shc-force-fader-wrap">
+          <div class="shc-fader-scale-ticks ticks-top"></div>
+          <input type="range" id="input-force-magnitude" min="5" max="150" step="5" value="30" class="shc-knurled-slider" />
+          <div class="shc-fader-scale-ticks ticks-bottom"></div>
+        </div>
+
+        <!-- Integrated Directional Thrust & Impulse Kick / Reset Bar -->
+        <div class="shc-force-tools-row">
+          <div class="shc-dpad-mini">
+            <button type="button" id="btn-force-left" class="shc-concave-btn shc-mini-btn dpad-btn" title="Thrust Left">
+              <span class="btn-recess"></span>
+              <span class="btn-dish"></span>
+              <span class="btn-label">←</span>
+            </button>
+            <button type="button" id="btn-force-up" class="shc-concave-btn shc-mini-btn dpad-btn" title="Thrust Up">
+              <span class="btn-recess"></span>
+              <span class="btn-dish"></span>
+              <span class="btn-label">↑</span>
+            </button>
+            <button type="button" id="btn-force-down" class="shc-concave-btn shc-mini-btn dpad-btn" title="Thrust Down">
+              <span class="btn-recess"></span>
+              <span class="btn-dish"></span>
+              <span class="btn-label">↓</span>
+            </button>
+            <button type="button" id="btn-force-right" class="shc-concave-btn shc-mini-btn dpad-btn" title="Thrust Right">
+              <span class="btn-recess"></span>
+              <span class="btn-dish"></span>
+              <span class="btn-label">→</span>
+            </button>
+          </div>
+
+          <div class="shc-impulse-group">
+            <button type="button" id="btn-apply-impulse" class="shc-concave-btn shc-btn-kick" title="Apply Instantaneous High-Force Kick">
+              <span class="btn-recess"></span>
+              <span class="btn-dish"></span>
+              <span class="btn-label">KICK</span>
+            </button>
+            <button type="button" id="btn-clear-forces" class="shc-concave-btn shc-btn-clear" title="Reset All External Forces">
+              <span class="btn-recess"></span>
+              <span class="btn-dish"></span>
+              <span class="btn-label">RESET</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. LIVE TELEMETRY READOUTS (6 Segmented Displays) -->
+      <div class="shc-box shc-box-telemetry">
+        <div class="shc-box-header">
+          <span class="shc-box-title">LIVE TELEMETRY READOUTS</span>
+        </div>
+
+        <div class="shc-vfd-grid">
+          <!-- Row 1: Mass (M) -->
+          <div class="shc-vfd-module">
+            <span class="shc-vfd-hdr">MASS (M)</span>
+            <div class="shc-vfd-bezel">
+              <span class="shc-vfd-ghost">8.8.8 M</span>
+              <span id="tel-mass" class="shc-vfd-digit">2.00 kg</span>
+            </div>
+          </div>
+
+          <!-- Row 1: Position (x,y) -->
+          <div class="shc-vfd-module">
+            <span class="shc-vfd-hdr">POSITION (x,y)</span>
+            <div class="shc-vfd-bezel">
+              <span class="shc-vfd-ghost">P0.80</span>
+              <span id="tel-position" class="shc-vfd-digit">(4.5, 6.0)</span>
+            </div>
+          </div>
+
+          <!-- Row 1: Velocity (vx,vy) -->
+          <div class="shc-vfd-module">
+            <span class="shc-vfd-hdr">VELOCITY (vx,vy)</span>
+            <div class="shc-vfd-bezel">
+              <span class="shc-vfd-ghost">Vx,Vy</span>
+              <span id="tel-velocity" class="shc-vfd-digit">(0.0, 0.0)</span>
+            </div>
+          </div>
+
+          <!-- Row 2: Speed (|v|) -->
+          <div class="shc-vfd-module">
+            <span class="shc-vfd-hdr">SPEED (|v|)</span>
+            <div class="shc-vfd-bezel">
+              <span class="shc-vfd-ghost">8.1.88</span>
+              <span id="tel-speed" class="shc-vfd-digit">0.00 m/s</span>
+            </div>
+          </div>
+
+          <!-- Row 2: Acceleration (A) -->
+          <div class="shc-vfd-module">
+            <span class="shc-vfd-hdr">ACCELERATION (A)</span>
+            <div class="shc-vfd-bezel">
+              <span class="shc-vfd-ghost">F.n.8</span>
+              <span id="tel-acceleration" class="shc-vfd-digit">(0, -9.8)</span>
+            </div>
+          </div>
+
+          <!-- Row 2: Kinetic Energy -->
+          <div class="shc-vfd-module">
+            <span class="shc-vfd-hdr">KINETIC ENERGY</span>
+            <div class="shc-vfd-bezel">
+              <span class="shc-vfd-ghost">8856</span>
+              <span id="tel-kinetic-energy" class="shc-vfd-digit">0.0 J</span>
+            </div>
+          </div>
+
+          <!-- Hidden mirror of net force for API continuity -->
+          <span id="tel-net-force" class="hidden">0.0 N</span>
+        </div>
+      </div>
+
+      <!-- 6. KINEMATIC GRAPHS (Integrated Oscilloscope) -->
+      <div class="shc-box shc-box-graphs">
+        <div class="shc-box-header">
+          <span class="shc-box-title">KINEMATIC GRAPHS</span>
+        </div>
+
+        <!-- Oscilloscope CRT Screen Frame -->
+        <div class="shc-crt-screen-wrap">
+          <canvas id="sandbox-graphs-canvas"></canvas>
+          <div class="shc-crt-scanlines"></div>
+          <div class="shc-crt-glare"></div>
+        </div>
+
+        <!-- Graph Mode Concave Selector Buttons -->
+        <div class="shc-buttons-row shc-graph-buttons">
+          <button type="button" id="tab-graph-pos" class="shc-concave-btn shc-btn-concave graph-tab-btn" title="Graph Position vs Time">
+            <span class="btn-recess"></span>
+            <span class="btn-dish"></span>
+            <span class="btn-label">POSITION</span>
+          </button>
+          <button type="button" id="tab-graph-vel" class="shc-concave-btn shc-btn-concave graph-tab-btn active" title="Graph Velocity vs Time">
+            <span class="btn-recess"></span>
+            <span class="btn-dish"></span>
+            <span class="btn-label">VELOCITY</span>
+          </button>
+          <button type="button" id="tab-graph-energy" class="shc-concave-btn shc-btn-concave graph-tab-btn" title="Graph Kinetic Energy vs Time">
+            <span class="btn-recess"></span>
+            <span class="btn-dish"></span>
+            <span class="btn-label">KE</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
 
       </aside>
 
@@ -3015,6 +3299,335 @@
     </section>
 
   </div><!-- /#exp-sandbox-section -->
+
+  <!-- =====================================
+       EXPERIMENT 5: DIFFRACTION OF LIGHT USING DIFFRACTION GRATING
+  ===================================== -->
+  <div id="exp-diffraction-section" class="exp-section-wrapper hidden">
+    
+    <!-- LABORATORY PROCEDURE GUIDE RIBBON -->
+    <section class="of-setup-container dg-setup-container">
+      <div class="of-procedure-ribbon dg-procedure-ribbon">
+        <div class="of-proc-step" id="dg-step-indicator-1">
+          <span class="step-num">1</span>
+          <div class="step-details">
+            <strong>Laser Source</strong>
+            <span>Tunable λ (400-700nm)</span>
+          </div>
+        </div>
+        <div class="proc-arrow">›</div>
+        <div class="of-proc-step" id="dg-step-indicator-2">
+          <span class="step-num">2</span>
+          <div class="step-details">
+            <strong>Grating Element</strong>
+            <span>Density N (300-1200 /mm)</span>
+          </div>
+        </div>
+        <div class="proc-arrow">›</div>
+        <div class="of-proc-step" id="dg-step-indicator-3">
+          <span class="step-num">3</span>
+          <div class="step-details">
+            <strong>Screen Alignment</strong>
+            <span>Distance L (0.50-2.00m)</span>
+          </div>
+        </div>
+        <div class="proc-arrow">›</div>
+        <div class="of-proc-step" id="dg-step-indicator-4">
+          <span class="step-num">4</span>
+          <div class="step-details">
+            <strong>Spectral Maxima</strong>
+            <span>Resolve Orders d sinθ = mλ</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN DUAL-CANVAS SIMULATOR WORKSTATION -->
+    <main class="dashboard dg-dashboard">
+      
+      <!-- LEFT: OPTICAL BENCH PROFILE SIMULATION VIEWPORT -->
+      <section class="simulation-card dg-bench-card">
+        <div class="simulation-top-bar">
+          <div class="current-lab-badge">
+            <span class="live-dot" style="background:#a855f7; box-shadow:0 0 8px #a855f7;"></span>
+            <span>● OPTICAL BENCH • FRAUNHOFER MULTI-SLIT INTERFERENCE</span>
+          </div>
+
+          <div class="of-bench-hud-pill">
+            <span>Calibrated Rail Scale: 0.0 to 2.0 m</span>
+          </div>
+        </div>
+
+        <div class="dg-canvas-wrapper">
+          <canvas id="dg-bench-canvas" width="820" height="360"></canvas>
+        </div>
+
+        <!-- HARDWARE CONTROLS DECK -->
+        <div class="dg-hardware-deck">
+          <!-- Wavelength Control -->
+          <div class="dg-deck-group">
+            <div class="dg-group-header">
+              <span class="dg-deck-label">Monochromatic Laser Wavelength (λ)</span>
+              <div class="dg-val-badge">
+                <span class="dg-color-chip" id="dg-color-chip" style="background:#10b981;"></span>
+                <strong id="dg-wl-val">550 nm</strong>
+              </div>
+            </div>
+            <div class="dg-slider-row">
+              <input type="range" id="dg-wl-slider" min="400" max="700" step="1" value="550" />
+            </div>
+            <div class="dg-presets-bar">
+              <button type="button" class="dg-wl-preset-btn" data-wl="405" style="border-color: rgba(147, 51, 234, 0.4);">405nm Violet</button>
+              <button type="button" class="dg-wl-preset-btn" data-wl="488" style="border-color: rgba(6, 182, 212, 0.4);">488nm Cyan</button>
+              <button type="button" class="dg-wl-preset-btn active" data-wl="532" style="border-color: rgba(16, 185, 129, 0.4);">532nm Green</button>
+              <button type="button" class="dg-wl-preset-btn" data-wl="589" style="border-color: rgba(245, 158, 11, 0.4);">589nm Sodium</button>
+              <button type="button" class="dg-wl-preset-btn" data-wl="633" style="border-color: rgba(239, 68, 68, 0.4);">633nm He-Ne</button>
+              <button type="button" class="dg-wl-preset-btn" data-wl="650" style="border-color: rgba(225, 29, 72, 0.4);">650nm Red</button>
+            </div>
+          </div>
+
+          <!-- Grating Line Density Control -->
+          <div class="dg-deck-group">
+            <div class="dg-group-header">
+              <span class="dg-deck-label">Grating Line Density (N) & Pitch (d)</span>
+              <div class="dg-val-badge">
+                <strong id="dg-density-val">600 lines/mm</strong>
+                <span class="dg-sub-val" id="dg-spacing-val">d = 1.667 μm</span>
+              </div>
+            </div>
+            <div class="dg-slider-row">
+              <input type="range" id="dg-density-slider" min="300" max="1200" step="50" value="600" />
+            </div>
+            <div class="dg-presets-bar">
+              <button type="button" class="dg-density-preset-btn" data-density="300">300 /mm</button>
+              <button type="button" class="dg-density-preset-btn" data-density="500">500 /mm</button>
+              <button type="button" class="dg-density-preset-btn active" data-density="600">600 /mm</button>
+              <button type="button" class="dg-density-preset-btn" data-density="1000">1000 /mm</button>
+              <button type="button" class="dg-density-preset-btn" data-density="1200">1200 /mm</button>
+            </div>
+          </div>
+
+          <!-- Screen Distance Control -->
+          <div class="dg-deck-group">
+            <div class="dg-group-header">
+              <span class="dg-deck-label">Screen Distance (L)</span>
+              <strong id="dg-dist-val" class="dg-val-highlight">1.00 m</strong>
+            </div>
+            <div class="dg-slider-row">
+              <input type="range" id="dg-dist-slider" min="0.50" max="2.00" step="0.05" value="1.00" />
+            </div>
+            <div class="dg-presets-bar">
+              <span class="dg-limit-badge" id="dg-max-order-val">m_max = ±3</span>
+              <span class="dg-limit-badge" id="dg-dispersion-val">0.635 rad/μm</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="of-bench-footer">
+          <span class="of-hint-text">
+            <svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            Drag sliders to observe real-time angular beam deflection and spatial fringe separation on the detector screen.
+          </span>
+        </div>
+      </section>
+
+      <!-- RIGHT: DETECTOR SCREEN VIEW & ORDER SELECTION DECK -->
+      <aside class="controls-panel dg-screen-panel">
+        <div class="of-screen-header">
+          <div class="of-screen-title-group">
+            <h3>Detector Screen Profile</h3>
+            <p>Spatial fringe pattern & intensity envelope</p>
+          </div>
+          <div class="of-status-pill pill-active">
+            Laser Beam Coherent
+          </div>
+        </div>
+
+        <!-- Target Screen Canvas -->
+        <div class="dg-screen-canvas-wrapper">
+          <canvas id="dg-screen-canvas" width="440" height="260"></canvas>
+        </div>
+
+        <!-- Diffraction Order Selection Bar -->
+        <div class="dg-order-controls-box">
+          <div class="control-header">
+            <span class="control-name">Select Diffraction Order (m)</span>
+            <strong id="dg-order-val" class="val-dist">m = +1</strong>
+          </div>
+          <div class="dg-order-pills-row">
+            <button type="button" class="dg-order-select-btn" data-order="all">All</button>
+            <button type="button" class="dg-order-select-btn" data-order="-3">-3</button>
+            <button type="button" class="dg-order-select-btn" data-order="-2">-2</button>
+            <button type="button" class="dg-order-select-btn" data-order="-1">-1</button>
+            <button type="button" class="dg-order-select-btn" data-order="0">0</button>
+            <button type="button" class="dg-order-select-btn active" data-order="1">+1</button>
+            <button type="button" class="dg-order-select-btn" data-order="2">+2</button>
+            <button type="button" class="dg-order-select-btn" data-order="3">+3</button>
+          </div>
+        </div>
+
+        <!-- Telemetry Quick Readouts -->
+        <div class="dg-side-telemetry-grid">
+          <div class="dg-tele-item">
+            <span class="dg-tele-lbl">Diffraction Angle (θ)</span>
+            <span class="dg-tele-val" id="dg-angle-val" style="color:#c084fc;">19.27°</span>
+          </div>
+          <div class="dg-tele-item">
+            <span class="dg-tele-lbl">Fringe Offset (y)</span>
+            <span class="dg-tele-val" id="dg-fringe-val" style="color:#38bdf8;">34.96 cm</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="buttons of-action-buttons dg-action-buttons">
+          <button type="button" id="dg-btn-record" class="launch-btn of-record-btn" title="Commit trial to observation table">
+            <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            Record Observation
+          </button>
+          <button type="button" id="dg-btn-toggle-laser" class="reset-btn active" title="Toggle laser emitter ON/OFF">
+            Laser ON
+          </button>
+          <button type="button" id="dg-btn-reset" class="reset-btn" title="Calibrate apparatus to default parameters">
+            Reset
+          </button>
+          <button type="button" id="dg-btn-view-results" class="clear-btn" title="View comprehensive report">
+            Lab Report
+          </button>
+        </div>
+
+        <!-- Mystery Tube Challenge Tray -->
+        <div class="dg-mystery-card">
+          <div class="dg-mystery-header">
+            <h4>Mystery Gas Tube Challenge</h4>
+            <button type="button" id="dg-btn-start-mystery" class="dg-mystery-btn">Install Unknown</button>
+          </div>
+          <div class="dg-mystery-input-row">
+            <input type="number" id="dg-mystery-guess-input" placeholder="Enter computed λ in nm (e.g. 589)" />
+            <button type="button" id="dg-btn-submit-guess" class="dg-mystery-submit-btn">Verify</button>
+          </div>
+        </div>
+
+      </aside>
+    </main>
+
+    <!-- REAL-TIME OPTICAL TELEMETRY CARDS -->
+    <section class="results-container dg-results-container">
+      <div class="results-card dg-telemetry-row">
+        
+        <div class="result-box card-distance">
+          <div class="result-icon icon-dist">
+            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><line x1="4" y1="4" x2="4" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line><line x1="20" y1="4" x2="20" y2="20"></line></svg>
+          </div>
+          <div class="result-meta">
+            <span class="result-label">Grating Spacing (d)</span>
+            <span id="dg-hud-spacing" class="result-val">1.667 μm</span>
+            <span class="result-sub">d = 1 / N = 1.667 × 10⁻⁶ m</span>
+          </div>
+        </div>
+
+        <div class="result-box card-spot">
+          <div class="result-icon icon-spot">
+            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+          <div class="result-meta">
+            <span class="result-label">Diffraction Angle (θ)</span>
+            <span id="dg-hud-angle" class="result-val">19.27°</span>
+            <span class="result-sub">θ = arcsin(mλ / d)</span>
+          </div>
+        </div>
+
+        <div class="result-box card-na">
+          <div class="result-icon icon-na">
+            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>
+          </div>
+          <div class="result-meta">
+            <span class="result-label">Fringe Position (y)</span>
+            <span id="dg-hud-fringe" class="result-val">34.96 cm</span>
+            <span class="result-sub">y = L · tan(θ) on detector</span>
+          </div>
+        </div>
+
+        <div class="result-box card-angle">
+          <div class="result-icon icon-angle">
+            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 3a9 9 0 0 1 9 9"></path></svg>
+          </div>
+          <div class="result-meta">
+            <span class="result-label">Dispersion & Limits</span>
+            <span id="dg-hud-limits" class="result-val">m_max = ±3</span>
+            <span class="result-sub">D = m / (d · cos θ)</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- DIFFRACTION WORKSTATION: CHALLENGES & OBSERVATIONS -->
+    <section class="lab-workstation-container dg-workstation-container">
+      
+      <!-- LEFT: CHALLENGES PANEL -->
+      <div class="workstation-card dg-challenges-card">
+        <div class="workstation-header">
+          <div class="workstation-title">
+            <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+            <h3>Wave Optics Challenges</h3>
+          </div>
+          <span class="workstation-badge">Spectroscopy Mastery</span>
+        </div>
+
+        <div class="dg-challenges-list" id="dg-challenges-list">
+          <!-- Populated dynamically by createDiffractionGratingExperiment -->
+        </div>
+      </div>
+
+      <!-- RIGHT: OBSERVATIONS LOGBOOK WORKSTATION -->
+      <div class="workstation-card dg-observations-card">
+        <div class="workstation-header">
+          <div class="workstation-title">
+            <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            <h3>Experimental Observation Table</h3>
+          </div>
+          <div class="obs-actions-group">
+            <span class="workstation-badge" id="dg-obs-count-badge">0 Trials</span>
+            <button type="button" id="dg-btn-export-csv" class="obs-export-btn" title="Export Observation CSV">CSV</button>
+            <button type="button" id="dg-btn-export-pdf" class="obs-export-btn" title="Generate Academic PDF Report">PDF</button>
+            <button type="button" id="dg-btn-clear-obs" class="obs-clear-btn" title="Clear All Trials">Clear</button>
+          </div>
+        </div>
+
+        <div class="obs-table-scroll-wrapper">
+          <div id="dg-obs-empty" class="obs-empty-state">
+            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <p>No trials recorded yet. Configure parameters and click <strong>Record Observation</strong>.</p>
+          </div>
+
+          <table id="dg-obs-table" class="obs-data-table hidden">
+            <thead>
+              <tr>
+                <th>Trial</th>
+                <th>Nominal λ</th>
+                <th>Density N</th>
+                <th>Pitch d</th>
+                <th>Order m</th>
+                <th>Angle θ</th>
+                <th>Screen L</th>
+                <th>Fringe y</th>
+                <th>Calc λ</th>
+                <th>Error %</th>
+                <th>Time</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="dg-obs-tbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+  </div><!-- /#exp-diffraction-section -->
+
 
   <!-- =====================================
        EXPLORE LABS HUB MODAL
@@ -3488,20 +4101,21 @@
           <div class="card-specular-rim"></div>
         </div>
 
-        <!-- 9. DIFFRACTION GRATING (EXP 6) -->
-        <div class="lab-card coming-lab" data-category="wave" data-name="Determination of Wavelength using Diffraction Grating (Laser Source)">
+        <!-- 9. DIFFRACTION GRATING (ACTIVE EXP 5) -->
+        <div class="lab-card active-lab" data-category="optics" data-exp-target="diffraction" data-name="Diffraction Grating">
           <div class="card-header-bar">
             <div class="card-icon-badge">
               <svg class="badge-ring" viewBox="0 0 44 44">
                 <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
-                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #10b981; stroke-dashoffset: 60;"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #a855f7; filter: drop-shadow(0 0 5px #a855f7);"></circle>
               </svg>
               <div class="badge-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2">
                   <line x1="4" y1="4" x2="4" y2="20"></line>
                   <line x1="8" y1="4" x2="8" y2="20"></line>
                   <line x1="12" y1="4" x2="12" y2="20"></line>
                   <line x1="16" y1="4" x2="16" y2="20"></line>
+                  <line x1="20" y1="4" x2="20" y2="20"></line>
                 </svg>
               </div>
             </div>
@@ -3514,15 +4128,15 @@
 
           <div class="card-preview-art">
             <svg viewBox="0 0 280 110" class="preview-svg">
-              <line x1="90" y1="20" x2="90" y2="90" stroke="rgba(255,255,255,0.4)" stroke-width="3"></line>
-              <line x1="20" y1="55" x2="90" y2="55" stroke="#f43f5e" stroke-width="2"></line>
-              <line x1="90" y1="55" x2="250" y2="55" stroke="#f43f5e" stroke-width="1.8"></line>
-              <line x1="90" y1="55" x2="250" y2="25" stroke="#f43f5e" stroke-width="1.8"></line>
-              <line x1="90" y1="55" x2="250" y2="85" stroke="#f43f5e" stroke-width="1.8"></line>
-              <circle cx="250" cy="55" r="4" fill="#f43f5e" filter="drop-shadow(0 0 6px #f43f5e)"></circle>
-              <circle cx="250" cy="25" r="3.5" fill="#f43f5e" filter="drop-shadow(0 0 5px #f43f5e)"></circle>
-              <circle cx="250" cy="85" r="3.5" fill="#f43f5e" filter="drop-shadow(0 0 5px #f43f5e)"></circle>
-              <text x="170" y="102" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8">(a+b) sinθ = mλ</text>
+              <line x1="90" y1="15" x2="90" y2="95" stroke="rgba(255,255,255,0.4)" stroke-width="3"></line>
+              <line x1="20" y1="55" x2="90" y2="55" stroke="#10b981" stroke-width="2"></line>
+              <line x1="90" y1="55" x2="250" y2="55" stroke="#10b981" stroke-width="2"></line>
+              <line x1="90" y1="55" x2="250" y2="20" stroke="#a855f7" stroke-width="1.8"></line>
+              <line x1="90" y1="55" x2="250" y2="90" stroke="#a855f7" stroke-width="1.8"></line>
+              <circle cx="250" cy="55" r="4.5" fill="#10b981" filter="drop-shadow(0 0 6px #10b981)"></circle>
+              <circle cx="250" cy="20" r="3.5" fill="#a855f7" filter="drop-shadow(0 0 5px #a855f7)"></circle>
+              <circle cx="250" cy="90" r="3.5" fill="#a855f7" filter="drop-shadow(0 0 5px #a855f7)"></circle>
+              <text x="170" y="102" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8">d sinθ = mλ</text>
             </svg>
           </div>
 
@@ -3531,7 +4145,7 @@
               <span class="title-grad">Diffraction</span>
               <span class="title-main">Grating</span>
             </h3>
-            <p class="card-desc">Calculate monochromatic laser wavelength from diffraction grating line density and angular spectral maxima</p>
+            <p class="card-desc">Explore how a diffraction grating separates light into different orders and observe how wavelength and grating spacing affect diffraction.</p>
           </div>
 
           <div class="card-action-bar">
@@ -3909,7 +4523,25 @@
             <path d="M22 12a10 10 0 0 1-10 10" stroke="#10b981" stroke-width="2"></path>
             <path d="M12 22a10 10 0 0 1-10-10" stroke="#3b82f6" stroke-width="2"></path>
           </svg>
-          <span>Exp 3: Colour Sensor (TCS3200)</span>
+          <span>Exp 3: Colour Sensor</span>
+        </button>
+        <button type="button" class="help-tab-btn" id="btn-help-tab-exp4">
+          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="#00f0ff" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+            <circle cx="8.5" cy="8.5" r="2" fill="#00f0ff"></circle>
+            <path d="m21 15-5-5L5 21"></path>
+          </svg>
+          <span>Exp 4: Physics Sandbox</span>
+        </button>
+        <button type="button" class="help-tab-btn" id="btn-help-tab-exp5">
+          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2">
+            <line x1="4" y1="4" x2="4" y2="20"></line>
+            <line x1="8" y1="4" x2="8" y2="20"></line>
+            <line x1="12" y1="4" x2="12" y2="20"></line>
+            <line x1="16" y1="4" x2="16" y2="20"></line>
+            <line x1="20" y1="4" x2="20" y2="20"></line>
+          </svg>
+          <span>Exp 5: Diffraction Grating</span>
         </button>
       </div>
 
@@ -3927,6 +4559,10 @@
             <div class="help-hero-body">
               <h3>Experiment 1: 2D Projectile Motion Virtual Laboratory</h3>
               <p>Simulates real-time 2D ballistic kinematics trajectories, resolving independent horizontal ($v_x$) and vertical ($v_y$) velocity vectors, gravitational acceleration ($g$), maximum apex altitude ($H_{\max}$), flight airtime ($t_{\text{flight}}$), and total landing range ($R$).</p>
+              <button type="button" class="btn-help-start-tour" data-tour-exp="projectile">
+                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                Launch Interactive Guided Tour
+              </button>
             </div>
           </div>
 
@@ -4074,6 +4710,10 @@
             <div class="help-hero-body">
               <h3>Experiment 2: Numerical Aperture of an Optical Fibre Laboratory</h3>
               <p>Simulates an optoelectronic optical bench designed to determine the <strong>Numerical Aperture ($NA$)</strong> and <strong>Acceptance Angle ($\theta_a$)</strong> of a step-index multimode plastic optical fibre (POF) using a laser diode source and a movable graduated screen.</p>
+              <button type="button" class="btn-help-start-tour" data-tour-exp="optical">
+                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                Launch Interactive Guided Tour
+              </button>
             </div>
           </div>
 
@@ -4213,6 +4853,10 @@
             <div class="help-hero-body">
               <h3>Experiment 3: Study of Colour Sensor (TCS3200) Laboratory</h3>
               <p>Simulates the Texas Advanced Optoelectronic Solutions (TAOS) <strong>TCS3200 programmable light-to-frequency converter IC</strong>. It converts spectral irradiance reflected from specimen swatches into square-wave output frequencies via an $8\times 8$ photodiode matrix.</p>
+              <button type="button" class="btn-help-start-tour" data-tour-exp="colour-sensor">
+                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                Launch Interactive Guided Tour
+              </button>
             </div>
           </div>
 
@@ -4332,6 +4976,112 @@
             </div>
           </div>
 
+        </div>
+
+        <!-- ==========================================
+             TAB 4: PHYSICS SANDBOX USER GUIDE
+        ========================================== -->
+        <div id="help-pane-exp4" class="help-pane hidden">
+          <div class="help-hero-card">
+            <div class="help-hero-icon-box" style="background:rgba(0,240,255,0.15); border-color:rgba(0,240,255,0.3);">
+              <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="#00f0ff" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+                <circle cx="8.5" cy="8.5" r="2" fill="#00f0ff"></circle>
+                <path d="m21 15-5-5L5 21"></path>
+              </svg>
+            </div>
+            <div class="help-hero-body">
+              <h3>Experiment 4: Newtonian Physics Sandbox Laboratory</h3>
+              <p>An interactive 2D rigid-body dynamics playground to explore Newton's three laws of motion ($F = ma$, $F_{AB} = -F_{BA}$), impulse kicks ($J = \Delta p$), conservation of mechanical energy ($E = KE + PE$), and planetary gravitational fields.</p>
+              <button type="button" class="btn-help-start-tour" data-tour-exp="sandbox">
+                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                Launch Interactive Guided Tour
+              </button>
+            </div>
+          </div>
+
+          <div class="help-section-card">
+            <h4 class="help-section-title">
+              <span class="help-step-badge" style="background:#00f0ff;">1</span>
+              How to Spawn &amp; Manipulate Rigid Bodies
+            </h4>
+            <div class="help-steps-grid">
+              <div class="help-step-item">
+                <span class="step-num">Step 1</span>
+                <h5>Spawn Objects</h5>
+                <p>Click <strong>+ Ball</strong>, <strong>+ Box</strong>, or <strong>+ Platform</strong> to place dynamic bodies into the simulation space.</p>
+              </div>
+              <div class="help-step-item">
+                <span class="step-num">Step 2</span>
+                <h5>Drag &amp; Throw</h5>
+                <p>Click and drag any object on the canvas with your cursor or finger to toss it across the room and test physical collisions.</p>
+              </div>
+              <div class="help-step-item">
+                <span class="step-num">Step 3</span>
+                <h5>Tweak Properties</h5>
+                <p>Select any object to modify its Mass ($m$), Friction ($\mu$), Restitution ($e$), and initial launch velocities in the Inspector.</p>
+              </div>
+              <div class="help-step-item">
+                <span class="step-num">Step 4</span>
+                <h5>Apply Thrust &amp; Kicks</h5>
+                <p>Use the D-Pad directional controls to apply continuous forces ($F$), or press <strong>KICK</strong> for a high-energy ballistic impulse.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             TAB 5: DIFFRACTION GRATING USER GUIDE
+        ========================================== -->
+        <div id="help-pane-exp5" class="help-pane hidden">
+          <div class="help-hero-card">
+            <div class="help-hero-icon-box" style="background:rgba(168,85,247,0.15); border-color:rgba(168,85,247,0.3);">
+              <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2">
+                <line x1="4" y1="4" x2="4" y2="20"></line>
+                <line x1="8" y1="4" x2="8" y2="20"></line>
+                <line x1="12" y1="4" x2="12" y2="20"></line>
+                <line x1="16" y1="4" x2="16" y2="20"></line>
+                <line x1="20" y1="4" x2="20" y2="20"></line>
+              </svg>
+            </div>
+            <div class="help-hero-body">
+              <h3>Experiment 5: Diffraction Grating Spectrometry Laboratory</h3>
+              <p>Simulates Fraunhofer multi-slit wave interference and angular diffraction governed by the grating equation: $d \sin\theta = m\lambda$. Measure laser wavelengths, calculate angular dispersion $D$, and solve unknown atomic emission lines.</p>
+              <button type="button" class="btn-help-start-tour" data-tour-exp="diffraction">
+                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                Launch Interactive Guided Tour
+              </button>
+            </div>
+          </div>
+
+          <div class="help-section-card">
+            <h4 class="help-section-title">
+              <span class="help-step-badge" style="background:#a855f7;">1</span>
+              Apparatus Tuning &amp; Spectral Measurements
+            </h4>
+            <div class="help-steps-grid">
+              <div class="help-step-item">
+                <span class="step-num">Step 1</span>
+                <h5>Tune Laser Wavelength</h5>
+                <p>Adjust $\lambda$ from 400 nm to 700 nm or choose calibrated laser presets (405nm, 488nm, 532nm, 589nm, 633nm).</p>
+              </div>
+              <div class="help-step-item">
+                <span class="step-num">Step 2</span>
+                <h5>Set Grating Density</h5>
+                <p>Vary ruling density $N$ from 300 to 1200 lines/mm. Finer ruling pitch spreads spectral maxima wider apart.</p>
+              </div>
+              <div class="help-step-item">
+                <span class="step-num">Step 3</span>
+                <h5>Align Detector Screen</h5>
+                <p>Move the screen along the optical bench from $L = 0.50\text{ m}$ to $2.00\text{ m}$ to measure fringe displacement $y = L\tan\theta$.</p>
+              </div>
+              <div class="help-step-item">
+                <span class="step-num">Step 4</span>
+                <h5>Isolate Orders &amp; Log</h5>
+                <p>Click diffraction orders ($m = -2, -1, 0, +1, +2$) to inspect telemetry and log observations into your scientific table.</p>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -5709,6 +6459,71 @@
         <div class="of-formula-recap">
           <strong>Governing Optoelectronic Equations:</strong>
           <code>I_ph = η (q P_opt λ)/(hc) ⟹ f_out ∝ I_ph | r = f_R / (f_R + f_G + f_B) | E ∝ 1/d²</code>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================
+       DIFFRACTION GRATING RESULTS & REPORT MODAL
+  ===================================== -->
+  <div id="dg-results-modal" class="modal-overlay hidden">
+    <div class="modal-card modal-card-report">
+      <div class="modal-header">
+        <div>
+          <h2>
+            <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2">
+              <line x1="4" y1="4" x2="4" y2="20"></line>
+              <line x1="8" y1="4" x2="8" y2="20"></line>
+              <line x1="12" y1="4" x2="12" y2="20"></line>
+              <line x1="16" y1="4" x2="16" y2="20"></line>
+              <line x1="20" y1="4" x2="20" y2="20"></line>
+            </svg>
+            Experiment 5: Laboratory Performance Report
+          </h2>
+          <p>Diffraction of Light using Diffraction Grating • Fraunhofer Multi-Slit Analysis</p>
+        </div>
+        <button id="dg-btn-close-results" class="modal-close-btn" title="Close Report">
+          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="of-report-content">
+        <!-- Performance Honors Banner -->
+        <div class="of-report-banner">
+          <div class="of-report-badge-icon">
+            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+          </div>
+          <div>
+            <span class="of-banner-sub">Performance Evaluation</span>
+            <h3 id="dg-res-grade">Master Spectroscopist (Grade A+)</h3>
+          </div>
+        </div>
+
+        <!-- Telemetry Summary KPI Grid -->
+        <div class="of-report-metrics-grid">
+          <div class="of-rep-metric">
+            <span>Grating Ruling Density</span>
+            <strong id="dg-res-density" class="text-cyan">600 lines/mm</strong>
+          </div>
+          <div class="of-rep-metric">
+            <span>Grating Slit Pitch (d)</span>
+            <strong id="dg-res-spacing" class="text-purple">1.667 μm</strong>
+          </div>
+          <div class="of-rep-metric">
+            <span>Experimental Fidelity</span>
+            <strong id="dg-res-accuracy" class="text-green">99.6%</strong>
+          </div>
+          <div class="of-rep-metric">
+            <span>Max Observable Order</span>
+            <strong id="dg-res-max-order" class="text-yellow">m = ±3</strong>
+          </div>
+        </div>
+
+        <!-- Theoretical Summary Formula -->
+        <div class="of-formula-recap">
+          <strong>Governing Wave Optics Equation:</strong>
+          <code>d · sin(θ) = m · λ &nbsp;|&nbsp; d = 1 / N &nbsp;|&nbsp; y = L · tan(θ) &nbsp;|&nbsp; D = m / (d · cos θ)</code>
         </div>
       </div>
     </div>

@@ -4,7 +4,7 @@
  * Supports: direct URL navigation, offline reload, Ctrl+Shift+R, query-busted Vite assets
  */
 
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v7';
 const APP_SHELL_CACHE = `physix-app-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `physix-runtime-${CACHE_VERSION}`;
 
@@ -18,6 +18,7 @@ const CORE_PRECACHE_URLS = [
   '/cursor.png',
   '/offline.html',
   '/quiz.json',
+  '/fonts/fonts.css',
   '/src/style.css',
   '/src/light-mode.css',
   '/src/main.js',
@@ -31,6 +32,7 @@ const CORE_PRECACHE_URLS = [
   '/src/celebrations.js',
   '/src/colour-sensor.js',
   '/src/content-protection.js',
+  '/src/diffraction-grating.js',
   '/src/experiment-details-data.js',
   '/src/optical-fibre.js',
   '/src/pdf-export.js',
@@ -179,6 +181,17 @@ async function networkFirstNavigation(request) {
  */
 async function staleWhileRevalidate(request) {
   const url = new URL(request.url);
+
+  // For localhost development, prioritize fresh network response so code edits reflect immediately
+  if ((url.hostname === 'localhost' || url.hostname === '127.0.0.1') && navigator.onLine) {
+    try {
+      const networkResponse = await fetch(request);
+      if (networkResponse && (networkResponse.ok || networkResponse.type === 'opaque')) {
+        safeCachePut(request, networkResponse);
+        return networkResponse;
+      }
+    } catch (e) {}
+  }
 
   // 1. Check cache first
   const cachedResponse = await matchInCaches(request);

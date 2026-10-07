@@ -386,249 +386,582 @@ export function createColourSensorExperiment(callbacks = {}) {
     ctx.fillText("Optical Standoff Distance (mm)", railX + railW - 10, railY + railH + 18);
 
     // ==========================================
-    // 1. TRAINER MAIN CONTROL UNIT CHASSIS (LEFT)
+    // 1. PHOTOREALISTIC TCS3200 CONTROLLER ENCLOSURE (REFERENCE DESIGN)
     // ==========================================
-    const unitX = 40;
-    const unitY = 60;
-    const unitW = 160;
-    const unitH = 240;
+    const unitX = 35;
+    const unitY = 55;
+    const unitW = 275;
+    const unitH = 225;
 
-    const gradUnit = ctx.createLinearGradient(unitX, unitY, unitX + unitW, unitY + unitH);
-    gradUnit.addColorStop(0, isLight ? "#f8fafc" : "#182238");
-    gradUnit.addColorStop(1, isLight ? "#e2e8f0" : "#0f1626");
-    ctx.fillStyle = gradUnit;
-    ctx.fillRect(unitX, unitY, unitW, unitH);
-    ctx.strokeStyle = isLight ? "#94a3b8" : "#2a3b5c";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(unitX, unitY, unitW, unitH);
-
-    // Unit Header
-    ctx.fillStyle = isLight ? "#0f172a" : "#f1f5f9";
-    ctx.font = "bold 11px 'Inter', sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText("TCS3200 CONTROLLER", unitX + 12, unitY + 22);
-
-    ctx.fillStyle = isLight ? "#64748b" : "#94a3b8";
-    ctx.font = "8.5px 'JetBrains Mono', monospace";
-    ctx.fillText("COLORIMETRY TRAINER", unitX + 12, unitY + 34);
-
-    // Power Switch (Clickable)
-    const pX = unitX + 15;
-    const pY = unitY + 65;
-    clickRegions.powerSwitch = { x: pX, y: pY, w: 55, h: 42 };
-
-    ctx.fillStyle = state.powerSupplyOn ? "rgba(16, 185, 129, 0.15)" : "rgba(239, 68, 68, 0.12)";
-    ctx.strokeStyle = state.powerSupplyOn ? "#10b981" : "#ef4444";
-    ctx.lineWidth = 1.5;
+    // 3D Angled Bench Instrument Side Profile (Left Anodized Cheek)
+    ctx.save();
     ctx.beginPath();
-    ctx.roundRect(pX, pY, 55, 42, 6);
+    ctx.moveTo(unitX, unitY + 12);
+    ctx.lineTo(unitX - 16, unitY + 36);
+    ctx.lineTo(unitX - 16, unitY + unitH);
+    ctx.lineTo(unitX, unitY + unitH);
+    ctx.closePath();
+    const gradCheek = ctx.createLinearGradient(unitX - 16, unitY, unitX, unitY + unitH);
+    gradCheek.addColorStop(0, "#2a151b");
+    gradCheek.addColorStop(0.5, "#181a24");
+    gradCheek.addColorStop(1, "#0f121a");
+    ctx.fillStyle = gradCheek;
     ctx.fill();
+    ctx.strokeStyle = "#382026";
+    ctx.lineWidth = 1.2;
     ctx.stroke();
 
-    // LED Indicator
+    // Side cheek screw fasteners
+    [unitY + 50, unitY + unitH - 25].forEach(sy => {
+      ctx.beginPath();
+      ctx.arc(unitX - 8, sy, 3, 0, Math.PI * 2);
+      ctx.fillStyle = "#64748b";
+      ctx.fill();
+      ctx.strokeStyle = "#1e293b";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    });
+
+    // Main Extruded Faceplate Body
+    const gradFace = ctx.createLinearGradient(unitX, unitY, unitX + unitW, unitY + unitH);
+    gradFace.addColorStop(0, "#1e2532");
+    gradFace.addColorStop(0.3, "#151b26");
+    gradFace.addColorStop(0.8, "#0d111a");
+    gradFace.addColorStop(1, "#090d15");
+    ctx.fillStyle = gradFace;
     ctx.beginPath();
-    ctx.arc(pX + 12, pY + 14, 4.5, 0, Math.PI * 2);
-    ctx.fillStyle = state.powerSupplyOn ? "#10b981" : "#475569";
+    ctx.roundRect(unitX, unitY, unitW, unitH, 10);
     ctx.fill();
+
+    // Outer Enclosure Machined Bevel
+    ctx.strokeStyle = "#334155";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Inner Recessed Control Deck Panel
+    const deckPad = 8;
+    const deckX = unitX + deckPad;
+    const deckY = unitY + deckPad;
+    const deckW = unitW - deckPad * 2;
+    const deckH = unitH - deckPad * 2;
+    ctx.fillStyle = "#0c1018";
+    ctx.beginPath();
+    ctx.roundRect(deckX, deckY, deckW, deckH, 6);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Silkscreen Header: TCS3200 CONTROLLER
+    ctx.fillStyle = "#f1f5f9";
+    ctx.font = "800 13px 'Outfit', 'Inter', sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("TCS3200 CONTROLLER", deckX + 16, deckY + 22);
+
+    // Decorative Top Bevel Line
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(deckX + 16, deckY + 28);
+    ctx.lineTo(deckX + deckW - 16, deckY + 28);
+    ctx.stroke();
+
+    // ------------------------------------------
+    // CONCAVE BUTTON 1: POWER SWITCH (OFF / ON)
+    // ------------------------------------------
+    const pX = unitX + 50;
+    const pY = unitY + 115;
+    const btnRadius = 22;
+    clickRegions.powerSwitch = { x: pX - 26, y: pY - 35, w: 52, h: 72 };
+
+    // Label Top: POWER
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "800 9px 'Outfit', sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("POWER", pX, pY - 26);
+
+    // Machined Metal Outer Bezel Ring (Concave Bezel)
+    ctx.beginPath();
+    ctx.arc(pX, pY, btnRadius, 0, Math.PI * 2);
+    const gradBezelP = ctx.createLinearGradient(pX - btnRadius, pY - btnRadius, pX + btnRadius, pY + btnRadius);
+    gradBezelP.addColorStop(0, "#475569");
+    gradBezelP.addColorStop(0.5, "#1e293b");
+    gradBezelP.addColorStop(1, "#0f172a");
+    ctx.fillStyle = gradBezelP;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetY = 3;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.strokeStyle = "#334155";
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    // Inset Concave Dish (Deep Inward Curved Depression)
+    ctx.beginPath();
+    ctx.arc(pX, pY, btnRadius - 3.5, 0, Math.PI * 2);
+    const gradDishP = ctx.createRadialGradient(pX, pY, 2, pX, pY, btnRadius - 3.5);
     if (state.powerSupplyOn) {
-      ctx.shadowColor = "#10b981";
-      ctx.shadowBlur = 8;
+      gradDishP.addColorStop(0, "#2d080a");
+      gradDishP.addColorStop(0.65, "#4c0d12");
+      gradDishP.addColorStop(1, "#68131a");
+    } else {
+      gradDishP.addColorStop(0, "#060911");
+      gradDishP.addColorStop(0.6, "#101624");
+      gradDishP.addColorStop(1, "#1c2536");
+    }
+    ctx.fillStyle = gradDishP;
+    ctx.fill();
+
+    // Concave Depression Inner Top Shadow
+    ctx.strokeStyle = "rgba(0, 0, 0, 0.9)";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(pX, pY, btnRadius - 4.5, Math.PI * 1.1, Math.PI * 1.9);
+    ctx.stroke();
+
+    // Concave Bottom Reflection Arc
+    ctx.strokeStyle = state.powerSupplyOn ? "rgba(239, 68, 68, 0.4)" : "rgba(255, 255, 255, 0.12)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(pX, pY, btnRadius - 4.5, Math.PI * 0.1, Math.PI * 0.9);
+    ctx.stroke();
+
+    // Power Indicator Ring / Icon inside dish
+    ctx.beginPath();
+    ctx.arc(pX, pY, 9, 0, Math.PI * 2);
+    if (state.powerSupplyOn) {
+      ctx.shadowColor = "#ef4444";
+      ctx.shadowBlur = 12;
+      ctx.strokeStyle = "#ef4444";
+      ctx.lineWidth = 2.5;
       ctx.stroke();
       ctx.shadowBlur = 0;
+
+      // Illuminated Power Center Dot
+      ctx.beginPath();
+      ctx.arc(pX, pY, 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffffff";
+      ctx.shadowColor = "#ef4444";
+      ctx.shadowBlur = 8;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    } else {
+      ctx.strokeStyle = "#334155";
+      ctx.lineWidth = 2;
+      ctx.stroke();
     }
 
-    ctx.fillStyle = isLight ? "#0f172a" : "#f8fafc";
-    ctx.font = "bold 9.5px 'Inter', sans-serif";
-    ctx.fillText("POWER", pX + 22, pY + 17);
-    ctx.font = "8px 'JetBrains Mono', monospace";
-    ctx.fillStyle = state.powerSupplyOn ? "#10b981" : "#ef4444";
-    ctx.fillText(state.powerSupplyOn ? "ON (5V)" : "OFF", pX + 12, pY + 34);
+    // Label Bottom: OFF/ON
+    ctx.fillStyle = state.powerSupplyOn ? "#ef4444" : "#64748b";
+    ctx.font = "800 8.5px 'JetBrains Mono', monospace";
+    ctx.textAlign = "center";
+    ctx.fillText(state.powerSupplyOn ? "ON" : "OFF/ON", pX, pY + 34);
 
-    // LED Spotlight Array Switch (Clickable)
-    const ledX = unitX + 85;
-    const ledY = unitY + 65;
-    clickRegions.ledSwitch = { x: ledX, y: ledY, w: 60, h: 42 };
+    // ------------------------------------------
+    // CONCAVE BUTTON 2: WHITE LED SPOTLIGHT (DARK / ACTIVE)
+    // ------------------------------------------
+    const ledX = unitX + 112;
+    const ledY = unitY + 115;
+    clickRegions.ledSwitch = { x: ledX - 26, y: ledY - 35, w: 52, h: 72 };
 
-    ctx.fillStyle = state.ledArrayActive ? "rgba(56, 189, 248, 0.15)" : "rgba(100, 116, 139, 0.15)";
-    ctx.strokeStyle = state.ledArrayActive ? "#38bdf8" : "#64748b";
-    ctx.lineWidth = 1.5;
+    // Label Top: WHITE LED
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "800 9px 'Outfit', sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("WHITE LED", ledX, ledY - 26);
+
+    // Machined Metal Outer Bezel Ring
     ctx.beginPath();
-    ctx.roundRect(ledX, ledY, 60, 42, 6);
+    ctx.arc(ledX, ledY, btnRadius, 0, Math.PI * 2);
+    const gradBezelL = ctx.createLinearGradient(ledX - btnRadius, ledY - btnRadius, ledX + btnRadius, ledY + btnRadius);
+    gradBezelL.addColorStop(0, "#475569");
+    gradBezelL.addColorStop(0.5, "#1e293b");
+    gradBezelL.addColorStop(1, "#0f172a");
+    ctx.fillStyle = gradBezelL;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetY = 3;
     ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.strokeStyle = "#334155";
+    ctx.lineWidth = 1.2;
     ctx.stroke();
 
+    // Inset Concave Dish
     ctx.beginPath();
-    ctx.arc(ledX + 12, ledY + 14, 4.5, 0, Math.PI * 2);
-    ctx.fillStyle = state.ledArrayActive && state.powerSupplyOn ? "#38bdf8" : "#475569";
+    ctx.arc(ledX, ledY, btnRadius - 3.5, 0, Math.PI * 2);
+    const gradDishL = ctx.createRadialGradient(ledX, ledY, 2, ledX, ledY, btnRadius - 3.5);
+    const isLedOn = state.ledArrayActive && state.powerSupplyOn;
+    if (isLedOn) {
+      gradDishL.addColorStop(0, "#082f49");
+      gradDishL.addColorStop(0.65, "#0c4a6e");
+      gradDishL.addColorStop(1, "#075985");
+    } else {
+      gradDishL.addColorStop(0, "#060911");
+      gradDishL.addColorStop(0.6, "#101624");
+      gradDishL.addColorStop(1, "#1c2536");
+    }
+    ctx.fillStyle = gradDishL;
     ctx.fill();
-    if (state.ledArrayActive && state.powerSupplyOn) {
+
+    // Concave Inner Shadow
+    ctx.strokeStyle = "rgba(0, 0, 0, 0.9)";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(ledX, ledY, btnRadius - 4.5, Math.PI * 1.1, Math.PI * 1.9);
+    ctx.stroke();
+
+    // Concave Dish Illuminated Ring
+    ctx.beginPath();
+    ctx.arc(ledX, ledY, 9, 0, Math.PI * 2);
+    if (isLedOn) {
+      ctx.shadowColor = "#38bdf8";
+      ctx.shadowBlur = 14;
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // Bright Core Glow
+      ctx.beginPath();
+      ctx.arc(ledX, ledY, 4, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffffff";
       ctx.shadowColor = "#38bdf8";
       ctx.shadowBlur = 8;
-      ctx.stroke();
+      ctx.fill();
       ctx.shadowBlur = 0;
+    } else {
+      ctx.strokeStyle = "#334155";
+      ctx.lineWidth = 2;
+      ctx.stroke();
     }
 
-    ctx.fillStyle = isLight ? "#0f172a" : "#f8fafc";
-    ctx.font = "bold 9.5px 'Inter', sans-serif";
-    ctx.fillText("WHITE LED", ledX + 20, ledY + 17);
-    ctx.font = "8px 'JetBrains Mono', monospace";
-    ctx.fillStyle = state.ledArrayActive && state.powerSupplyOn ? "#38bdf8" : "#64748b";
-    ctx.fillText(state.ledArrayActive ? "ACTIVE" : "DARK", ledX + 12, ledY + 34);
+    // Label Bottom: DARK / ACTIVE
+    ctx.fillStyle = isLedOn ? "#38bdf8" : "#64748b";
+    ctx.font = "800 8.5px 'JetBrains Mono', monospace";
+    ctx.textAlign = "center";
+    ctx.fillText(isLedOn ? "ACTIVE" : "DARK", ledX, ledY + 34);
 
-    // Digital Frequency Readout Display (LCD screen on unit)
-    const lcdX = unitX + 12;
-    const lcdY = unitY + 125;
-    const lcdW = unitW - 24;
-    const lcdH = 50;
+    // ------------------------------------------
+    // DIGITAL OLED DISPLAY SCREEN (CENTER-RIGHT)
+    // ------------------------------------------
+    const lcdX = unitX + 154;
+    const lcdY = unitY + 68;
+    const lcdW = 114;
+    const lcdH = 70;
 
-    ctx.fillStyle = isLight ? "#0f172a" : "#050811";
-    ctx.fillRect(lcdX, lcdY, lcdW, lcdH);
-    ctx.strokeStyle = isLight ? "#38bdf8" : "#1e3a5f";
+    // Recessed Bezel
+    ctx.fillStyle = "#020409";
+    ctx.beginPath();
+    ctx.roundRect(lcdX, lcdY, lcdW, lcdH, 4);
+    ctx.fill();
+    ctx.strokeStyle = "#1e3a5f";
     ctx.lineWidth = 1.5;
-    ctx.strokeRect(lcdX, lcdY, lcdW, lcdH);
+    ctx.stroke();
 
-    ctx.fillStyle = isLight ? "#38bdf8" : "#38bdf8";
-    ctx.font = "7.5px 'JetBrains Mono', monospace";
+    // OLED Backlight Sheen
+    if (state.powerSupplyOn) {
+      const gradOled = ctx.createLinearGradient(lcdX, lcdY, lcdX, lcdY + lcdH);
+      gradOled.addColorStop(0, "rgba(56, 189, 248, 0.08)");
+      gradOled.addColorStop(1, "rgba(2, 6, 23, 0.4)");
+      ctx.fillStyle = gradOled;
+      ctx.fill();
+    }
+
+    // Line 1: Filter Channel Selection
+    ctx.fillStyle = state.powerSupplyOn ? "#38bdf8" : "#475569";
+    ctx.font = "7px 'JetBrains Mono', monospace";
     ctx.textAlign = "left";
-    ctx.fillText(`FILTER: S2,S3=[${getFilterPinText()}]`, lcdX + 8, lcdY + 14);
+    ctx.fillText(`FILTER: S2,S3=[${getFilterPinText()}]`, lcdX + 7, lcdY + 14);
 
-    ctx.font = "bold 15px 'JetBrains Mono', monospace";
-    ctx.fillStyle = state.powerSupplyOn ? (isLight ? "#0284c7" : "#38bdf8") : "#475569";
+    // Line 2: Large Frequency Readout (f_out)
+    ctx.font = "800 14px 'JetBrains Mono', monospace";
+    ctx.fillStyle = state.powerSupplyOn ? "#38bdf8" : "#334155";
+    if (state.powerSupplyOn) {
+      ctx.shadowColor = "#38bdf8";
+      ctx.shadowBlur = 6;
+    }
     ctx.fillText(
       state.powerSupplyOn ? `${state.currentOutputFrequency.toFixed(1)} kHz` : "---.- kHz",
-      lcdX + 8,
-      lcdY + 35
+      lcdX + 7,
+      lcdY + 36
     );
+    ctx.shadowBlur = 0;
 
-    ctx.font = "8px 'JetBrains Mono', monospace";
-    ctx.fillStyle = "#94a3b8";
-    ctx.textAlign = "right";
-    ctx.fillText(`Scale: ${state.scaling}`, lcdX + lcdW - 8, lcdY + 44);
+    // Line 3: System Status & Scale
+    ctx.font = "7.5px 'JetBrains Mono', monospace";
+    ctx.fillStyle = state.powerSupplyOn ? "#7dd3fc" : "#475569";
+    ctx.fillText(`STATUS: CALIBRATED ${state.scaling}`, lcdX + 7, lcdY + 54);
 
-    // Pin Connections Header
-    ctx.fillStyle = isLight ? "#475569" : "#64748b";
-    ctx.font = "8px 'JetBrains Mono', monospace";
+    // ------------------------------------------
+    // I/O MULTI-PIN CONNECTOR & BRAIDED CABLE
+    // ------------------------------------------
+    const ioX = unitX + 160;
+    const ioY = unitY + 154;
+
+    // Silkscreen Pinout Legend
+    ctx.fillStyle = "#64748b";
+    ctx.font = "7px 'JetBrains Mono', monospace";
     ctx.textAlign = "left";
-    ctx.fillText("I/O: VCC GND S0 S1 S2 S3 OUT", unitX + 12, unitY + 195);
-    ctx.fillText("STATUS: CALIBRATED 20%", unitX + 12, unitY + 210);
+    ctx.fillText("I/O: VCC GND S0 S1 S2 S3 OUT", ioX - 6, ioY + 8);
+
+    // Black IDC Header Socket Receptacle
+    ctx.fillStyle = "#030712";
+    ctx.beginPath();
+    ctx.roundRect(ioX + 2, ioY + 14, 82, 18, 3);
+    ctx.fill();
+    ctx.strokeStyle = "#334155";
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    // Internal Pin Terminals
+    for (let p = 0; p < 8; p++) {
+      ctx.fillStyle = "#94a3b8";
+      ctx.fillRect(ioX + 8 + p * 9.5, ioY + 19, 3.5, 4);
+    }
+
+    // Flexible Braided Multi-Conductor Ribbon Cable
+    // Loops gracefully out of the I/O socket across to the TCS3200 sensor module
+    const sensX = 355;
+    const sensY = 70;
+    const sensW = 82;
+    const sensH = 145;
+
+    const cableStartX = ioX + 44;
+    const cableStartY = ioY + 28;
+    const cableEndX = sensX + 4;
+    const cableEndY = sensY + sensH - 22;
+
+    ctx.save();
+    // Render 6 braided wire conductors with alternating tones
+    const wireColors = ["#475569", "#64748b", "#94a3b8", "#cbd5e1", "#64748b", "#475569"];
+    wireColors.forEach((wColor, idx) => {
+      const offset = (idx - 2.5) * 2.2;
+      ctx.beginPath();
+      ctx.moveTo(cableStartX + offset, cableStartY);
+      ctx.bezierCurveTo(
+        cableStartX + 20 + offset, cableStartY + 45,
+        unitX + unitW + 20 + offset, 260,
+        cableEndX + offset, cableEndY
+      );
+      ctx.strokeStyle = wColor;
+      ctx.lineWidth = 2.4;
+      ctx.stroke();
+    });
+    ctx.restore();
 
     // ==========================================
-    // 2. TCS3200 SENSOR MODULE BOARD (CENTER-LEFT)
+    // 2. PHOTOREALISTIC TCS3200 SENSOR MODULE & CHIP
     // ==========================================
-    const sensX = 240;
-    const sensY = 90;
-    const sensW = 75;
-    const sensH = 135;
     clickRegions.sensorArray = { x: sensX, y: sensY, w: sensW, h: sensH };
 
-    // Sensor PCB Plate (Deep Blue / Black FR4)
-    ctx.fillStyle = "#0c1b33";
-    ctx.fillRect(sensX, sensY, sensW, sensH);
-    ctx.strokeStyle = "#2563eb";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(sensX, sensY, sensW, sensH);
+    // Sensor PCB Plate (Deep Royal Blue FR4 with Satin Sheen)
+    const gradPcb = ctx.createLinearGradient(sensX, sensY, sensX + sensW, sensY + sensH);
+    gradPcb.addColorStop(0, "#0c234b");
+    gradPcb.addColorStop(0.5, "#081b3a");
+    gradPcb.addColorStop(1, "#051126");
+    ctx.fillStyle = gradPcb;
+    ctx.beginPath();
+    ctx.roundRect(sensX, sensY, sensW, sensH, 6);
+    ctx.fill();
+    ctx.strokeStyle = "#1d4ed8";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
 
-    // Gold Corner Mounting Holes & Traces
-    const goldPads = [
-      [sensX + 8, sensY + 8],
-      [sensX + sensW - 8, sensY + 8],
-      [sensX + 8, sensY + sensH - 8],
-      [sensX + sensW - 8, sensY + sensH - 8]
+    // Gold Traces and Silkscreen Lines on PCB
+    ctx.strokeStyle = "rgba(234, 179, 8, 0.4)";
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(sensX + 10, sensY + 38);
+    ctx.lineTo(sensX + 22, sensY + 38);
+    ctx.lineTo(sensX + 22, sensY + 65);
+    ctx.moveTo(sensX + sensW - 10, sensY + 38);
+    ctx.lineTo(sensX + sensW - 22, sensY + 38);
+    ctx.lineTo(sensX + sensW - 22, sensY + 65);
+    ctx.stroke();
+
+    // 4 Brass Standoff Mounting Pillars in Corners (Matching Reference Image)
+    const standoffs = [
+      [sensX + 9, sensY + 9],
+      [sensX + sensW - 9, sensY + 9],
+      [sensX + 9, sensY + sensH - 9],
+      [sensX + sensW - 9, sensY + sensH - 9]
     ];
-    goldPads.forEach(([gx, gy]) => {
+    standoffs.forEach(([sx, sy]) => {
+      // Brass Washer Outer Ring
       ctx.beginPath();
-      ctx.arc(gx, gy, 4, 0, Math.PI * 2);
+      ctx.arc(sx, sy, 5.5, 0, Math.PI * 2);
       ctx.fillStyle = "#eab308";
       ctx.fill();
+      ctx.strokeStyle = "#a16207";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Inner Screw Hex Socket
       ctx.beginPath();
-      ctx.arc(gx, gy, 2, 0, Math.PI * 2);
+      ctx.arc(sx, sy, 2.5, 0, Math.PI * 2);
       ctx.fillStyle = "#0a0f1d";
       ctx.fill();
     });
 
-    // 4 White Spotlight Illumination LEDs
+    // 4 White SMD Spotlight LEDs (Illumination Array)
     const ledPositions = [
-      [sensX + 16, sensY + 25],
-      [sensX + sensW - 16, sensY + 25],
-      [sensX + 16, sensY + sensH - 25],
-      [sensX + sensW - 16, sensY + sensH - 25]
+      [sensX + 16, sensY + 26],
+      [sensX + sensW - 16, sensY + 26],
+      [sensX + 16, sensY + sensH - 26],
+      [sensX + sensW - 16, sensY + sensH - 26]
     ];
 
     ledPositions.forEach(([lx, ly]) => {
-      ctx.beginPath();
-      ctx.arc(lx, ly, 6, 0, Math.PI * 2);
-      ctx.fillStyle = state.ledArrayActive && state.powerSupplyOn ? "#ffffff" : "#64748b";
-      ctx.fill();
-      ctx.strokeStyle = "#cbd5e1";
-      ctx.lineWidth = 1;
-      ctx.stroke();
+      // SMD Package Housing
+      ctx.fillStyle = "#1e293b";
+      ctx.fillRect(lx - 5, ly - 5, 10, 10);
+      ctx.strokeStyle = "#475569";
+      ctx.lineWidth = 0.8;
+      ctx.strokeRect(lx - 5, ly - 5, 10, 10);
 
-      if (state.ledArrayActive && state.powerSupplyOn) {
-        ctx.beginPath();
-        ctx.arc(lx, ly, 10, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
+      // Gold Solder Terminals
+      ctx.fillStyle = "#eab308";
+      ctx.fillRect(lx - 6, ly - 2, 2, 4);
+      ctx.fillRect(lx + 4, ly - 2, 2, 4);
+
+      // White LED Encapsulation Dome
+      ctx.beginPath();
+      ctx.arc(lx, ly, 3.8, 0, Math.PI * 2);
+      ctx.fillStyle = isLedOn ? "#ffffff" : "#cbd5e1";
+      ctx.fill();
+
+      if (isLedOn) {
+        // High Intensity Radiant Bloom
+        ctx.shadowColor = "#ffffff";
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = "#ffffff";
         ctx.fill();
+        ctx.beginPath();
+        ctx.arc(lx, ly, 7, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+        ctx.fill();
+        ctx.shadowBlur = 0;
       }
     });
 
-    // TCS3200 IC Package (Center Square)
-    const icX = sensX + sensW / 2 - 18;
-    const icY = sensY + sensH / 2 - 18;
-    const icSize = 36;
+    // ------------------------------------------
+    // THE REALISTIC TCS3200 IC CHIP (CENTER)
+    // ------------------------------------------
+    const icSize = 42;
+    const icX = sensX + sensW / 2 - icSize / 2;
+    const icY = sensY + sensH / 2 - icSize / 2;
 
-    ctx.fillStyle = "#030712";
-    ctx.fillRect(icX, icY, icSize, icSize);
-    ctx.strokeStyle = "#475569";
+    // Solder Lead Pins (8 Pins: 4 Left, 4 Right)
+    for (let p = 0; p < 4; p++) {
+      const py = icY + 6 + p * 8.5;
+      ctx.fillStyle = "#94a3b8";
+      // Left pin
+      ctx.fillRect(icX - 4, py, 4, 3);
+      // Right pin
+      ctx.fillRect(icX + icSize, py, 4, 3);
+    }
+
+    // Black Epoxy Molded IC Package Body
+    const gradIc = ctx.createLinearGradient(icX, icY, icX + icSize, icY + icSize);
+    gradIc.addColorStop(0, "#1f2937");
+    gradIc.addColorStop(0.5, "#111827");
+    gradIc.addColorStop(1, "#030712");
+    ctx.fillStyle = gradIc;
+    ctx.beginPath();
+    ctx.roundRect(icX, icY, icSize, icSize, 3);
+    ctx.fill();
+    ctx.strokeStyle = "#4b5563";
     ctx.lineWidth = 1;
-    ctx.strokeRect(icX, icY, icSize, icSize);
+    ctx.stroke();
 
-    // 8x8 Photodiode Micro-Aperture Array Matrix inside IC
-    const arrayPad = 3;
-    const microSize = 3.2;
-    const rows = 4;
-    const cols = 4;
+    // Pin 1 Index Notch Dot
+    ctx.beginPath();
+    ctx.arc(icX + 5, icY + 5, 1.5, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
+    ctx.fill();
 
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        const mx = icX + 6 + c * (microSize + 3.5);
-        const my = icY + 6 + r * (microSize + 3.5);
+    // Recessed Gold Leadframe Cavity
+    const cavX = icX + 6;
+    const cavY = icY + 6;
+    const cavSize = icSize - 12;
+    ctx.fillStyle = "#78350f";
+    ctx.fillRect(cavX, cavY, cavSize, cavSize);
+    ctx.strokeStyle = "#d97706";
+    ctx.lineWidth = 0.8;
+    ctx.strokeRect(cavX, cavY, cavSize, cavSize);
 
-        // Pattern: Red (r0,c0), Blue (r0,c1), Clear (r1,c0), Green (r1,c1)...
+    // Gold Bond Wires at corners
+    ctx.strokeStyle = "#fde047";
+    ctx.lineWidth = 0.6;
+    ctx.beginPath();
+    ctx.moveTo(cavX - 2, cavY - 2); ctx.lineTo(cavX + 3, cavY + 3);
+    ctx.moveTo(cavX + cavSize + 2, cavY - 2); ctx.lineTo(cavX + cavSize - 3, cavY + 3);
+    ctx.moveTo(cavX - 2, cavY + cavSize + 2); ctx.lineTo(cavX + 3, cavY + cavSize - 3);
+    ctx.moveTo(cavX + cavSize + 2, cavY + cavSize + 2); ctx.lineTo(cavX + cavSize - 3, cavY + cavSize - 3);
+    ctx.stroke();
+
+    // 8x8 Silicon Photodiode Array Matrix (64 Micro-Filters)
+    const arrayStart = cavX + 3;
+    const cellSize = 2.4;
+    const cellGap = 0.9;
+    const gridDim = 8;
+
+    for (let r = 0; r < gridDim; r++) {
+      for (let c = 0; c < gridDim; c++) {
+        const mx = arrayStart + c * (cellSize + cellGap);
+        const my = arrayStart + r * (cellSize + cellGap);
+
+        // Standard TCS3200 8x8 Photodiode Filter Distribution
+        // 16 Red, 16 Green, 16 Blue, 16 Clear
         let filterType = "clear";
-        if ((r + c) % 4 === 0) filterType = "red";
-        else if ((r + c) % 4 === 1) filterType = "blue";
-        else if ((r + c) % 4 === 2) filterType = "green";
+        const codeVal = (r % 2) * 2 + (c % 2);
+        if (codeVal === 0) filterType = "red";
+        else if (codeVal === 1) filterType = "blue";
+        else if (codeVal === 2) filterType = "clear";
+        else filterType = "green";
 
-        let fillColor = "#94a3b8";
-        let glow = false;
+        let cellColor = "#334155";
+        let isGlow = false;
         if (filterType === "red") {
-          fillColor = state.filterChannel === "red" ? "#ef4444" : "#7f1d1d";
-          glow = state.filterChannel === "red" && state.powerSupplyOn;
+          cellColor = state.filterChannel === "red" ? "#ef4444" : "#7f1d1d";
+          isGlow = state.filterChannel === "red" && state.powerSupplyOn;
         } else if (filterType === "green") {
-          fillColor = state.filterChannel === "green" ? "#10b981" : "#064e3b";
-          glow = state.filterChannel === "green" && state.powerSupplyOn;
+          cellColor = state.filterChannel === "green" ? "#10b981" : "#064e3b";
+          isGlow = state.filterChannel === "green" && state.powerSupplyOn;
         } else if (filterType === "blue") {
-          fillColor = state.filterChannel === "blue" ? "#3b82f6" : "#1e3a8a";
-          glow = state.filterChannel === "blue" && state.powerSupplyOn;
+          cellColor = state.filterChannel === "blue" ? "#38bdf8" : "#1e3a8a";
+          isGlow = state.filterChannel === "blue" && state.powerSupplyOn;
         } else {
-          fillColor = state.filterChannel === "clear" ? "#f8fafc" : "#475569";
-          glow = state.filterChannel === "clear" && state.powerSupplyOn;
+          cellColor = state.filterChannel === "clear" ? "#f8fafc" : "#64748b";
+          isGlow = state.filterChannel === "clear" && state.powerSupplyOn;
         }
 
-        ctx.fillStyle = fillColor;
-        ctx.fillRect(mx, my, microSize, microSize);
+        ctx.fillStyle = cellColor;
+        ctx.fillRect(mx, my, cellSize, cellSize);
 
-        if (glow) {
+        if (isGlow) {
           ctx.strokeStyle = "#ffffff";
-          ctx.lineWidth = 0.5;
-          ctx.strokeRect(mx, my, microSize, microSize);
+          ctx.lineWidth = 0.4;
+          ctx.strokeRect(mx, my, cellSize, cellSize);
         }
       }
     }
 
-    // Sensor Label
-    ctx.fillStyle = "#93c5fd";
-    ctx.font = "bold 8px 'JetBrains Mono', monospace";
+    // Translucent Optical Glass Window Sheen over Sensor
+    const gradGlass = ctx.createLinearGradient(cavX, cavY, cavX + cavSize, cavY + cavSize);
+    gradGlass.addColorStop(0, "rgba(255, 255, 255, 0.3)");
+    gradGlass.addColorStop(0.4, "rgba(255, 255, 255, 0.05)");
+    gradGlass.addColorStop(1, "rgba(56, 189, 248, 0.15)");
+    ctx.fillStyle = gradGlass;
+    ctx.fillRect(cavX, cavY, cavSize, cavSize);
+
+    // Silkscreen Chip Label on PCB below IC
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "800 8.5px 'JetBrains Mono', monospace";
     ctx.textAlign = "center";
     ctx.fillText("TCS3200", sensX + sensW / 2, sensY + sensH - 8);
 
@@ -636,8 +969,8 @@ export function createColourSensorExperiment(callbacks = {}) {
     // 3. TARGET SPECIMEN STAGE ON VERNIER RAIL (CENTER-RIGHT)
     // ==========================================
     // Position stage along rail according to standoff distance (5mm to 30mm)
-    const stageOffsetPx = (state.distanceMm - 5.0) * 11.0;
-    const stageX = sensX + sensW + 30 + stageOffsetPx;
+    const stageOffsetPx = (state.distanceMm - 5.0) * 11.5;
+    const stageX = sensX + sensW + 35 + stageOffsetPx;
     const stageY = 75;
     const stageW = 38;
     const stageH = 160;
@@ -671,6 +1004,29 @@ export function createColourSensorExperiment(callbacks = {}) {
     ctx.font = "bold 10px 'JetBrains Mono', monospace";
     ctx.textAlign = "center";
     ctx.fillText(`d = ${state.distanceMm.toFixed(1)} mm`, stageX + stageW / 2, stageY - 14);
+
+    // Knurled Thumbscrew Standoff Lock Knob on Stage
+    const knobX = stageX + stageW + 4;
+    const knobY = stageY + 55;
+    ctx.fillStyle = "#334155";
+    ctx.fillRect(stageX + stageW, knobY + 4, 4, 8);
+    const gradKnob = ctx.createLinearGradient(knobX, knobY, knobX + 11, knobY + 16);
+    gradKnob.addColorStop(0, "#94a3b8");
+    gradKnob.addColorStop(0.4, "#cbd5e1");
+    gradKnob.addColorStop(1, "#475569");
+    ctx.fillStyle = gradKnob;
+    ctx.beginPath();
+    ctx.roundRect(knobX, knobY, 11, 16, 2.5);
+    ctx.fill();
+    ctx.strokeStyle = "#1e293b";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    for (let k = knobY + 2.5; k < knobY + 15; k += 2.5) {
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.4)";
+      ctx.beginPath();
+      ctx.moveTo(knobX, k); ctx.lineTo(knobX + 11, k);
+      ctx.stroke();
+    }
 
     // Stage Vertical Upright Holder
     ctx.fillStyle = isLight ? "#cbd5e1" : "#1e293b";
@@ -1739,6 +2095,7 @@ export function createColourSensorExperiment(callbacks = {}) {
     const btnPower = document.getElementById("cs-btn-power-switch");
     btnPower?.addEventListener("click", () => {
       state.powerSupplyOn = !state.powerSupplyOn;
+      playHardwareAudio(state.powerSupplyOn ? "power-on" : "power-off");
       updateDomHud();
       if (showToast) showToast(`Main Power Supply: ${state.powerSupplyOn ? "ON" : "OFF"}`);
     });
@@ -1746,6 +2103,7 @@ export function createColourSensorExperiment(callbacks = {}) {
     const btnIllum = document.getElementById("cs-btn-illum-switch");
     btnIllum?.addEventListener("click", () => {
       state.ledArrayActive = !state.ledArrayActive;
+      playHardwareAudio("click");
       updateDomHud();
       if (showToast) showToast(`White Illumination LEDs: ${state.ledArrayActive ? "ON" : "OFF"}`);
     });
@@ -1755,6 +2113,7 @@ export function createColourSensorExperiment(callbacks = {}) {
       btn.addEventListener("click", () => {
         const filter = btn.getAttribute("data-filter");
         if (filter) {
+          playHardwareAudio("click");
           state.filterChannel = filter;
           updateDomHud();
           if (showToast) showToast(`Filter Selected: ${filter.toUpperCase()} (${getFilterPinText()})`);
@@ -1767,6 +2126,7 @@ export function createColourSensorExperiment(callbacks = {}) {
       btn.addEventListener("click", () => {
         const scale = btn.getAttribute("data-scale");
         if (scale) {
+          playHardwareAudio("click");
           state.scaling = scale;
           updateDomHud();
           if (showToast) showToast(`Frequency Scaling: ${scale}`);
@@ -1783,12 +2143,14 @@ export function createColourSensorExperiment(callbacks = {}) {
 
     const btnDecDist = document.getElementById("cs-btn-dec-dist");
     btnDecDist?.addEventListener("click", () => {
+      playHardwareAudio("click");
       state.distanceMm = Math.max(5.0, Number((state.distanceMm - 1.0).toFixed(1)));
       updateDomHud();
     });
 
     const btnIncDist = document.getElementById("cs-btn-inc-dist");
     btnIncDist?.addEventListener("click", () => {
+      playHardwareAudio("click");
       state.distanceMm = Math.min(30.0, Number((state.distanceMm + 1.0).toFixed(1)));
       updateDomHud();
     });
@@ -1798,6 +2160,7 @@ export function createColourSensorExperiment(callbacks = {}) {
       btn.addEventListener("click", () => {
         const dist = parseFloat(btn.getAttribute("data-dist"));
         if (!isNaN(dist)) {
+          playHardwareAudio("click");
           state.distanceMm = dist;
           updateDomHud();
         }
@@ -1809,6 +2172,7 @@ export function createColourSensorExperiment(callbacks = {}) {
       chip.addEventListener("click", () => {
         const sw = chip.getAttribute("data-swatch");
         if (sw && PRESET_SWATCHES[sw]) {
+          playHardwareAudio("click");
           state.currentSwatchId = sw;
           state.isCustomMode = false;
           state.isMysteryMode = false;
@@ -1891,6 +2255,7 @@ export function createColourSensorExperiment(callbacks = {}) {
       const p = clickRegions.powerSwitch;
       if (clickX >= p.x && clickX <= p.x + p.w && clickY >= p.y && clickY <= p.y + p.h) {
         state.powerSupplyOn = !state.powerSupplyOn;
+        playHardwareAudio(state.powerSupplyOn ? "power-on" : "power-off");
         updateDomHud();
         return;
       }
@@ -1899,6 +2264,7 @@ export function createColourSensorExperiment(callbacks = {}) {
       const l = clickRegions.ledSwitch;
       if (clickX >= l.x && clickX <= l.x + l.w && clickY >= l.y && clickY <= l.y + l.h) {
         state.ledArrayActive = !state.ledArrayActive;
+        playHardwareAudio("click");
         updateDomHud();
         return;
       }
@@ -1918,17 +2284,42 @@ export function createColourSensorExperiment(callbacks = {}) {
       }
     });
 
+    // Interactive Hover Cursor Feedback on Canvas Elements
+    benchCanvas?.addEventListener("mousemove", (e) => {
+      if (isDraggingStage) return;
+      const rect = benchCanvas.getBoundingClientRect();
+      const scaleX = BENCH_LOGICAL_W / rect.width;
+      const scaleY = BENCH_LOGICAL_H / rect.height;
+      const mx = (e.clientX - rect.left) * scaleX;
+      const my = (e.clientY - rect.top) * scaleY;
+
+      const p = clickRegions.powerSwitch;
+      const l = clickRegions.ledSwitch;
+      const s = clickRegions.specimenStage;
+
+      if (p && mx >= p.x && mx <= p.x + p.w && my >= p.y && my <= p.y + p.h) {
+        benchCanvas.style.cursor = "pointer";
+      } else if (l && mx >= l.x && mx <= l.x + l.w && my >= l.y && my <= l.y + l.h) {
+        benchCanvas.style.cursor = "pointer";
+      } else if (s && mx >= s.x && mx <= s.x + s.w && my >= s.y && my <= s.y + s.h) {
+        benchCanvas.style.cursor = "grab";
+      } else {
+        benchCanvas.style.cursor = "default";
+      }
+    });
+
     window.addEventListener("mousemove", (e) => {
       if (!isDraggingStage || !benchCanvas) return;
+      benchCanvas.style.cursor = "grabbing";
       const rect = benchCanvas.getBoundingClientRect();
       const scaleX = BENCH_LOGICAL_W / rect.width;
       const curX = (e.clientX - rect.left) * scaleX;
 
       // Map canvas X to standoff distance (5mm to 30mm)
-      const minX = 240 + 75 + 30; // 5mm
-      const maxX = minX + 25 * 11; // 30mm
+      const minX = 355 + 82 + 35; // 5mm
+      const maxX = minX + 25 * 11.5; // 30mm
       const clampedX = Math.max(minX, Math.min(maxX, curX));
-      const dist = 5.0 + (clampedX - minX) / 11.0;
+      const dist = 5.0 + (clampedX - minX) / 11.5;
 
       state.distanceMm = Math.round(dist * 10) / 10;
       updateDomHud();
