@@ -246,6 +246,15 @@ export const api = {
 
   // Vectra AI Physics Copilot
   async sendAiChat({ message, history = [], simulationContext = {} }) {
+    if (isCreatorQuestion(message)) {
+      return {
+        success: true,
+        name: "Vectra AI",
+        model: "Vectra AI Direct",
+        reply: "This is a Project built by four Computer Engineering students Ojas Joshi, Jeshurun Selvakumar, Kshitij Jadhav, Adithya Iyer."
+      };
+    }
+
     const res = await fetchJson(`${API_BASE}/ai/chat`, {
       method: "POST",
       body: JSON.stringify({ message, history, simulationContext })
@@ -253,6 +262,13 @@ export const api = {
     if (res && res.success && res.reply) {
       return res;
     }
+
+    // Direct Gemini client fallback if backend is offline/unreachable
+    const directAi = await tryClientDirectAiChat(message, history, simulationContext);
+    if (directAi) {
+      return directAi;
+    }
+
     // Client-side physics copilot fallback for GitHub Pages & static hosting
     return {
       success: true,
@@ -283,6 +299,83 @@ export const api = {
 };
 
 // Client-Side Physics Intelligence Engine for GitHub Pages & Offline Deployments
+const CLIENT_API_KEY = typeof __VECTRA_AI_KEY__ !== "undefined" ? __VECTRA_AI_KEY__ : "";
+const CLIENT_CANDIDATE_MODELS = [
+  "gemini-3.5-flash-lite",
+  "gemini-3.1-flash-lite",
+  "gemini-flash-lite-latest",
+  "gemini-3.8-flash",
+  "gemini-3.7-flash"
+];
+
+async function tryClientDirectAiChat(message, history = [], simulationContext = {}) {
+  if (!CLIENT_API_KEY || !navigator.onLine) return null;
+
+  for (const model of CLIENT_CANDIDATE_MODELS) {
+    try {
+      const contents = [];
+      if (Array.isArray(history) && history.length > 0) {
+        for (const h of history.slice(-8)) {
+          const text = (h.text || h.content || "").trim();
+          if (!text) continue;
+          const role = h.role === "user" ? "user" : "model";
+          if (contents.length > 0 && contents[contents.length - 1].role === role) {
+            contents[contents.length - 1].parts[0].text += "\n" + text;
+          } else {
+            contents.push({ role, parts: [{ text }] });
+          }
+        }
+        while (contents.length > 0 && contents[0].role !== "user") {
+          contents.shift();
+        }
+        if (contents.length > 0 && contents[contents.length - 1].role === "user") {
+          if (contents[contents.length - 1].parts[0].text === message) {
+            contents.pop();
+          }
+        }
+      }
+
+      contents.push({
+        role: "user",
+        parts: [{ text: message }]
+      });
+
+      const systemPrompt = `You are Vectra AI, an intelligent physics laboratory copilot built into PhysiX.
+Answer the user's physics questions conversationally, accurately, and mathematically.
+Format equations clearly using standard LaTeX ($...$ for inline, $$...$$ for display equations) or clear mathematical symbols.
+Keep explanations intuitive, rigorous, and relevant to classical mechanics, wave optics, or optoelectronics.`;
+
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${CLIENT_API_KEY}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: AbortSignal.timeout(15000),
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemPrompt }] },
+          contents,
+          generationConfig: {
+            temperature: 0.2,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 1400
+          }
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+        return {
+          success: true,
+          name: "Vectra AI",
+          model,
+          reply: data.candidates[0].content.parts[0].text
+        };
+      }
+    } catch (err) {
+      // Continue to next model
+    }
+  }
+  return null;
+}
 function isCreatorQuestion(text = "") {
   const t = text.toLowerCase();
   return (
@@ -473,7 +566,7 @@ You can switch between any of these laboratories using the **Explore Labs Hub** 
   if (
     msg.includes("challenge") ||
     msg.includes("game mode") ||
-    msg.includes("xp") ||
+    /\bxp\b/i.test(msg) ||
     msg.includes("badge") ||
     msg.includes("gamification") ||
     msg.includes("quiz") ||

@@ -44,7 +44,8 @@
       "badges": [
         "badge-profile-saved",
         "badge-high-velocity",
-        "badge-optimal-angle"
+        "badge-optimal-angle",
+        "badge-lab-veteran"
       ],
       "quizHighScore": 10,
       "observations": [
@@ -530,11 +531,11 @@
         "interests": "2D Kinematics, Planetary Gravity, Orbital Dynamics",
         "bio": "Exploring 2D projectile kinematics, parabolic trajectories, vector breakdown components, and gravitational effects across the solar system.",
         "createdAt": "2026-09-21T16:15:28.210Z",
-        "updatedAt": "2026-10-06T15:25:16.544Z",
+        "updatedAt": "2026-10-08T16:42:23.350Z",
         "email": "jeshurunselvakumar640@gmail.com",
         "streak": 1,
         "highestStreak": 1,
-        "lastLoginDate": "2026-09-21"
+        "lastLoginDate": "2026-10-08"
       },
       "telemetry": {
         "totalLaunches": 0,
@@ -553,7 +554,7 @@
       "flightLogs": [],
       "observations": [],
       "challenges": {},
-      "bonusXp": 2225,
+      "bonusXp": 2695,
       "badges": [
         "badge-profile-saved",
         "badge-lab-veteran",
@@ -561,7 +562,8 @@
         "badge-high-dispersion",
         "badge-second-order",
         "badge-spectroscopy-sleuth",
-        "badge-diffraction-master"
+        "badge-diffraction-master",
+        "badge-semiconductor-specialist"
       ],
       "quizHighScore": 0
     }

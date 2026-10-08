@@ -9,11 +9,11 @@ const AI_NAME = process.env.AI_NAME || "Vectra AI";
 const PROJECT_NAME = process.env.GCP_PROJECT_NAME || "";
 
 const CANDIDATE_MODELS = [
+  "gemini-3.5-flash-lite",
   "gemini-3.1-flash-lite",
-  "gemini-3.6-flash",
-  "gemini-3.5-flash",
-  "gemini-3.7-flash",
-  "gemini-flash-latest"
+  "gemini-flash-lite-latest",
+  "gemini-3.8-flash",
+  "gemini-3.7-flash"
 ];
 
 const CREATOR_RESPONSE = "This is a Project built by four Computer Engineering students Ojas Joshi, Jeshurun Selvakumar, Kshitij Jadhav, Adithya Iyer.";
@@ -499,7 +499,7 @@ You can switch between any of these laboratories using the **Explore Labs Hub** 
   if (
     msg.includes("challenge") ||
     msg.includes("game mode") ||
-    msg.includes("xp") ||
+    /\bxp\b/i.test(msg) ||
     msg.includes("badge") ||
     msg.includes("gamification") ||
     msg.includes("quiz") ||
@@ -940,10 +940,26 @@ router.post("/chat", async (req, res) => {
           const contents = [];
 
           if (Array.isArray(history) && history.length > 0) {
-            const formattedHistory = history.slice(-6).map(h => ({
-              role: h.role === "user" ? "user" : "model",
-              parts: [{ text: h.text || h.content || "" }]
-            }));
+            const formattedHistory = [];
+            for (const h of history.slice(-8)) {
+              const text = (h.text || h.content || "").trim();
+              if (!text) continue;
+              const role = h.role === "user" ? "user" : "model";
+              if (formattedHistory.length > 0 && formattedHistory[formattedHistory.length - 1].role === role) {
+                formattedHistory[formattedHistory.length - 1].parts[0].text += "\n" + text;
+              } else {
+                formattedHistory.push({ role, parts: [{ text }] });
+              }
+            }
+            while (formattedHistory.length > 0 && formattedHistory[0].role !== "user") {
+              formattedHistory.shift();
+            }
+            // Avoid duplicating the user message if already at the end of history
+            if (formattedHistory.length > 0 && formattedHistory[formattedHistory.length - 1].role === "user") {
+              if (formattedHistory[formattedHistory.length - 1].parts[0].text === message) {
+                formattedHistory.pop();
+              }
+            }
             contents.push(...formattedHistory);
           }
 
@@ -958,7 +974,7 @@ router.post("/chat", async (req, res) => {
             },
             contents,
             generationConfig: {
-              temperature: 0.15,
+              temperature: 0.2,
               topK: 40,
               topP: 0.95,
               maxOutputTokens: 1400
@@ -968,7 +984,7 @@ router.post("/chat", async (req, res) => {
           const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            signal: AbortSignal.timeout(9000),
+            signal: AbortSignal.timeout(15000),
             body: JSON.stringify(requestBody)
           });
 

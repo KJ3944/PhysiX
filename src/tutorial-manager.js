@@ -5,6 +5,8 @@
  * and user-scoped offline-safe persistence.
  */
 
+import { renderMathInText } from "./math-renderer.js";
+
 // Storage key helper for user-scoping and offline/guest support
 export function getTutorialStorageKey(userId) {
   const cleanId = (userId && userId !== "guest") ? userId : "guest";
@@ -57,6 +59,7 @@ export function normalizeExpId(expId) {
   if (expId === "optical-fibre" || expId === "optical") return "optical";
   if (expId === "physics-sandbox" || expId === "sandbox") return "sandbox";
   if (expId === "colour-sensor" || expId === "color-sensor") return "colour-sensor";
+  if (expId === "diode" || expId === "diode-vi" || expId === "diode-characteristics") return "diode";
   return "projectile";
 }
 
@@ -68,6 +71,7 @@ export function getExperimentFriendlyName(expId) {
     case "colour-sensor": return "Exp 3: Study of Colour Sensor";
     case "sandbox": return "Exp 4: Physics Sandbox";
     case "diffraction": return "Exp 5: Diffraction Grating";
+    case "diode": return "Exp 6: Diode V-I Characteristics";
     default: return "Interactive Physics Lab";
   }
 }
@@ -537,6 +541,148 @@ export const TUTORIAL_DEFINITIONS = {
       description: "Master multi-slit interference! Open the Physics Quiz in the top navigation to solve 10 questions on Fraunhofer diffraction, angular dispersion ($D$), grating pitch ($d$), and maximum order limits to earn student XP and level up your dossier.",
       placement: "bottom"
     }
+  ],
+
+  // -----------------------------------------------------------------------
+  // EXPERIMENT 6: DIODE V-I CHARACTERISTICS
+  // -----------------------------------------------------------------------
+  diode: [
+    {
+      id: "diode-tour-1",
+      selector: "#exp-diode-section .diode-setup-ribbon",
+      title: "Experiment Objective & Purpose",
+      category: "1. EXPERIMENT OBJECTIVE",
+      description: "Aim: To study the voltage - current (V-I) characteristics of a forward and reverse bias P-N Junction diode. Observe the cut-in knee voltage, barrier potential, and unidirectional conduction property.",
+      placement: "bottom"
+    },
+    {
+      id: "diode-tour-2",
+      selector: "#diode-voltmeter-container",
+      title: "Precision Analog Voltmeter",
+      category: "2. VOLTMETER",
+      description: "A dual-scale analog voltmeter measures the potential drop. It features dual concentric scales: an upper scale (0 to 1.5 V) for forward bias and a lower scale (0 to 30 V) for reverse bias.",
+      placement: "bottom"
+    },
+    {
+      id: "diode-tour-3",
+      selector: "#diode-vm-range-box",
+      title: "Voltmeter Range Selector",
+      category: "3. VOLTMETER RANGE",
+      description: "Toggle between 1.5 V (Forward Bias) and 30 V (Reverse Bias). The active range determines the scale interpretation of the needle.",
+      placement: "top"
+    },
+    {
+      id: "diode-tour-4",
+      selector: "#diode-center-panel",
+      title: "Master Power ON / OFF Switch",
+      category: "4. ON/OFF SWITCH",
+      description: "Flipping this heavy-duty toggle switch to ON energizes the laboratory circuit and illuminates the radiant red pilot lamp. When OFF, current drops to zero.",
+      placement: "bottom"
+    },
+    {
+      id: "diode-tour-5",
+      selector: "#diode-ammeter-container",
+      title: "Dual-Scale Analog Ammeter",
+      category: "5. AMMETER",
+      description: "Measures circuit current. Features an upper scale (0 to 10 mA) for forward bias and a lower scale (0 to 100 μA) for minute reverse saturation currents.",
+      placement: "bottom"
+    },
+    {
+      id: "diode-tour-6",
+      selector: "#diode-am-range-box",
+      title: "Ammeter Current Range Selector",
+      category: "6. AMMETER RANGE",
+      description: "Toggle between 10 mA (upper scale for Forward Bias) and 100 μA (lower scale for Reverse Bias). Greek symbol μA denotes microamperes.",
+      placement: "top"
+    },
+    {
+      id: "diode-tour-7",
+      selector: "#diode-sec-fwd-supply",
+      title: "Forward-Bias DC Power Supply (VF)",
+      category: "7. FORWARD BIAS SUPPLY",
+      description: "Adjusts the forward DC voltage (0 to 1.5 V) using the rotary potentiometer knob. Includes dual red (+) positive and black (−) negative DC output sockets.",
+      placement: "top"
+    },
+    {
+      id: "diode-tour-8",
+      selector: "#diode-term-fwd-diode",
+      title: "Forward Bias Diode Terminals (P ▷| N)",
+      category: "8. FORWARD DIODE TERMINALS",
+      description: "Red terminal connects to the P-type anode; black terminal connects to the N-type cathode. Current flows readily when forward voltage exceeds ~0.65 V.",
+      placement: "top"
+    },
+    {
+      id: "diode-tour-9",
+      selector: "#diode-term-rev-diode",
+      title: "Reverse Bias Diode Terminals (N |◁ P)",
+      category: "9. REVERSE DIODE TERMINALS",
+      description: "Black terminal connects to the N-region and red terminal connects to the P-region for reversed polarity, demonstrating depletion widening.",
+      placement: "top"
+    },
+    {
+      id: "diode-tour-10",
+      selector: "#diode-sec-rev-supply",
+      title: "Reverse-Bias DC Power Supply (VR)",
+      category: "10. REVERSE BIAS SUPPLY",
+      description: "Adjusts reverse DC supply voltage (0 to 30 V) with the rotary knob. Provides two red (+) and two black (−) terminals.",
+      placement: "top"
+    },
+    {
+      id: "diode-tour-11",
+      selector: "#diode-wire-canvas",
+      title: "Positive & Negative Connection Wires",
+      category: "11. POSITIVE / NEGATIVE WIRES",
+      description: "Realistic banana cables: RED for positive connections, BLACK for negative return paths. Click any terminal socket to attach or detach wires.",
+      placement: "bottom"
+    },
+    {
+      id: "diode-tour-12",
+      selector: "#diode-btn-auto-fwd",
+      title: "Forward-Bias Wiring Procedure",
+      category: "12. FORWARD-BIAS PROCEDURE",
+      description: "Connect DC Output (+) to Diode P, Diode N to Ammeter (+), Ammeter (−) to DC Output (−) in series, and Voltmeter in parallel across DC Output. Click 'Auto Connect Forward' to wire automatically.",
+      placement: "bottom"
+    },
+    {
+      id: "diode-tour-13",
+      selector: "#diode-btn-auto-rev",
+      title: "Reverse-Bias Wiring Procedure",
+      category: "13. REVERSE-BIAS PROCEDURE",
+      description: "Connect DC Output (+) to Diode N, Diode P to Microammeter (+), Microammeter (−) to DC Output (−) in series, and Voltmeter in parallel across DC Output. Click 'Auto Connect Reverse' to wire automatically.",
+      placement: "bottom"
+    },
+    {
+      id: "diode-tour-14",
+      selector: "#diode-btn-record",
+      title: "Recording Observations",
+      category: "14. RECORDING OBSERVATIONS",
+      description: "Click 'Record Observation' to log the live meter telemetry. For Reverse Bias, microamperes (μA) are automatically converted to milliamperes (mA) in the logbook (1 μA = 0.001 mA).",
+      placement: "top"
+    },
+    {
+      id: "diode-tour-15",
+      selector: "#diode-fwd-graph-card",
+      title: "Forward V-I Graph (1st Quadrant)",
+      category: "15. FORWARD GRAPH",
+      description: "Plots Forward Voltage Vf (V) along X-axis (1 cm = 0.1 V) versus Forward Current If (mA) along Y-axis (1 cm = 1 mA) in the 1st quadrant with real-time curve fitting.",
+      placement: "top"
+    },
+    {
+      id: "diode-tour-16",
+      selector: "#diode-rev-graph-card",
+      title: "Reverse V-I Graph (3rd Quadrant)",
+      category: "16. REVERSE GRAPH",
+      description: "Plots Reverse Voltage Vr (V) along negative X-axis (1 cm = 2 V) versus Reverse Current Ir (μA) along negative Y-axis (1 cm = 10 μA) strictly in the 3rd quadrant.",
+      placement: "top"
+    },
+    {
+      id: "diode-tour-17",
+      selector: "#diode-btn-reset-exp",
+      title: "Reset & Calibration",
+      category: "17. RESET",
+      description: "Resets the voltage supplies, clears the dynamic needle deflections, and resets wires or observations whenever starting a fresh experimental run.",
+      placement: "top"
+    }
   ]
 };
 
@@ -704,7 +850,7 @@ class TutorialManager {
 
       <div class="tutorial-card-body">
         <h3 class="tutorial-card-title">${step.title}</h3>
-        <p class="tutorial-card-desc">${step.description}</p>
+        <p class="tutorial-card-desc">${renderMathInText(step.description)}</p>
       </div>
 
       <div class="tutorial-card-progress">

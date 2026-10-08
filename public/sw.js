@@ -33,6 +33,8 @@ const CORE_PRECACHE_URLS = [
   '/src/colour-sensor.js',
   '/src/content-protection.js',
   '/src/diffraction-grating.js',
+  '/src/diode-vi.js',
+  '/src/diode-vi.css',
   '/src/experiment-details-data.js',
   '/src/optical-fibre.js',
   '/src/pdf-export.js',

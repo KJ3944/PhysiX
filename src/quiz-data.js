@@ -2290,6 +2290,476 @@ export const COLOUR_SENSOR_QUESTION_BANK = {
   ]
 };
 
+export const SANDBOX_QUESTION_BANK = {
+  title: "Physics Sandbox & Newtonian Mechanics - Question Bank",
+  experimentId: "sandbox",
+  quizId: "sandbox-mastery-quiz",
+  experimentName: "Physics Sandbox (Newtonian Mechanics)",
+  total_questions: 15,
+  questions: [
+    {
+      id: 1,
+      question: "State Newton's Second Law of Motion mathematically:",
+      options: [
+        "F = ma",
+        "F = m / a",
+        "F = mv",
+        "F = (1/2)ma²"
+      ],
+      answer: "A",
+      correct_option: "F = ma",
+      difficulty: "easy",
+      global_id: 201,
+      explanation: "Newton's Second Law states that net applied force equals mass multiplied by acceleration: F = ma."
+    },
+    {
+      id: 2,
+      question: "How is average linear acceleration 'a' defined from initial velocity u, final velocity v, and elapsed time t?",
+      options: [
+        "a = (v − u) / t",
+        "a = (v + u) / t",
+        "a = (v − u) · t",
+        "a = t / (v − u)"
+      ],
+      answer: "A",
+      correct_option: "a = (v − u) / t",
+      difficulty: "easy",
+      global_id: 202,
+      explanation: "Acceleration is the time rate of change of velocity: a = Δv / Δt = (v − u) / t."
+    },
+    {
+      id: 3,
+      question: "What formula gives the weight W of an object of mass m under local gravitational acceleration g?",
+      options: [
+        "W = mg",
+        "W = m / g",
+        "W = (1/2)mg²",
+        "W = g / m"
+      ],
+      answer: "A",
+      correct_option: "W = mg",
+      difficulty: "easy",
+      global_id: 203,
+      explanation: "Weight is the force exerted on a mass by gravity: W = mg."
+    },
+    {
+      id: 4,
+      question: "What is the formula for frictional force Fᶠ given coefficient of friction μ and normal force N?",
+      options: [
+        "Fᶠ = μN",
+        "Fᶠ = μ / N",
+        "Fᶠ = N / μ",
+        "Fᶠ = (1/2)μN²"
+      ],
+      answer: "A",
+      correct_option: "Fᶠ = μN",
+      difficulty: "easy",
+      global_id: 204,
+      explanation: "Frictional resistance between two surfaces is proportional to normal load: Fᶠ = μN."
+    },
+    {
+      id: 5,
+      question: "What is the formula for the kinetic energy (KE) of a body with mass m moving at velocity v?",
+      options: [
+        "KE = (1/2)mv²",
+        "KE = mv²",
+        "KE = (1/2)mv",
+        "KE = 2mv²"
+      ],
+      answer: "A",
+      correct_option: "KE = (1/2)mv²",
+      difficulty: "easy",
+      global_id: 205,
+      explanation: "Kinetic energy of a moving mass is KE = (1/2)mv²."
+    },
+    {
+      id: 6,
+      question: "If a 2.0 kg box in the simulator experiences a net applied force of 10.0 N, what is its acceleration?",
+      options: [
+        "5.0 m/s²",
+        "20.0 m/s²",
+        "2.0 m/s²",
+        "0.2 m/s²"
+      ],
+      answer: "A",
+      correct_option: "5.0 m/s²",
+      difficulty: "easy",
+      global_id: 206,
+      explanation: "From F = ma, acceleration a = F / m = 10.0 N / 2.0 kg = 5.0 m/s²."
+    },
+    {
+      id: 7,
+      question: "An object accelerated from rest (u = 0 m/s) reaches a speed of 20 m/s in 4.0 s. Its acceleration is:",
+      options: [
+        "5.0 m/s²",
+        "80.0 m/s²",
+        "2.5 m/s²",
+        "10.0 m/s²"
+      ],
+      answer: "A",
+      correct_option: "5.0 m/s²",
+      difficulty: "medium",
+      global_id: 207,
+      explanation: "Using a = (v − u) / t: a = (20 − 0) / 4 = 5.0 m/s²."
+    },
+    {
+      id: 8,
+      question: "A 5.0 kg mass sits on a horizontal surface where g = 9.8 m/s². What is its gravitational weight W?",
+      options: [
+        "49.0 N",
+        "9.8 N",
+        "2.0 N",
+        "50.0 N"
+      ],
+      answer: "A",
+      correct_option: "49.0 N",
+      difficulty: "easy",
+      global_id: 208,
+      explanation: "W = mg = 5.0 kg × 9.8 m/s² = 49.0 N."
+    },
+    {
+      id: 9,
+      question: "If normal reaction force N = 50.0 N and friction coefficient μ = 0.20, what is the maximum frictional force Fᶠ?",
+      options: [
+        "10.0 N",
+        "250.0 N",
+        "5.0 N",
+        "0.004 N"
+      ],
+      answer: "A",
+      correct_option: "10.0 N",
+      difficulty: "medium",
+      global_id: 209,
+      explanation: "Fᶠ = μN = 0.20 × 50.0 N = 10.0 N."
+    },
+    {
+      id: 10,
+      question: "A 4.0 kg ball moves with speed 3.0 m/s. What is its kinetic energy?",
+      options: [
+        "18.0 J",
+        "12.0 J",
+        "36.0 J",
+        "6.0 J"
+      ],
+      answer: "A",
+      correct_option: "18.0 J",
+      difficulty: "medium",
+      global_id: 210,
+      explanation: "KE = (1/2)mv² = 0.5 × 4.0 × (3.0)² = 2 × 9 = 18.0 J."
+    },
+    {
+      id: 11,
+      question: "According to Newton's Second Law, if the net external force F_net acting on an object is zero, its acceleration is:",
+      options: [
+        "Zero (velocity remains constant)",
+        "Infinity",
+        "9.8 m/s²",
+        "Continuously increasing"
+      ],
+      answer: "A",
+      correct_option: "Zero (velocity remains constant)",
+      difficulty: "easy",
+      global_id: 211,
+      explanation: "When F_net = 0, a = F_net / m = 0, meaning velocity does not change (Newton's 1st Law)."
+    },
+    {
+      id: 12,
+      question: "What happens to the kinetic energy of an object if its speed v is doubled?",
+      options: [
+        "It increases by 4 times (quadruples)",
+        "It doubles (increases by 2 times)",
+        "It remains unchanged",
+        "It increases by 8 times"
+      ],
+      answer: "A",
+      correct_option: "It increases by 4 times (quadruples)",
+      difficulty: "medium",
+      global_id: 212,
+      explanation: "Since KE ∝ v², doubling v multiplies KE by 2² = 4."
+    },
+    {
+      id: 13,
+      question: "If the mass of an accelerating body is doubled while the net applied force remains constant, the acceleration:",
+      options: [
+        "Halves (is reduced to 1/2)",
+        "Doubles (is multiplied by 2)",
+        "Stays constant",
+        "Quadruples"
+      ],
+      answer: "A",
+      correct_option: "Halves (is reduced to 1/2)",
+      difficulty: "easy",
+      global_id: 213,
+      explanation: "Since a = F / m, acceleration is inversely proportional to mass."
+    },
+    {
+      id: 14,
+      question: "In the friction formula Fᶠ = μN, what does N represent physically?",
+      options: [
+        "The normal contact force perpendicular to the contact interface",
+        "Newton's constant of universal gravitation",
+        "Net horizontal driving force",
+        "Number of interacting surface molecules"
+      ],
+      answer: "A",
+      correct_option: "The normal contact force perpendicular to the contact interface",
+      difficulty: "medium",
+      global_id: 214,
+      explanation: "N is the normal reaction force directed perpendicular to the contact surface."
+    },
+    {
+      id: 15,
+      question: "A 10.0 kg object is in free fall in zero-gravity space (g = 0 m/s²). What is its weight?",
+      options: [
+        "0 N (weightless)",
+        "98.1 N",
+        "10.0 N",
+        "Infinity"
+      ],
+      answer: "A",
+      correct_option: "0 N (weightless)",
+      difficulty: "easy",
+      global_id: 215,
+      explanation: "W = mg = 10.0 kg × 0 m/s² = 0 N."
+    }
+  ]
+};
+
+export const DIFFRACTION_QUESTION_BANK = {
+  title: "Diffraction Grating & Wave Optics - Question Bank",
+  experimentId: "diffraction",
+  quizId: "diffraction-mastery-quiz",
+  experimentName: "Diffraction Grating (Wave Optics)",
+  total_questions: 15,
+  questions: [
+    {
+      id: 1,
+      question: "What is the fundamental Grating Equation relating grating spacing d, angle θ, spectral order n, and wavelength λ?",
+      options: [
+        "d sin θ = nλ",
+        "d cos θ = nλ",
+        "d / sin θ = nλ",
+        "d sin θ = λ / n"
+      ],
+      answer: "A",
+      correct_option: "d sin θ = nλ",
+      difficulty: "easy",
+      global_id: 301,
+      explanation: "The condition for constructive interference principal maxima through a transmission grating is d sin θ = nλ."
+    },
+    {
+      id: 2,
+      question: "Rearranging the grating equation, what is the formula for wavelength λ?",
+      options: [
+        "λ = (d sin θ) / n",
+        "λ = (n sin θ) / d",
+        "λ = n d sin θ",
+        "λ = d / (n sin θ)"
+      ],
+      answer: "A",
+      correct_option: "λ = (d sin θ) / n",
+      difficulty: "easy",
+      global_id: 302,
+      explanation: "Dividing both sides of d sin θ = nλ by order n yields λ = (d sin θ) / n."
+    },
+    {
+      id: 3,
+      question: "How is the grating element d related to the number of lines per unit length N?",
+      options: [
+        "d = 1 / N",
+        "d = N",
+        "d = 10⁻³ · N",
+        "d = N²"
+      ],
+      answer: "A",
+      correct_option: "d = 1 / N",
+      difficulty: "easy",
+      global_id: 303,
+      explanation: "The grating element (pitch d) is the reciprocal of lines per unit length: d = 1 / N."
+    },
+    {
+      id: 4,
+      question: "If N is the number of lines per millimeter, what is the grating element d in meters?",
+      options: [
+        "d = 10⁻³ / N",
+        "d = 10³ / N",
+        "d = 10⁻⁶ / N",
+        "d = N / 10⁻³"
+      ],
+      answer: "A",
+      correct_option: "d = 10⁻³ / N",
+      difficulty: "medium",
+      global_id: 304,
+      explanation: "Since 1 mm = 10⁻³ m, d in meters is 10⁻³ / N."
+    },
+    {
+      id: 5,
+      question: "Substituting d = 10⁻³ / N into the wavelength formula λ = (d sin θ) / n gives:",
+      options: [
+        "λ = (10⁻³ sin θ) / (nN)",
+        "λ = (nN sin θ) / 10⁻³",
+        "λ = (10⁻³ n sin θ) / N",
+        "λ = (N sin θ) / (10⁻³ n)"
+      ],
+      answer: "A",
+      correct_option: "λ = (10⁻³ sin θ) / (nN)",
+      difficulty: "medium",
+      global_id: 305,
+      explanation: "Substituting d = 10⁻³ / N into λ = (d sin θ) / n directly yields λ = (10⁻³ sin θ) / (nN)."
+    },
+    {
+      id: 6,
+      question: "What is the diffraction angle θ for the central zeroth-order maximum (n = 0)?",
+      options: [
+        "0° (directly on the optical axis)",
+        "90°",
+        "45°",
+        "Depends on wavelength"
+      ],
+      answer: "A",
+      correct_option: "0° (directly on the optical axis)",
+      difficulty: "easy",
+      global_id: 306,
+      explanation: "When n = 0, d sin θ = 0 ⇒ sin θ = 0 ⇒ θ = 0° for all wavelengths."
+    },
+    {
+      id: 7,
+      question: "If a diffraction grating has N = 500 lines/mm, what is its grating pitch d?",
+      options: [
+        "2.0 × 10⁻⁶ m (2.0 μm)",
+        "5.0 × 10⁻⁶ m (5.0 μm)",
+        "0.5 × 10⁻³ m",
+        "2.0 × 10⁻³ m"
+      ],
+      answer: "A",
+      correct_option: "2.0 × 10⁻⁶ m (2.0 μm)",
+      difficulty: "medium",
+      global_id: 307,
+      explanation: "d = 10⁻³ / 500 = 2.0 × 10⁻⁶ m = 2.0 μm."
+    },
+    {
+      id: 8,
+      question: "In the grating equation d sin θ = nλ, what does the integer 'n' designate?",
+      options: [
+        "Order number of the diffraction maximum (n = 0, ±1, ±2, ...)",
+        "Refractive index of the grating glass",
+        "Total number of slits in the grating",
+        "Intensity of the incident beam"
+      ],
+      answer: "A",
+      correct_option: "Order number of the diffraction maximum (n = 0, ±1, ±2, ...)",
+      difficulty: "easy",
+      global_id: 308,
+      explanation: "n is the spectral order representing the integer number of wavelengths path difference between adjacent slits."
+    },
+    {
+      id: 9,
+      question: "For a given order n and grating d, how does the diffraction angle θ vary with wavelength λ?",
+      options: [
+        "Longer wavelengths diffract at larger angles θ",
+        "Shorter wavelengths diffract at larger angles θ",
+        "All wavelengths diffract at the exact same angle",
+        "Wavelength has no effect on diffraction angle"
+      ],
+      answer: "A",
+      correct_option: "Longer wavelengths diffract at larger angles θ",
+      difficulty: "medium",
+      global_id: 309,
+      explanation: "From sin θ = nλ / d, sin θ is directly proportional to λ; red light (longer λ) diffracts more than blue (shorter λ)."
+    },
+    {
+      id: 10,
+      question: "If the calculated sin θ for an order n exceeds 1.0, what does this indicate physically?",
+      options: [
+        "That spectral order cannot form (it is physically inaccessible)",
+        "The light is absorbed as heat",
+        "The wave becomes supersonic",
+        "The grating converts light into electricity"
+      ],
+      answer: "A",
+      correct_option: "That spectral order cannot form (it is physically inaccessible)",
+      difficulty: "medium",
+      global_id: 310,
+      explanation: "Since real angles have |sin θ| ≤ 1, any order requiring sin θ > 1 cannot exist physically."
+    },
+    {
+      id: 11,
+      question: "If a grating's line density N is increased (e.g. from 300 to 600 lines/mm), what happens to fringe angular spacing?",
+      options: [
+        "Angular separation between orders increases",
+        "Angular separation between orders decreases",
+        "Fringes collapse into a single point",
+        "No change occurs"
+      ],
+      answer: "A",
+      correct_option: "Angular separation between orders increases",
+      difficulty: "medium",
+      global_id: 311,
+      explanation: "Higher N means smaller d (d = 1/N). Since sin θ = nλ/d, smaller d increases sin θ and widens fringe separation."
+    },
+    {
+      id: 12,
+      question: "On a detector screen at distance L, fringe position y for small to moderate angle θ is related to θ by:",
+      options: [
+        "y = L · tan θ",
+        "y = L / sin θ",
+        "y = L · cos θ",
+        "y = L² · tan θ"
+      ],
+      answer: "A",
+      correct_option: "y = L · tan θ",
+      difficulty: "easy",
+      global_id: 312,
+      explanation: "From standard right-triangle geometry of the optical bench, tan θ = y / L ⇒ y = L · tan θ."
+    },
+    {
+      id: 13,
+      question: "What physical phenomenon occurs when light passes through thousands of closely spaced parallel slits?",
+      options: [
+        "Multi-slit Fraunhofer diffraction and coherent interference",
+        "Nuclear magnetic resonance",
+        "Total internal reflection inside the vacuum",
+        "Piezoelectric polarization"
+      ],
+      answer: "A",
+      correct_option: "Multi-slit Fraunhofer diffraction and coherent interference",
+      difficulty: "easy",
+      global_id: 313,
+      explanation: "A diffraction grating produces constructive interference between diffracted wavelets from multiple coherent slits."
+    },
+    {
+      id: 14,
+      question: "What is the SI unit of wavelength λ calculated from the grating formula?",
+      options: [
+        "Meter (m)",
+        "Diopter (D)",
+        "Watt per steradian",
+        "Hertz (Hz)"
+      ],
+      answer: "A",
+      correct_option: "Meter (m)",
+      difficulty: "easy",
+      global_id: 314,
+      explanation: "Wavelength is a spatial length measurement with SI unit meters (m), commonly expressed in nanometers (1 nm = 10⁻⁹ m)."
+    },
+    {
+      id: 15,
+      question: "Why does the central maximum (n = 0) of a white-light source through a grating appear white?",
+      options: [
+        "Because all wavelengths have zero path difference (θ = 0) and recombine",
+        "Because gratings only diffract ultraviolet rays",
+        "Because glass absorbs all colors except white",
+        "Because speed of light is zero on axis"
+      ],
+      answer: "A",
+      correct_option: "Because all wavelengths have zero path difference (θ = 0) and recombine",
+      difficulty: "medium",
+      global_id: 315,
+      explanation: "At n = 0, path difference d sin θ = 0 for all wavelengths simultaneously, so all spectral components overlap to yield white light."
+    }
+  ]
+};
+
 /**
  * Fisher-Yates pure randomization shuffle algorithm
  */
@@ -2306,7 +2776,7 @@ function shuffleArray(array) {
  * Returns a fresh, randomly sampled 10-question quiz with completely shuffled questions
  * and shuffled options for every single question.
  * 
- * @param {string} expId - 'projectile' | 'optical' | 'colour-sensor'
+ * @param {string} expId - 'projectile' | 'optical' | 'colour-sensor' | 'sandbox' | 'diffraction'
  * @returns {object} { quizId, title, experimentName, questions: [10 randomly sampled and shuffled questions] }
  */
 export function generateRandom10QuestionQuiz(expId = "projectile") {
@@ -2315,6 +2785,10 @@ export function generateRandom10QuestionQuiz(expId = "projectile") {
     bank = OPTICAL_FIBRE_QUESTION_BANK;
   } else if (expId === "colour-sensor" || expId === "exp-colour-sensor" || expId === "exp3") {
     bank = COLOUR_SENSOR_QUESTION_BANK;
+  } else if (expId === "sandbox" || expId === "exp-sandbox" || expId === "exp4") {
+    bank = SANDBOX_QUESTION_BANK;
+  } else if (expId === "diffraction" || expId === "exp-diffraction" || expId === "exp5") {
+    bank = DIFFRACTION_QUESTION_BANK;
   }
 
   // 1. Shuffle the full 50-question bank

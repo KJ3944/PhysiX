@@ -21,6 +21,7 @@ import { createOpticalFibreExperiment } from "./optical-fibre.js";
 import { createColourSensorExperiment } from "./colour-sensor.js";
 import { createPhysicsSandboxExperiment } from "./sandbox/sandbox-experiment.js";
 import { createDiffractionGratingExperiment } from "./diffraction-grating.js";
+import { createDiodeExperiment } from "./diode-vi.js";
 import {
   tutorialManager,
   isExperimentTutorialCompleted,
@@ -32,6 +33,7 @@ import { initPhysixLogoAnimation } from "./logo-animation.js";
 import { generateLabReportPdf } from "./pdf-export.js";
 import { initContentProtection } from "./content-protection.js";
 import { EXPERIMENT_DETAILS } from "./experiment-details-data.js";
+import { renderMathInText, renderMathInElement } from "./math-renderer.js";
 import {
   initCelebrations,
   showLevelUpCelebration,
@@ -336,6 +338,7 @@ let opticalExperimentInstance = null;
 let colourSensorExperimentInstance = null;
 let physicsSandboxExperimentInstance = null;
 let diffractionExperimentInstance = null;
+let diodeExperimentInstance = null;
 
 // Help & Interactive User Guide DOM Elements
 const helpModal = document.getElementById("help-modal");
@@ -346,11 +349,13 @@ const btnHelpExp2 = document.getElementById("btn-help-tab-exp2");
 const btnHelpExp3 = document.getElementById("btn-help-tab-exp3");
 const btnHelpExp4 = document.getElementById("btn-help-tab-exp4");
 const btnHelpExp5 = document.getElementById("btn-help-tab-exp5");
+const btnHelpExp6 = document.getElementById("btn-help-tab-exp6");
 const helpPaneExp1 = document.getElementById("help-pane-exp1");
 const helpPaneExp2 = document.getElementById("help-pane-exp2");
 const helpPaneExp3 = document.getElementById("help-pane-exp3");
 const helpPaneExp4 = document.getElementById("help-pane-exp4");
 const helpPaneExp5 = document.getElementById("help-pane-exp5");
+const helpPaneExp6 = document.getElementById("help-pane-exp6");
 
 // Vectra AI DOM Elements
 const aiCopilotModal = document.getElementById("ai-copilot-modal");
@@ -914,7 +919,7 @@ function drawCoordinateGrid(ctx) {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    ctx.fillStyle = isLight ? "#64748b" : "#506080";
+    ctx.fillStyle = isLight ? "#334155" : "#506080";
     ctx.textAlign = "right";
     ctx.fillText(`${h}m`, ORIGIN_X - 10, y + 4);
   }
@@ -1646,6 +1651,22 @@ function syncChallengeToLocalState(challengeId, persistToStorage = true) {
       diffractionExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
     }
   }
+
+  // Exp 6: Diode V-I Characteristics
+  if (challengeId.startsWith("diode.")) {
+    const diodeKey = challengeId.replace("diode.", "");
+    if (persistToStorage && canPerformCloudOperation()) {
+      try {
+        const savedDiode = JSON.parse(localStorage.getItem("physix_diode_challenges") || "{}");
+        if (!savedDiode[diodeKey]) savedDiode[diodeKey] = {};
+        savedDiode[diodeKey].completed = true;
+        localStorage.setItem("physix_diode_challenges", JSON.stringify(savedDiode));
+      } catch (e) {}
+    }
+    if (diodeExperimentInstance && typeof diodeExperimentInstance.hydrateChallenges === "function") {
+      diodeExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+    }
+  }
 }
 
 export async function completeChallengeAuthoritatively({ challengeId, xp, badgeId, badgeTitle, title }) {
@@ -1852,6 +1873,23 @@ function hydrateAllExperimentChallenges(completedChallengeIds) {
 
   if (diffractionExperimentInstance && typeof diffractionExperimentInstance.hydrateChallenges === "function") {
     diffractionExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+  }
+
+  // 6. Exp 6: Diode V-I Characteristics
+  try {
+    const savedDiode = JSON.parse(localStorage.getItem("physix_diode_challenges") || "{}");
+    const diodeKeys = ["setRangesFwd", "connectFwd", "recordFwd", "setRangesRev", "connectRev", "recordRev", "generateFwdCurve", "generateRevCurve"];
+    diodeKeys.forEach(k => {
+      if (set.has(`diode.${k}`)) {
+        if (!savedDiode[k]) savedDiode[k] = {};
+        savedDiode[k].completed = true;
+      }
+    });
+    localStorage.setItem("physix_diode_challenges", JSON.stringify(savedDiode));
+  } catch (e) {}
+
+  if (diodeExperimentInstance && typeof diodeExperimentInstance.hydrateChallenges === "function") {
+    diodeExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
   }
 }
 
@@ -3572,6 +3610,8 @@ function initQuiz(expId) {
     if (chosenExp === "projectile") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 1";
     else if (chosenExp === "optical") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 2";
     else if (chosenExp === "colour-sensor") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 3";
+    else if (chosenExp === "sandbox") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 4";
+    else if (chosenExp === "diffraction") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 5";
   }
 
   if (quizModalTitle) {
@@ -3596,6 +3636,20 @@ function initQuiz(expId) {
         </svg>
         Colour Sensor TCS3200 Quiz (10Q)
       `;
+    } else if (chosenExp === "sandbox") {
+      quizModalTitle.innerHTML = `
+        <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#38bdf8;">
+          <circle cx="12" cy="12" r="9"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        Newtonian Mechanics & Kinematics Quiz (10Q)
+      `;
+    } else if (chosenExp === "diffraction") {
+      quizModalTitle.innerHTML = `
+        <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#10b981;">
+          <circle cx="12" cy="12" r="9"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        Diffraction Grating & Wave Optics Quiz (10Q)
+      `;
     }
   }
 
@@ -3606,6 +3660,10 @@ function initQuiz(expId) {
       quizModalDesc.textContent = "Randomized 10-question evaluation sampled from 50-question Optical Fibre & TIR bank";
     } else if (chosenExp === "colour-sensor") {
       quizModalDesc.textContent = "Randomized 10-question evaluation sampled from 50-question Colour Sensor & Photometry bank";
+    } else if (chosenExp === "sandbox") {
+      quizModalDesc.textContent = "Randomized 10-question evaluation on Newton's Second Law, Acceleration, Friction, and Energy";
+    } else if (chosenExp === "diffraction") {
+      quizModalDesc.textContent = "Randomized 10-question evaluation on the Grating Equation, Spectral Orders, and Wavelength determination";
     }
   }
 
@@ -3626,7 +3684,7 @@ function renderQuizQuestion(index) {
   if (quizProgressBar) quizProgressBar.style.width = `${progressPercent}%`;
   if (quizProgressPercent) quizProgressPercent.textContent = `${Math.round(progressPercent)}%`;
 
-  if (quizQuestionText) quizQuestionText.textContent = `${index + 1}. ${q.question}`;
+  if (quizQuestionText) quizQuestionText.innerHTML = `${index + 1}. ${renderMathInText(q.question)}`;
   if (quizOptionsList) quizOptionsList.innerHTML = "";
 
   const savedAnswer = quizState.userAnswers[q.id];
@@ -3643,7 +3701,7 @@ function renderQuizQuestion(index) {
     card.innerHTML = `
       <div style="display:flex; align-items:center; gap:12px;">
         <span class="quiz-option-marker">${letters[optIdx]}</span>
-        <span>${opt}</span>
+        <span>${renderMathInText(opt)}</span>
       </div>
       <span style="font-size:18px;">${opt === chosenOption ? "●" : "○"}</span>
     `;
@@ -3983,16 +4041,104 @@ btnCloseExplorer.addEventListener("click", () => {
   explorerModal.classList.add("hidden");
 });
 
-// Theory Modal
-btnOpenTheory.addEventListener("click", () => {
-  if (activeExperimentId === "colour-sensor") {
-    btnTheoryExp3?.click();
+// Theory Modal - Opens Active Experiment Theory Directly
+function openActiveExperimentTheory() {
+  const panes = [
+    document.getElementById("theory-pane-exp1"),
+    document.getElementById("theory-pane-exp2"),
+    document.getElementById("theory-pane-exp3"),
+    document.getElementById("theory-pane-exp4"),
+    document.getElementById("theory-pane-exp5"),
+    document.getElementById("theory-pane-exp6")
+  ];
+  panes.forEach(pane => {
+    if (pane) {
+      pane.classList.remove("active");
+      pane.classList.add("hidden");
+    }
+  });
+
+  let targetPane = document.getElementById("theory-pane-exp1");
+  const modalDesc = document.getElementById("theory-modal-desc");
+
+  if (activeExperimentId === "diode" || activeExperimentId === "diode-vi") {
+    targetPane = document.getElementById("theory-pane-exp6");
+    const modalTitle = document.getElementById("theory-modal-title");
+    if (modalTitle) {
+      modalTitle.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#f59e0b;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> Diode V-I Characteristics Theory & Formulas`;
+    }
+    if (modalDesc) modalDesc.textContent = "Complete Theory, Shockley Equation, Forward Knee Voltage & Dual Circuit Diagrams";
+
+    if (targetPane && EXPERIMENT_DETAILS && EXPERIMENT_DETAILS["diode"]) {
+      const d = EXPERIMENT_DETAILS["diode"];
+      targetPane.innerHTML = `
+        <div class="theory-detail-content" style="display:flex; flex-direction:column; gap:16px;">
+          <div class="formula-block" style="border-left: 3px solid #f59e0b; padding-left: 12px;">
+            <h4 style="color:#fbbf24; margin-bottom:6px;">Aim of Experiment</h4>
+            <div style="color:#cbd5e1; font-size:13px; line-height:1.6;">${d.aim}</div>
+          </div>
+          <div class="formula-block" style="border-left: 3px solid #38bdf8; padding-left: 12px;">
+            <h4 style="color:#38bdf8; margin-bottom:6px;">Apparatus Required</h4>
+            <div style="color:#cbd5e1; font-size:13px; line-height:1.6;">${d.apparatus}</div>
+          </div>
+          <div class="formula-block">
+            <h4 style="color:#f8fafc; margin-bottom:10px;">Governing Formulas & Mathematical Expressions</h4>
+            <div class="formula-grid">
+              <div class="formula-item">
+                <span class="f-name">Shockley Diode Equation:</span>
+                <code>I = I_0 \\left( e^{\\frac{V}{\\eta V_t}} - 1 \\right)</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Thermal Voltage:</span>
+                <code>V_t = \\frac{kT}{q}</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Dynamic (AC) Resistance:</span>
+                <code>r_d = \\frac{\\Delta V_f}{\\Delta I_f}</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Static (DC) Resistance:</span>
+                <code>R_{dc} = \\frac{V_f}{I_f}</code>
+              </div>
+            </div>
+            <div style="margin-top:10px; font-size:12px; color:#94a3b8; line-height:1.6;">
+              Where $I$ is diode current, $I_0$ is reverse saturation current ($~\\mu\\text{A}$), $V$ is applied voltage, $\\eta$ is ideality factor ($\\approx 1$ for Ge, $\\approx 2$ for Si at moderate currents), $V_t$ is thermal voltage ($\\approx 25.86\\text{ mV}$ at $300\\text{ K}$), $k$ is Boltzmann constant ($1.381 \\times 10^{-23}\\text{ J/K}$), $T$ is absolute temperature in Kelvin, and $q$ is electronic charge ($1.602 \\times 10^{-19}\\text{ C}$).
+            </div>
+          </div>
+          <div class="theory-main-body" style="color:#cbd5e1; font-size:13px; line-height:1.6;">
+            ${d.theory}
+          </div>
+        </div>
+      `;
+    }
+  } else if (activeExperimentId === "diffraction") {
+    targetPane = document.getElementById("theory-pane-exp5");
+    if (modalDesc) modalDesc.textContent = "Grating Equation, Element Spacing, Spectral Orders & Wavelength Equations";
+  } else if (activeExperimentId === "sandbox") {
+    targetPane = document.getElementById("theory-pane-exp4");
+    if (modalDesc) modalDesc.textContent = "Newton's Second Law, Acceleration, Weight, Friction & Kinetic Energy";
+  } else if (activeExperimentId === "colour-sensor") {
+    targetPane = document.getElementById("theory-pane-exp3");
+    if (modalDesc) modalDesc.textContent = "TCS3200 Photodiode Matrix, Colorimetry & Frequency Equations";
   } else if (activeExperimentId === "optical") {
-    btnTheoryExp2?.click();
+    targetPane = document.getElementById("theory-pane-exp2");
+    if (modalDesc) modalDesc.textContent = "Total Internal Reflection, Acceptance Angle & Numerical Aperture Equations";
   } else {
-    btnTheoryExp1?.click();
+    targetPane = document.getElementById("theory-pane-exp1");
+    if (modalDesc) modalDesc.textContent = "2D Projectile Motion Kinematics, Range & Time of Flight Equations";
   }
+
+  if (targetPane) {
+    targetPane.classList.remove("hidden");
+    targetPane.classList.add("active");
+  }
+
   theoryModal.classList.remove("hidden");
+  renderMathInElement(theoryModal);
+}
+
+btnOpenTheory.addEventListener("click", () => {
+  openActiveExperimentTheory();
 });
 btnCloseTheory.addEventListener("click", () => {
   theoryModal.classList.add("hidden");
@@ -4000,7 +4146,7 @@ btnCloseTheory.addEventListener("click", () => {
 
 // Help & Interactive User Guide Modal
 function switchHelpTab(tabIndex) {
-  [btnHelpExp1, btnHelpExp2, btnHelpExp3, btnHelpExp4, btnHelpExp5].forEach((btn, idx) => {
+  [btnHelpExp1, btnHelpExp2, btnHelpExp3, btnHelpExp4, btnHelpExp5, btnHelpExp6].forEach((btn, idx) => {
     if (btn) {
       if (idx === tabIndex - 1) {
         btn.classList.add("active");
@@ -4010,11 +4156,12 @@ function switchHelpTab(tabIndex) {
     }
   });
 
-  [helpPaneExp1, helpPaneExp2, helpPaneExp3, helpPaneExp4, helpPaneExp5].forEach((pane, idx) => {
+  [helpPaneExp1, helpPaneExp2, helpPaneExp3, helpPaneExp4, helpPaneExp5, helpPaneExp6].forEach((pane, idx) => {
     if (pane) {
       if (idx === tabIndex - 1) {
         pane.classList.remove("hidden");
         pane.classList.add("active");
+        renderMathInElement(pane);
       } else {
         pane.classList.add("hidden");
         pane.classList.remove("active");
@@ -4028,9 +4175,12 @@ btnHelpExp2?.addEventListener("click", () => switchHelpTab(2));
 btnHelpExp3?.addEventListener("click", () => switchHelpTab(3));
 btnHelpExp4?.addEventListener("click", () => switchHelpTab(4));
 btnHelpExp5?.addEventListener("click", () => switchHelpTab(5));
+btnHelpExp6?.addEventListener("click", () => switchHelpTab(6));
 
 btnOpenHelp?.addEventListener("click", () => {
-  if (activeExperimentId === "diffraction") {
+  if (activeExperimentId === "diode" || activeExperimentId === "diode-vi") {
+    switchHelpTab(6);
+  } else if (activeExperimentId === "diffraction") {
     switchHelpTab(5);
   } else if (activeExperimentId === "sandbox") {
     switchHelpTab(4);
@@ -4042,6 +4192,7 @@ btnOpenHelp?.addEventListener("click", () => {
     switchHelpTab(1);
   }
   helpModal?.classList.remove("hidden");
+  if (helpModal) renderMathInElement(helpModal);
 });
 
 btnCloseHelp?.addEventListener("click", () => {
@@ -4101,6 +4252,24 @@ function getLiveSimulationContext() {
       maxOrder: dgState.maxObservableOrder || 3,
       isMysteryMode: !!dgState.isMysteryMode,
       observationsCount: Array.isArray(dgState.observations) ? dgState.observations.length : 0
+    };
+  }
+
+  if ((activeExperimentId === "diode" || activeExperimentId === "diode-vi") && diodeExperimentInstance) {
+    const dState = diodeExperimentInstance.getState();
+    return {
+      experiment: "Diode V-I Characteristics",
+      activeLab: "Voltage-Current Characteristics of Forward and Reverse Biased P-N Junction Diode",
+      mode: dState.mode,
+      powerOn: dState.powerOn,
+      circuitValid: dState.circuitValid,
+      forwardVoltage: dState.vf,
+      reverseVoltage: dState.vr,
+      forwardCurrentMa: dState.ifMa,
+      reverseCurrentUa: dState.irUa,
+      voltmeterRange: dState.vRange,
+      ammeterRange: dState.iRange,
+      observationsCount: dState.observationsCount
     };
   }
 
@@ -4287,29 +4456,13 @@ function closeAiCopilot() {
 
 function formatMarkdownToHtml(markdownText) {
   if (!markdownText) return "";
-  let text = markdownText
+  let text = renderMathInText(markdownText)
     .replace(/^#### (.*$)/gim, '<h5>$1</h5>')
     .replace(/^### (.*$)/gim, '<h4>$1</h4>')
     .replace(/^## (.*$)/gim, '<h3>$1</h3>')
     .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/gim, '<em>$1</em>')
-    .replace(/`([^`]+)`/gim, '<code class="font-mono">$1</code>')
-    .replace(/\\mathbf\{([^}]+)\}/gim, '<strong>$1</strong>')
-    .replace(/\\text\{([^}]+)\}/gim, '$1')
-    .replace(/\\approx/gim, '≈')
-    .replace(/\\times/gim, '×')
-    .replace(/\\cdot/gim, '·')
-    .replace(/\\theta/gim, 'θ')
-    .replace(/\\pi/gim, 'π')
-    .replace(/\\le/gim, '≤')
-    .replace(/\\ge/gim, '≥')
-    .replace(/\\pm/gim, '±')
-    .replace(/\\Delta/gim, 'Δ')
-    .replace(/\\circ/gim, '°')
-    .replace(/\\\((.*?)\\\)/gim, '<span class="font-mono">$1</span>')
-    .replace(/\\\[(.*?)\\\]/gim, '<div class="formula-latex">$1</div>')
-    .replace(/\$\$([\s\S]*?)\$\$/gim, '<div class="formula-latex">$1</div>')
-    .replace(/\$([^$]+)\$/gim, '<span class="font-mono">$1</span>');
+    .replace(/`([^`]+)`/gim, '<code class="font-mono">$1</code>');
 
   const lines = text.split("\n");
   const formattedLines = [];
@@ -4562,11 +4715,13 @@ const expOptSection = document.getElementById("exp-optical-section");
 const expColourSection = document.getElementById("exp-colour-sensor-section");
 const expSandboxSection = document.getElementById("exp-sandbox-section");
 const expDiffractionSection = document.getElementById("exp-diffraction-section");
+const expDiodeSection = document.getElementById("exp-diode-section");
 const btnSwitchProj = document.getElementById("btn-switch-exp-projectile");
 const btnSwitchOpt = document.getElementById("btn-switch-exp-optical");
 const btnSwitchColour = document.getElementById("btn-switch-exp-colour");
 const btnSwitchSandbox = document.getElementById("btn-switch-exp-sandbox");
 const btnSwitchDiffraction = document.getElementById("btn-switch-exp-diffraction");
+const btnSwitchDiode = document.getElementById("btn-switch-exp-diode");
 
 async function trackExperimentEngagement(expId) {
   if (!canPerformCloudOperation()) return;
@@ -4611,7 +4766,8 @@ async function trackExperimentEngagement(expId) {
 
 function switchExperiment(expId, updateUrl = true) {
   let normalizedId = expId;
-  if (expId === "diffraction-grating") normalizedId = "diffraction";
+  if (expId === "diode" || expId === "diode-vi" || expId === "pn-junction") normalizedId = "diode";
+  else if (expId === "diffraction-grating") normalizedId = "diffraction";
   else if (expId === "optical-fibre") normalizedId = "optical";
   else if (expId === "physics-sandbox") normalizedId = "sandbox";
 
@@ -4623,16 +4779,20 @@ function switchExperiment(expId, updateUrl = true) {
   expColourSection?.classList.add("hidden");
   expSandboxSection?.classList.add("hidden");
   expDiffractionSection?.classList.add("hidden");
+  expDiodeSection?.classList.add("hidden");
 
   btnSwitchProj?.classList.remove("active");
   btnSwitchOpt?.classList.remove("active");
   btnSwitchColour?.classList.remove("active");
   btnSwitchSandbox?.classList.remove("active");
   btnSwitchDiffraction?.classList.remove("active");
+  btnSwitchDiode?.classList.remove("active");
 
-  const routeSlug = normalizedId === "diffraction"
-    ? "diffraction-grating"
-    : (normalizedId === "optical" ? "optical-fibre" : normalizedId);
+  const routeSlug = normalizedId === "diode"
+    ? "diode-vi"
+    : (normalizedId === "diffraction"
+      ? "diffraction-grating"
+      : (normalizedId === "optical" ? "optical-fibre" : normalizedId));
 
   if (updateUrl && !document.body.classList.contains("on-homepage")) {
     const targetUrl = `/simulations/${routeSlug}`;
@@ -4795,6 +4955,47 @@ function switchExperiment(expId, updateUrl = true) {
     }
 
     showToast("Switched to Exp 2: Numerical Aperture of Optical Fibre");
+  } else if (normalizedId === "diode") {
+    expDiodeSection?.classList.remove("hidden");
+    btnSwitchDiode?.classList.add("active");
+
+    if (!diodeExperimentInstance) {
+      diodeExperimentInstance = createDiodeExperiment({
+        onXpAwarded: (amount, reason) => addStudentXp(amount, reason),
+        onExperimentRecorded: (id, data) => {
+          if (auth.currentUser && canPerformCloudOperation()) {
+            recordExperimentInFirestore(auth.currentUser.uid, id, data).then(res => {
+              if (res && typeof res.totalXP === "number") {
+                setAuthoritativeUserXp(auth.currentUser.uid, res.totalXP);
+                loadUserProfile();
+              }
+              if (res && res.experimentsPerformed >= 5) {
+                unlockBadge("badge-lab-veteran", "Laboratory Veteran (Explored Labs 5+ Times)");
+              }
+            }).catch(() => {});
+          }
+        },
+        showToast,
+        getActiveUserId,
+        loadUserProfile,
+        getStoredUserProfile,
+        unlockBadge: (badgeId, badgeName) => unlockBadge(badgeId, badgeName),
+        isUserAuthenticated,
+        openLoginModal,
+        onChallengeCompleted: (data) => completeChallengeAuthoritatively(data)
+      });
+      diodeExperimentInstance.init();
+      if (activeAuthoritativeCompletedChallenges.length > 0 && typeof diodeExperimentInstance.hydrateChallenges === "function") {
+        diodeExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+      }
+    } else {
+      if (activeAuthoritativeCompletedChallenges.length > 0 && typeof diodeExperimentInstance.hydrateChallenges === "function") {
+        diodeExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+      }
+      diodeExperimentInstance.renderAll();
+    }
+
+    showToast("Switched to Exp 6: Diode V-I Characteristics");
   } else {
     expProjSection?.classList.remove("hidden");
     btnSwitchProj?.classList.add("active");
@@ -4813,6 +5014,7 @@ btnSwitchOpt?.addEventListener("click", () => switchExperiment("optical"));
 btnSwitchColour?.addEventListener("click", () => switchExperiment("colour-sensor"));
 btnSwitchSandbox?.addEventListener("click", () => switchExperiment("sandbox"));
 btnSwitchDiffraction?.addEventListener("click", () => switchExperiment("diffraction"));
+btnSwitchDiode?.addEventListener("click", () => switchExperiment("diode"));
 
 // ==========================================
 // LAB & EXPERIMENT CARDS INTERACTION & WHITE LIGHT EFFECT
@@ -4827,7 +5029,8 @@ allExperimentCards.forEach(card => {
     const name = card.getAttribute("data-name") || "";
 
     let expId = null;
-    if (target === "diffraction" || target === "diffraction-grating" || name.toLowerCase().includes("diffraction")) expId = "diffraction-grating";
+    if (target === "diode" || target === "diode-vi" || name.toLowerCase().includes("diode") || name.toLowerCase().includes("p-n junction")) expId = "diode";
+    else if (target === "diffraction" || target === "diffraction-grating" || name.toLowerCase().includes("diffraction")) expId = "diffraction-grating";
     else if (target === "sandbox" || name.toLowerCase().includes("sandbox")) expId = "sandbox";
     else if (target === "colour-sensor" || name.toLowerCase().includes("colour sensor")) expId = "colour-sensor";
     else if (target === "optical" || name.toLowerCase().includes("optical fibre")) expId = "optical";
@@ -4975,9 +5178,19 @@ function applyTheme(theme) {
     colourSensorExperimentInstance.renderAll();
   }
 
+  // Update Physics Sandbox (Exp 4) simulation canvases & graphs
+  if (physicsSandboxExperimentInstance) {
+    physicsSandboxExperimentInstance.renderAll();
+  }
+
   // Update Diffraction Grating (Exp 5) simulation canvases
   if (diffractionExperimentInstance) {
     diffractionExperimentInstance.renderAll();
+  }
+
+  // Update Diode V-I Characteristics (Exp 6) simulation canvases & meters
+  if (diodeExperimentInstance) {
+    diodeExperimentInstance.renderAll();
   }
 }
 
@@ -5020,14 +5233,17 @@ function updateAuthStateRestrictions() {
   const challengesCardExp2 = document.querySelector("#exp-optical-section .challenges-card");
   const challengesCardExp3 = document.querySelector("#exp-colour-sensor-section .challenges-card");
   const challengesCardExp5 = document.querySelector("#exp-diffraction-section .challenges-card");
+  const challengesCardExp6 = document.querySelector("#exp-diode-section .challenges-card");
   if (isAuth) {
     challengesCardExp2?.classList.remove("challenges-locked");
     challengesCardExp3?.classList.remove("challenges-locked");
     challengesCardExp5?.classList.remove("challenges-locked");
+    challengesCardExp6?.classList.remove("challenges-locked");
   } else {
     challengesCardExp2?.classList.add("challenges-locked");
     challengesCardExp3?.classList.add("challenges-locked");
     challengesCardExp5?.classList.add("challenges-locked");
+    challengesCardExp6?.classList.add("challenges-locked");
   }
 
   if (opticalExperimentInstance) {
@@ -5052,6 +5268,12 @@ function updateAuthStateRestrictions() {
     diffractionExperimentInstance.renderAll();
     if (diffractionExperimentInstance.renderChallengesDom) {
       diffractionExperimentInstance.renderChallengesDom();
+    }
+  }
+  if (diodeExperimentInstance) {
+    diodeExperimentInstance.renderAll();
+    if (diodeExperimentInstance.renderChallengesDom) {
+      diodeExperimentInstance.renderChallengesDom();
     }
   }
 
@@ -5311,8 +5533,20 @@ onAuthStateChanged(auth, async (user) => {
     hydrateAllExperimentChallenges([]);
     hideVerificationOverlay();
     updateAuthStateRestrictions();
+    await processUserDailyStreak(null);
     loadUserProfile();
     renderChallenges();
+  }
+});
+
+// Refresh daily streak when returning to tab (e.g. across midnight boundary)
+document.addEventListener("visibilitychange", async () => {
+  if (document.visibilityState === "visible") {
+    try {
+      const currentUser = auth?.currentUser || null;
+      await processUserDailyStreak(currentUser);
+      loadUserProfile();
+    } catch (e) {}
   }
 });
 
@@ -5324,8 +5558,8 @@ let currentActiveDetailExpId = "projectile";
 
 export function openExperimentDetailsPage(expId) {
   tutorialManager.destroyTour();
-  const normalizedId = (expId === "sandbox" || expId === "colour-sensor" || expId === "optical" || expId === "projectile" || expId === "diffraction" || expId === "diffraction-grating")
-    ? (expId === "diffraction-grating" ? "diffraction" : expId)
+  const normalizedId = (expId === "diode" || expId === "diode-vi" || expId === "sandbox" || expId === "colour-sensor" || expId === "optical" || expId === "projectile" || expId === "diffraction" || expId === "diffraction-grating")
+    ? (expId === "diffraction-grating" ? "diffraction" : (expId === "diode-vi" ? "diode" : expId))
     : "projectile";
 
   const data = EXPERIMENT_DETAILS[normalizedId] || EXPERIMENT_DETAILS["projectile"];
@@ -5365,6 +5599,8 @@ export function openExperimentDetailsPage(expId) {
   if (formulasContent) formulasContent.innerHTML = data.formulas || "";
   if (obsContent) obsContent.innerHTML = data.observations || "";
   if (resultContent) resultContent.innerHTML = data.result || "";
+
+  renderMathInElement(detailPage);
 
   // Hide other pages & modals
   document.body.classList.remove("on-homepage");
@@ -5471,7 +5707,8 @@ function initExperimentsPage() {
     const name = card.getAttribute("data-name") || "";
 
     let expId = null;
-    if (target === "diffraction" || target === "diffraction-grating" || name.toLowerCase().includes("diffraction")) expId = "diffraction-grating";
+    if (target === "diode" || target === "diode-vi" || name.toLowerCase().includes("diode") || name.toLowerCase().includes("p-n junction")) expId = "diode";
+    else if (target === "diffraction" || target === "diffraction-grating" || name.toLowerCase().includes("diffraction")) expId = "diffraction-grating";
     else if (target === "sandbox" || name.toLowerCase().includes("sandbox")) expId = "sandbox";
     else if (target === "colour-sensor" || name.toLowerCase().includes("colour sensor")) expId = "colour-sensor";
     else if (target === "optical" || name.toLowerCase().includes("optical fibre")) expId = "optical";
@@ -5552,7 +5789,8 @@ export function handleRoute(path = window.location.pathname, hash = window.locat
     document.body.classList.remove("on-standalone-page");
     physixHome?.classList.add("hidden");
     let mappedId = expId;
-    if (expId === "diffraction-grating" || expId === "diffraction") mappedId = "diffraction";
+    if (expId === "diode" || expId === "diode-vi" || expId === "pn-junction") mappedId = "diode";
+    else if (expId === "diffraction-grating" || expId === "diffraction") mappedId = "diffraction";
     else if (expId === "optical-fibre" || expId === "optical") mappedId = "optical";
     else if (expId === "colour-sensor") mappedId = "colour-sensor";
     else if (expId === "sandbox" || expId === "physics-sandbox") mappedId = "sandbox";
@@ -5577,13 +5815,14 @@ export function handleRoute(path = window.location.pathname, hash = window.locat
     expPage?.classList.remove("hidden");
     initExperimentsPage();
     window.scrollTo({ top: 0, behavior: "instant" });
-  } else if (cleanHash === "#diffraction" || cleanHash === "#diffraction-grating" || cleanHash === "#sandbox" || cleanHash === "#optical" || cleanHash === "#colour-sensor" || cleanHash === "#projectile") {
+  } else if (cleanHash === "#diode" || cleanHash === "#diode-vi" || cleanHash === "#diffraction" || cleanHash === "#diffraction-grating" || cleanHash === "#sandbox" || cleanHash === "#optical" || cleanHash === "#colour-sensor" || cleanHash === "#projectile") {
     // Direct link to simulation
     document.body.classList.remove("on-homepage");
     document.body.classList.remove("on-standalone-page");
     physixHome?.classList.add("hidden");
     let mapped = cleanHash.replace("#", "");
-    if (mapped === "diffraction-grating") mapped = "diffraction";
+    if (mapped === "diode-vi" || mapped === "pn-junction") mapped = "diode";
+    else if (mapped === "diffraction-grating") mapped = "diffraction";
     switchExperiment(mapped, false);
   } else {
     // Default to Homepage

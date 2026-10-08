@@ -12,21 +12,58 @@ import {
 } from "./celebrations.js";
 import { isCloudOperationAllowed } from "./user-data-service.js";
 
-// Helper: Format date to local YYYY-MM-DD
+// Helper: Format date to local YYYY-MM-DD using user's local timezone (IST, etc.)
 export function getLocalDateString(date = new Date()) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+  const d = (date instanceof Date && !isNaN(date.getTime())) ? date : new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
-// Helper: Calculate calendar day difference between two YYYY-MM-DD dates
+// Helper: Robustly parse and normalize any date input (ISO string, YYYY-MM-DD, timestamp, Date) to local YYYY-MM-DD
+export function normalizeToLocalDateString(input) {
+  if (!input) return getLocalDateString();
+  if (input instanceof Date) {
+    return isNaN(input.getTime()) ? getLocalDateString() : getLocalDateString(input);
+  }
+  if (typeof input === "number") {
+    const d = new Date(input);
+    return isNaN(d.getTime()) ? getLocalDateString() : getLocalDateString(d);
+  }
+  if (typeof input === "string") {
+    const trimmed = input.trim();
+    // Check if it's already pure YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+      return trimmed;
+    }
+    // Parse as Date object to accurately extract local calendar components in the user's timezone
+    const d = new Date(trimmed);
+    if (!isNaN(d.getTime())) {
+      return getLocalDateString(d);
+    }
+    // Fallback: match leading YYYY-MM-DD
+    const match = trimmed.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (match) return match[1];
+  }
+  return getLocalDateString();
+}
+
+// Helper: Calculate calendar day difference between two dates safely across all timezones
 export function getDayDifference(dateStr1, dateStr2) {
   if (!dateStr1 || !dateStr2) return 0;
-  const d1 = new Date(dateStr1 + "T00:00:00");
-  const d2 = new Date(dateStr2 + "T00:00:00");
-  const diffTime = d2.getTime() - d1.getTime();
-  return Math.round(diffTime / (1000 * 60 * 60 * 24));
+  const d1Str = normalizeToLocalDateString(dateStr1);
+  const d2Str = normalizeToLocalDateString(dateStr2);
+  if (d1Str === d2Str) return 0;
+
+  const [y1, m1, day1] = d1Str.split("-").map(Number);
+  const [y2, m2, day2] = d2Str.split("-").map(Number);
+
+  // Set both to noon (12:00:00) in local time to avoid DST and midnight edge cases
+  const t1 = new Date(y1, m1 - 1, day1, 12, 0, 0).getTime();
+  const t2 = new Date(y2, m2 - 1, day2, 12, 0, 0).getTime();
+
+  return Math.round((t2 - t1) / (1000 * 60 * 60 * 24));
 }
 
 // Helper: Check if streak day count matches milestone criteria (10, 50, 100, 200, 300, 400, etc.)
@@ -55,7 +92,16 @@ export function getStoredUserStreak(userId = "guest") {
   try {
     const raw = localStorage.getItem(getStreakStorageKey(userId));
     if (raw) {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") {
+        return {
+          currentStreak: Number(parsed.currentStreak) || 0,
+          highestStreak: Number(parsed.highestStreak) || Number(parsed.currentStreak) || 0,
+          lastLoginDate: parsed.lastLoginDate ? normalizeToLocalDateString(parsed.lastLoginDate) : null,
+          lastBrokenStreak: Number(parsed.lastBrokenStreak) || 0,
+          lastBrokenDate: parsed.lastBrokenDate ? normalizeToLocalDateString(parsed.lastBrokenDate) : null
+        };
+      }
     }
   } catch (e) {
     console.warn("[Streak] Error reading local streak:", e);
@@ -72,7 +118,14 @@ export function getStoredUserStreak(userId = "guest") {
 // Save Streak data locally
 export function saveStoredUserStreak(userId = "guest", streakData) {
   try {
-    localStorage.setItem(getStreakStorageKey(userId), JSON.stringify(streakData));
+    const safeData = {
+      currentStreak: Number(streakData.currentStreak) || 0,
+      highestStreak: Number(streakData.highestStreak) || Number(streakData.currentStreak) || 0,
+      lastLoginDate: streakData.lastLoginDate ? normalizeToLocalDateString(streakData.lastLoginDate) : getLocalDateString(),
+      lastBrokenStreak: Number(streakData.lastBrokenStreak) || 0,
+      lastBrokenDate: streakData.lastBrokenDate ? normalizeToLocalDateString(streakData.lastBrokenDate) : null
+    };
+    localStorage.setItem(getStreakStorageKey(userId), JSON.stringify(safeData));
   } catch (e) {
     console.warn("[Streak] Error saving local streak:", e);
   }
@@ -88,28 +141,30 @@ export async function syncStreakWithFirebase(user, streakData) {
     return;
   }
 
+  const cleanLastLogin = normalizeToLocalDateString(streakData.lastLoginDate || new Date());
   const payload = {
     email: user.email || "",
     uid: user.uid,
-    streak: streakData.currentStreak || 0,
-    highestStreak: streakData.highestStreak || 0,
-    lastLoginDate: streakData.lastLoginDate || getLocalDateString(),
+    streak: Number(streakData.currentStreak) || 0,
+    highestStreak: Number(streakData.highestStreak) || Number(streakData.currentStreak) || 0,
+    lastLoginDate: cleanLastLogin,
     lastSeenAt: new Date().toISOString(),
     authProvider: user.providerData?.[0]?.providerId || "password",
     updatedAt: new Date().toISOString()
   };
 
-  // 1. Sync to Firebase Firestore
+  // 1. Sync to Firebase Firestore (persist both streak, highestStreak, and lastLoginDate)
   if (db) {
     try {
       const userRef = doc(db, "users", user.uid);
       await setDoc(userRef, {
         streak: payload.streak,
+        highestStreak: payload.highestStreak,
+        lastLoginDate: payload.lastLoginDate,
         lastActiveDate: payload.lastSeenAt,
         updatedAt: payload.updatedAt
       }, { merge: true });
     } catch (err) {
-      // If Firestore rules or offline, fallback smoothly
       console.warn("[Firebase] Firestore streak sync notice:", err.message);
     }
   }
@@ -125,9 +180,9 @@ export async function syncStreakWithFirebase(user, streakData) {
   } catch (err) {}
 }
 
-// Fetch Streak from Firebase Firestore on login
+// Fetch Streak from Firebase Firestore / Express Backend on login
 export async function fetchStreakFromFirebase(user) {
-  if (!user || !user.uid || !db) return null;
+  if (!user || !user.uid) return null;
   
   // Guard: Skip cloud fetch when offline
   if (!navigator.onLine || !isCloudOperationAllowed()) {
@@ -135,36 +190,57 @@ export async function fetchStreakFromFirebase(user) {
     return null;
   }
   
-  try {
-    const userRef = doc(db, "users", user.uid);
-    const snap = await getDoc(userRef);
-    if (snap.exists()) {
-      const data = snap.data();
-      if (data) {
-        return {
-          currentStreak: data.streak || 0,
-          highestStreak: data.highestStreak || data.streak || 0,
-          lastLoginDate: data.lastActiveDate || null
-        };
+  // 1. Try Firebase Firestore
+  if (db) {
+    try {
+      const userRef = doc(db, "users", user.uid);
+      const snap = await getDoc(userRef);
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data && (data.streak !== undefined || data.lastActiveDate || data.lastLoginDate)) {
+          const rawDate = data.lastLoginDate || data.lastActiveDate || null;
+          return {
+            currentStreak: Number(data.streak) || 0,
+            highestStreak: Number(data.highestStreak) || Number(data.streak) || 0,
+            lastLoginDate: rawDate ? normalizeToLocalDateString(rawDate) : null
+          };
+        }
       }
+    } catch (err) {
+      console.warn("[Firebase] Could not fetch Firestore streak:", err.message);
     }
-  } catch (err) {
-    console.warn("[Firebase] Could not fetch Firestore streak:", err.message);
   }
+
+  // 2. Express Backend Fallback
+  try {
+    const res = await api.getProfile(user.uid);
+    if (res && res.profile && (res.profile.streak !== undefined || res.profile.lastLoginDate)) {
+      const rawDate = res.profile.lastLoginDate || res.profile.updatedAt || null;
+      return {
+        currentStreak: Number(res.profile.streak) || 0,
+        highestStreak: Number(res.profile.highestStreak) || Number(res.profile.streak) || 0,
+        lastLoginDate: rawDate ? normalizeToLocalDateString(rawDate) : null
+      };
+    }
+  } catch (err) {}
+
   return null;
 }
 
 /**
- * Process Daily User Streak on Login / Auth Transition
+ * Process Daily User Streak on Login / Auth Transition / Daily Activity
  * Handles daily increments, broken streaks, and milestone animations.
  */
 export async function processUserDailyStreak(user) {
   const userId = user ? user.uid : "guest";
-  const userEmail = user ? user.email : "Guest User";
+  const userEmail = user ? (user.email || user.displayName || "PhysiX Scholar") : "Guest User";
   const todayStr = getLocalDateString();
 
-  // Try reading remote Firebase data first if authenticated
+  // Read local stored data
   let stored = getStoredUserStreak(userId);
+  if (stored && stored.lastLoginDate) {
+    stored.lastLoginDate = normalizeToLocalDateString(stored.lastLoginDate);
+  }
 
   // In offline mode: Do NOT increment, break, or save streaks
   if (!navigator.onLine || !isCloudOperationAllowed()) {
@@ -172,21 +248,48 @@ export async function processUserDailyStreak(user) {
     return { ...stored, status: "offline_preserved", changed: false };
   }
 
+  // Fetch remote Firestore streak if authenticated
   if (user && db) {
     try {
       const remoteData = await fetchStreakFromFirebase(user);
       if (remoteData && remoteData.lastLoginDate) {
-        // Use latest record
-        if (remoteData.currentStreak >= stored.currentStreak) {
-          stored = { ...stored, ...remoteData };
+        const remoteDate = normalizeToLocalDateString(remoteData.lastLoginDate);
+        const storedDate = stored.lastLoginDate ? normalizeToLocalDateString(stored.lastLoginDate) : null;
+        
+        // Merge highest streak seen
+        const bestStreak = Math.max(Number(remoteData.currentStreak) || 0, Number(stored.currentStreak) || 0);
+        const bestHighest = Math.max(
+          Number(remoteData.highestStreak) || 0,
+          Number(stored.highestStreak) || 0,
+          bestStreak
+        );
+
+        // Pick the most recent login date
+        let latestDate = storedDate || remoteDate;
+        if (storedDate && remoteDate) {
+          const diffBetweenSources = getDayDifference(storedDate, remoteDate);
+          if (diffBetweenSources > 0) {
+            latestDate = remoteDate; // remote is more recent
+          } else {
+            latestDate = storedDate; // stored is more recent or same
+          }
         }
+
+        stored = {
+          ...stored,
+          currentStreak: bestStreak,
+          highestStreak: bestHighest,
+          lastLoginDate: latestDate
+        };
       }
-    } catch (e) {}
+    } catch (e) {
+      console.warn("[Streak] Error merging remote streak:", e);
+    }
   }
 
   const { lastLoginDate, currentStreak = 0, highestStreak = 0 } = stored;
 
-  // Case 1: First ever login or uninitialized streak
+  // Case 1: First ever activity or uninitialized streak
   if (!lastLoginDate || currentStreak === 0) {
     const newStreakData = {
       currentStreak: 1,
@@ -200,10 +303,10 @@ export async function processUserDailyStreak(user) {
     return { ...newStreakData, status: "initial", changed: true };
   }
 
-  // Calculate day difference
+  // Calculate day difference using robust calendar normalization
   const diffDays = getDayDifference(lastLoginDate, todayStr);
 
-  // Case 2: Same calendar day login (streak preserved, no repeat animation)
+  // Case 2: Same calendar day activity (streak preserved, idempotent)
   if (diffDays === 0) {
     const newStreakData = {
       ...stored,
@@ -273,6 +376,7 @@ export async function processUserDailyStreak(user) {
     return { ...newStreakData, status: "broken", lostStreak: lostStreakCount, changed: true };
   }
 
-  // Fallback for clock skew (diffDays < 0)
+  // Fallback for clock skew (diffDays < 0): preserve streak and update date to today if today is newer
   return { ...stored, status: "unchanged", changed: false };
 }
+

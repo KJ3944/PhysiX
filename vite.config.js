@@ -1,7 +1,13 @@
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export default defineConfig({
+  define: {
+    __VECTRA_AI_KEY__: JSON.stringify(process.env.VECTRA_AI_KEY || process.env.GEMINI_API_KEY || "")
+  },
   server: {
     port: 5173,
     proxy: {

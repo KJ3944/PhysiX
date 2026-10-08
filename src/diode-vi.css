@@ -1,0 +1,1357 @@
+/* ==========================================================================
+   PhysiX • Experiment 6: Diode V-I Characteristics
+   Hardware Laboratory Apparatus, Analog Meter Dynamics, Interactive Wiring,
+   Dual-Quadrant Scientific Canvas Graphs & Telemetry Stylesheet
+   100% Zero Emojis compliant.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   0. SETUP GUIDE RIBBON
+   -------------------------------------------------------------------------- */
+.diode-setup-container {
+  max-width: 1380px;
+  margin: 0 auto 16px auto;
+  padding: 0 16px;
+}
+
+.diode-procedure-ribbon {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.7) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 12px;
+  padding: 12px 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+}
+
+.diode-proc-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.diode-proc-step .step-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.2);
+  border: 1px solid #f59e0b;
+  color: #fbbf24;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.diode-proc-step.active .step-num {
+  background: #f59e0b;
+  color: #0f172a;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+}
+
+.diode-proc-step .step-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.diode-proc-step .step-details strong {
+  color: #f8fafc;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.diode-proc-step .step-details span {
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+/* --------------------------------------------------------------------------
+   1. MAIN WORKSTATION DASHBOARD
+   -------------------------------------------------------------------------- */
+.diode-dashboard {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 1080px) {
+  .diode-dashboard {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. PHYSICAL LABORATORY CONTROLLER (IMAGE 1 AUTHENTIC RECREATION)
+   -------------------------------------------------------------------------- */
+.diode-chassis-card {
+  background: linear-gradient(180deg, #111e3b 0%, #0c162e 50%, #070e20 100%);
+  border: 2px solid #2a3d66;
+  border-radius: 14px;
+  padding: 16px;
+  position: relative;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), inset 0 2px 6px rgba(255, 255, 255, 0.1), inset 0 -4px 12px rgba(0, 0, 0, 0.8);
+  user-select: none;
+}
+
+/* Screws in 4 Corners of Chassis */
+.chassis-screw {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #94a3b8 0%, #475569 60%, #1e293b 100%);
+  border: 1px solid #334155;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 1px 3px rgba(0, 0, 0, 0.8);
+  z-index: 10;
+}
+.screw-tl { top: 8px; left: 8px; }
+.screw-tr { top: 8px; right: 8px; }
+.screw-bl { bottom: 8px; left: 8px; }
+.screw-br { bottom: 8px; right: 8px; }
+.chassis-screw::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 2px;
+  width: 7px;
+  height: 1.5px;
+  background: #0f172a;
+  transform: rotate(35deg);
+}
+
+/* Chassis Header */
+.diode-chassis-header {
+  text-align: center;
+  position: relative;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+}
+
+.diode-header-rule {
+  height: 2px;
+  background: linear-gradient(90deg, transparent 5%, #dc2626 25%, #ef4444 50%, #dc2626 75%, transparent 95%);
+  margin: 4px 20px;
+}
+
+.diode-chassis-title {
+  color: #ef4444;
+  font-family: 'Space Grotesk', Outfit, sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin: 4px 0;
+  text-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+}
+
+/* Central Amber Medallion / Badge */
+.diode-medallion {
+  width: 38px;
+  height: 38px;
+  margin: 4px auto 8px auto;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #fbbf24 0%, #d97706 70%, #78350f 100%);
+  border: 2px solid #fef3c7;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #78350f;
+  font-weight: 900;
+  font-size: 7.5px;
+  letter-spacing: 0.5px;
+}
+.diode-medallion svg {
+  width: 14px;
+  height: 14px;
+  fill: #78350f;
+}
+
+/* --------------------------------------------------------------------------
+   3. UPPER CONTROLLER SECTION: METERS & CENTER SWITCH
+   -------------------------------------------------------------------------- */
+.diode-meters-row {
+  display: grid;
+  grid-template-columns: 1fr 100px 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 600px) {
+  .diode-meters-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* Circular Meter Housing */
+.analog-meter-housing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.meter-bezel {
+  width: 195px;
+  height: 195px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #242936 0%, #151922 70%, #0a0d14 100%);
+  border: 4px solid #10141d;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), inset 0 3px 6px rgba(255, 255, 255, 0.15), inset 0 -6px 12px rgba(0, 0, 0, 0.9);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.meter-dial-face {
+  width: 168px;
+  height: 168px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 45%, #fffdf5 0%, #f7f3e4 60%, #e8e2ce 100%);
+  border: 1px solid #dcd5be;
+  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Glass Glare Dome Reflection */
+.meter-glass-glare {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.08) 45%, transparent 60%);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Analog Needle Canvas */
+.meter-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+}
+
+/* Meter Sub-Controls: Range switch and terminals */
+.meter-sub-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 190px;
+  margin-top: 10px;
+  padding: 4px 6px;
+  background: rgba(10, 16, 32, 0.6);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Range Selector Switch Box */
+.range-switch-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.range-switch-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.range-switch-label.active {
+  color: #fbbf24;
+  text-shadow: 0 0 6px rgba(251, 191, 36, 0.5);
+}
+
+/* Physical Metal Toggle Switch Component */
+.physical-toggle {
+  width: 22px;
+  height: 42px;
+  background: radial-gradient(circle, #334155 0%, #0f172a 100%);
+  border: 2px solid #475569;
+  border-radius: 11px;
+  position: relative;
+  cursor: pointer;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8), 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.toggle-bat {
+  position: absolute;
+  left: 3px;
+  width: 12px;
+  height: 20px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #f8fafc 0%, #cbd5e1 45%, #64748b 80%, #334155 100%);
+  border: 1px solid #ffffff;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
+  transition: top 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.physical-toggle.toggle-up .toggle-bat {
+  top: 3px;
+}
+
+.physical-toggle.toggle-down .toggle-bat {
+  top: 15px;
+}
+
+/* --------------------------------------------------------------------------
+   4. CENTER VERTICAL PANEL: POWER TOGGLE & PILOT LAMP
+   -------------------------------------------------------------------------- */
+.diode-center-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 6px;
+  background: linear-gradient(180deg, #0c1426 0%, #080d19 100%);
+  border: 2px solid #38bdf8;
+  border-radius: 18px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.4);
+  gap: 10px;
+}
+
+.power-switch-labels {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.power-lbl {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #64748b;
+  transition: color 0.2s;
+}
+
+.power-lbl.active {
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+/* Master Power Jewel Lamp (LED) */
+.power-pilot-lamp {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #7f1d1d 0%, #450a0a 70%, #1c0404 100%);
+  border: 2px solid #334155;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.power-pilot-lamp.lamp-on {
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #ff4d4d 30%, #ef4444 70%, #991b1b 100%);
+  border-color: #fca5a5;
+  box-shadow: 0 0 16px #ef4444, 0 0 32px rgba(239, 68, 68, 0.65), inset 0 1px 4px #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   5. LOWER CONTROLLER: THREE HORIZONTAL FUNCTIONAL ZONES
+   -------------------------------------------------------------------------- */
+.diode-lower-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1.35fr 1.1fr;
+  gap: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 12px;
+}
+
+@media (max-width: 860px) {
+  .diode-lower-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+.lower-box {
+  background: rgba(7, 13, 27, 0.8);
+  border: 1.5px solid rgba(56, 189, 248, 0.35);
+  border-radius: 10px;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.lower-box-caption {
+  text-align: center;
+  color: #cbd5e1;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+/* Supply Zone Content: Knob + Arc + Ports */
+.supply-zone-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 8px;
+}
+
+/* Rotary Voltage Knob Component */
+.rotary-knob-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.knob-arc-indicator {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  width: 76px;
+  height: 76px;
+  pointer-events: none;
+}
+
+.rotary-knob {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #475569 0%, #1e293b 65%, #0f172a 100%);
+  border: 2px solid #64748b;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7), inset 0 2px 4px rgba(255, 255, 255, 0.25);
+  cursor: grab;
+  position: relative;
+  transition: transform 0.05s linear;
+}
+
+.rotary-knob:active {
+  cursor: grabbing;
+}
+
+/* Fluted ridges on knob */
+.rotary-knob::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+}
+
+/* Knob pointer line */
+.knob-pointer {
+  position: absolute;
+  top: 6px;
+  left: 28px;
+  width: 4px;
+  height: 16px;
+  background: #ffffff;
+  border-radius: 2px;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+}
+
+.knob-label-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-top: 4px;
+}
+
+/* DC Output Ports Block */
+.dc-output-ports {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.dc-out-title {
+  color: #94a3b8;
+  font-family: sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.ports-pair-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ports-vert-arrow {
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1;
+}
+
+/* --------------------------------------------------------------------------
+   6. PHYSICAL BANANA TERMINAL SOCKETS
+   -------------------------------------------------------------------------- */
+.banana-terminal {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.banana-terminal:hover {
+  transform: scale(1.15);
+}
+
+.banana-terminal.terminal-selected {
+  outline: 2px solid #00f0ff;
+  box-shadow: 0 0 12px #00f0ff, inset 0 0 4px #00f0ff;
+  animation: pulse-terminal 1s infinite alternate;
+}
+
+@keyframes pulse-terminal {
+  from { transform: scale(1.1); box-shadow: 0 0 8px #00f0ff; }
+  to { transform: scale(1.2); box-shadow: 0 0 16px #00f0ff; }
+}
+
+/* Red Positive Terminal Socket */
+.terminal-red {
+  background: radial-gradient(circle at 40% 40%, #ef4444 0%, #b91c1c 70%, #7f1d1d 100%);
+  border: 2px solid #f87171;
+}
+
+/* Black Negative Terminal Socket */
+.terminal-black {
+  background: radial-gradient(circle at 40% 40%, #334155 0%, #1e293b 70%, #020617 100%);
+  border: 2px solid #64748b;
+}
+
+/* Metallic Hole in Center */
+.terminal-hole {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #020617;
+  border: 1px solid #475569;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+/* Terminal Label (e.g. +, -, P, N) */
+.terminal-lbl {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+}
+.terminal-lbl.red-txt { color: #f87171; }
+.terminal-lbl.black-txt { color: #cbd5e1; }
+
+/* --------------------------------------------------------------------------
+   7. CENTER P-N JUNCTION TERMINALS SECTION
+   -------------------------------------------------------------------------- */
+.pn-junction-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.diode-row-mount {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 10px;
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.diode-schematic-symbol {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.diode-row-title {
+  text-align: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  color: #38bdf8;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------
+   8. INTERACTIVE SVG WIRING OVERLAY
+   -------------------------------------------------------------------------- */
+.diode-wires-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.wire-path {
+  fill: none;
+  stroke-linecap: round;
+  cursor: pointer;
+  pointer-events: stroke;
+  transition: opacity 0.2s;
+}
+
+.wire-path:hover {
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
+}
+
+.wire-shadow {
+  fill: none;
+  stroke: rgba(0, 0, 0, 0.65);
+  stroke-width: 6;
+  stroke-linecap: round;
+  filter: blur(2px);
+}
+
+/* Banana Plug Tips Rendered at Terminals */
+.banana-plug-collar {
+  stroke-width: 1.5;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+}
+
+/* --------------------------------------------------------------------------
+   9. QUICK WIRING & VALIDATION CONTROLS BAR
+   -------------------------------------------------------------------------- */
+.diode-wire-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+.wire-action-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.circuit-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: rgba(100, 116, 139, 0.2);
+  color: #cbd5e1;
+  border: 1px solid #475569;
+}
+
+.circuit-status-pill.status-connected {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: #10b981;
+}
+
+.circuit-status-pill.status-warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border-color: #f59e0b;
+}
+
+/* --------------------------------------------------------------------------
+   10. RIGHT SIDEWORKSTATION: TABS (OBSERVATIONS, GRAPHS, CHALLENGES)
+   -------------------------------------------------------------------------- */
+.diode-workstation-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.workstation-sub-card {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.75) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.sub-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sub-card-header h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   11. LIVE DUAL-CANVAS GRAPHS WORKSTATION
+   -------------------------------------------------------------------------- */
+.graphs-tabs-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.graph-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  min-height: 32px;
+  border-radius: 6px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  font-family: 'Space Grotesk', 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-sizing: border-box;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.graph-tab-btn:hover {
+  border-color: #38bdf8;
+  color: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+.graph-tab-btn.active {
+  background: rgba(245, 158, 11, 0.25);
+  border-color: #f59e0b;
+  color: #fbbf24;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.graph-canvas-container {
+  position: relative;
+  width: 100%;
+  height: 290px;
+  background: #030712;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.7);
+}
+
+.graph-canvas-container canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.graph-scale-legend {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+/* --------------------------------------------------------------------------
+   12. OBSERVATION LOGBOOK TABLES WORKSTATION
+   -------------------------------------------------------------------------- */
+.obs-tabs-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.obs-tab-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.obs-tab-btn.active {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+/* Least Count Pills */
+.least-count-strip {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 6px;
+  font-size: 11px;
+  color: #cbd5e1;
+}
+
+.lc-item strong {
+  color: #fbbf24;
+}
+
+/* Observation Table Container */
+.obs-table-scroll {
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+}
+
+.diode-obs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: center;
+}
+
+.diode-obs-table th {
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 8px 10px;
+  font-weight: 700;
+  border-bottom: 1px solid #334155;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.diode-obs-table td {
+  padding: 7px 10px;
+  color: #cbd5e1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.diode-obs-table tbody tr:hover {
+  background: rgba(56, 189, 248, 0.08);
+}
+
+.row-delete-btn {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.row-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+/* Logbook Actions Bar */
+.obs-actions-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   13. CHALLENGES CARD WORKSTATION
+   -------------------------------------------------------------------------- */
+.diode-challenges-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.challenge-item-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.challenge-item-card.completed {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.challenge-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.challenge-item-info strong {
+  color: #f8fafc;
+  font-size: 12.5px;
+}
+
+.challenge-item-info span {
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.challenge-item-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.xp-tag {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.status-check-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+}
+
+.challenge-item-card.completed .status-check-circle {
+  background: #10b981;
+  border-color: #10b981;
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   14. DIODE V-I SCOPED BUTTON STYLES
+   -------------------------------------------------------------------------- */
+#exp-diode-section .btn,
+#exp-diode-section button.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: 'Space Grotesk', 'Outfit', -apple-system, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+#exp-diode-section .btn-sm {
+  padding: 6px 12px;
+  font-size: 11.5px;
+  min-height: 30px;
+}
+
+#exp-diode-section .btn-secondary {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+#exp-diode-section .btn-secondary:hover:not(:disabled) {
+  background: rgba(51, 65, 85, 0.85);
+  border-color: #38bdf8;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(56, 189, 248, 0.25);
+}
+
+#exp-diode-section .btn-secondary:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98);
+}
+
+#exp-diode-section .btn-primary {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+}
+
+#exp-diode-section .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  box-shadow: 0 6px 16px rgba(56, 189, 248, 0.45);
+  transform: translateY(-1px);
+}
+
+#exp-diode-section .btn-primary:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98);
+}
+
+#exp-diode-section .btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Dial Step Buttons (< and >) directly below rotary knobs */
+.diode-dial-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 6px;
+  z-index: 5;
+}
+
+.diode-dial-step-btn {
+  width: 28px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid #475569;
+  border-radius: 6px;
+  color: #38bdf8;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.diode-dial-step-btn:hover {
+  background: rgba(56, 189, 248, 0.25);
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+  transform: translateY(-1px);
+}
+
+.diode-dial-step-btn:active {
+  transform: translateY(1px) scale(0.92);
+  background: rgba(56, 189, 248, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   15. LIGHT THEME OVERRIDES (SCOPED TO #exp-diode-section)
+   -------------------------------------------------------------------------- */
+body.light-mode #exp-diode-section .diode-procedure-ribbon {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+body.light-mode #exp-diode-section .diode-proc-step .step-details strong { color: #0f172a; }
+body.light-mode #exp-diode-section .diode-proc-step .step-details span { color: #64748b; }
+
+/* Controller Chassis & Panels in Light Mode */
+body.light-mode #exp-diode-section .diode-chassis-card {
+  background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%);
+  border: 2px solid #94a3b8;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12), inset 0 2px 4px rgba(255, 255, 255, 0.8), inset 0 -3px 8px rgba(0, 0, 0, 0.06);
+}
+
+body.light-mode #exp-diode-section .chassis-screw {
+  background: radial-gradient(circle at 35% 35%, #e2e8f0 0%, #94a3b8 60%, #64748b 100%);
+  border-color: #94a3b8;
+  box-shadow: inset 0 1px 1px #ffffff, 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+body.light-mode #exp-diode-section .diode-chassis-title {
+  color: #b91c1c;
+  text-shadow: none;
+}
+
+body.light-mode #exp-diode-section .meter-bezel {
+  background: radial-gradient(circle, #e2e8f0 0%, #cbd5e1 70%, #94a3b8 100%);
+  border: 4px solid #64748b;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.7);
+}
+
+body.light-mode #exp-diode-section .meter-sub-controls {
+  background: rgba(241, 245, 249, 0.95);
+  border: 1px solid #cbd5e1;
+}
+
+body.light-mode #exp-diode-section .range-switch-label {
+  color: #475569;
+}
+
+body.light-mode #exp-diode-section .range-switch-label.active {
+  color: #b45309;
+  text-shadow: none;
+}
+
+body.light-mode #exp-diode-section .diode-center-panel {
+  background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+  border: 2px solid #0284c7;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode #exp-diode-section .power-lbl {
+  color: #64748b;
+}
+
+body.light-mode #exp-diode-section .power-lbl.active {
+  color: #0f172a;
+  text-shadow: none;
+}
+
+body.light-mode #exp-diode-section .lower-box {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border: 1.5px solid #94a3b8;
+  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.9), 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+body.light-mode #exp-diode-section .lower-box-caption {
+  color: #334155;
+}
+
+body.light-mode #exp-diode-section .rotary-knob {
+  background: radial-gradient(circle at 40% 40%, #f1f5f9 0%, #cbd5e1 65%, #94a3b8 100%);
+  border: 2px solid #64748b;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+}
+
+body.light-mode #exp-diode-section .knob-pointer {
+  background: #0f172a;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+body.light-mode #exp-diode-section .knob-label-val {
+  color: #0284c7;
+}
+
+body.light-mode #exp-diode-section .dc-out-title {
+  color: #475569;
+}
+
+body.light-mode #exp-diode-section .ports-vert-arrow {
+  color: #94a3b8;
+}
+
+body.light-mode #exp-diode-section .diode-row-mount {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+}
+
+body.light-mode #exp-diode-section .diode-row-title {
+  color: #0284c7;
+}
+
+body.light-mode #exp-diode-section .diode-wire-toolbar {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+body.light-mode #exp-diode-section .circuit-status-pill {
+  background: #f1f5f9;
+  color: #334155;
+  border-color: #cbd5e1;
+}
+
+body.light-mode #exp-diode-section .circuit-status-pill.status-connected {
+  background: #d1fae5;
+  color: #065f46;
+  border-color: #10b981;
+}
+
+body.light-mode #exp-diode-section .circuit-status-pill.status-warning {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #f59e0b;
+}
+
+/* Workstation cards & panels in Light Mode */
+body.light-mode #exp-diode-section .workstation-sub-card {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+body.light-mode #exp-diode-section .sub-card-header h3 { color: #0f172a; }
+body.light-mode #exp-diode-section .sub-card-header { border-bottom-color: #e2e8f0; }
+
+body.light-mode #exp-diode-section .graph-tab-btn,
+body.light-mode #exp-diode-section .obs-tab-btn {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+body.light-mode #exp-diode-section .graph-tab-btn.active {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #b45309;
+}
+body.light-mode #exp-diode-section .obs-tab-btn.active {
+  background: #e0f2fe;
+  border-color: #0284c7;
+  color: #0369a1;
+}
+
+body.light-mode #exp-diode-section .graph-canvas-container {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode #exp-diode-section .graph-scale-legend {
+  color: #475569;
+}
+
+body.light-mode #exp-diode-section .least-count-strip {
+  background: #f8fafc;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+body.light-mode #exp-diode-section .diode-obs-table th {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-bottom-color: #cbd5e1;
+}
+body.light-mode #exp-diode-section .diode-obs-table td {
+  color: #1e293b;
+  border-bottom-color: #f1f5f9;
+}
+body.light-mode #exp-diode-section .diode-obs-table tbody tr:hover {
+  background: rgba(2, 132, 199, 0.08);
+}
+body.light-mode #exp-diode-section .row-delete-btn {
+  color: #dc2626;
+}
+body.light-mode #exp-diode-section .row-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+body.light-mode #exp-diode-section .challenge-item-card {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+body.light-mode #exp-diode-section .challenge-item-card.completed {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+body.light-mode #exp-diode-section .challenge-item-info strong { color: #0f172a; }
+body.light-mode #exp-diode-section .challenge-item-info span { color: #64748b; }
+body.light-mode #exp-diode-section .status-check-circle {
+  border-color: #cbd5e1;
+}
+body.light-mode #exp-diode-section .challenge-item-card.completed .status-check-circle {
+  background: #10b981;
+  border-color: #10b981;
+  color: #ffffff;
+}
+
+/* Buttons in Light Mode */
+body.light-mode #exp-diode-section .btn-secondary {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #1e293b;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode #exp-diode-section .btn-secondary:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #0284c7;
+  color: #0284c7;
+  box-shadow: 0 3px 8px rgba(2, 132, 199, 0.15);
+}
+
+body.light-mode #exp-diode-section .btn-primary {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  border-color: #0284c7;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+}
+
+body.light-mode #exp-diode-section .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+}
+
+body.light-mode #exp-diode-section .diode-dial-step-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode #exp-diode-section .diode-dial-step-btn:hover {
+  background: #f0f9ff;
+  border-color: #0284c7;
+  color: #0284c7;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.2);
+}
+
+body.light-mode #exp-diode-section .diode-dial-step-btn:active {
+  background: #e0f2fe;
+}
+

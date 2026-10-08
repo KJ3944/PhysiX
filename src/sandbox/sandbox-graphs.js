@@ -81,10 +81,17 @@ export class SandboxGraphs {
 
     ctx.clearRect(0, 0, w, h);
 
-    // Background gradient matching Space Theme
+    const isLight = document.documentElement.getAttribute("data-theme") === "light";
+
+    // Background gradient matching Space Theme or Light Scientific Theme
     const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
-    bgGrad.addColorStop(0, "rgba(8, 14, 30, 0.95)");
-    bgGrad.addColorStop(1, "rgba(4, 7, 18, 0.98)");
+    if (isLight) {
+      bgGrad.addColorStop(0, "rgba(255, 255, 255, 0.98)");
+      bgGrad.addColorStop(1, "rgba(240, 249, 255, 0.98)");
+    } else {
+      bgGrad.addColorStop(0, "rgba(8, 14, 30, 0.95)");
+      bgGrad.addColorStop(1, "rgba(4, 7, 18, 0.98)");
+    }
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, w, h);
 
@@ -96,7 +103,7 @@ export class SandboxGraphs {
     const plotH = h - padTop - padBottom;
 
     // Draw Subtle Grid & Axes
-    ctx.strokeStyle = "rgba(56, 189, 248, 0.12)";
+    ctx.strokeStyle = isLight ? "rgba(100, 116, 139, 0.18)" : "rgba(56, 189, 248, 0.12)";
     ctx.lineWidth = 1;
     ctx.setLineDash([3, 4]);
 
@@ -118,12 +125,12 @@ export class SandboxGraphs {
     ctx.setLineDash([]);
 
     // Outer Plot Border
-    ctx.strokeStyle = "rgba(56, 189, 248, 0.28)";
+    ctx.strokeStyle = isLight ? "rgba(14, 165, 233, 0.4)" : "rgba(56, 189, 248, 0.28)";
     ctx.strokeRect(padLeft, padTop, plotW, plotH);
 
     // If no history or no object selected
     if (this.history.length < 2) {
-      ctx.fillStyle = "rgba(148, 163, 184, 0.6)";
+      ctx.fillStyle = isLight ? "rgba(71, 85, 105, 0.75)" : "rgba(148, 163, 184, 0.6)";
       ctx.font = "12px 'Space Grotesk', sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(
@@ -138,18 +145,18 @@ export class SandboxGraphs {
     let traces = [];
     if (this.activeMode === "position") {
       traces = [
-        { label: "X Position (m)", color: "#00f0ff", key: "x" },
-        { label: "Y Altitude (m)", color: "#f59e0b", key: "y" }
+        { label: "X Position (m)", color: isLight ? "#0284c7" : "#00f0ff", key: "x" },
+        { label: "Y Altitude (m)", color: isLight ? "#d97706" : "#f59e0b", key: "y" }
       ];
     } else if (this.activeMode === "velocity") {
       traces = [
-        { label: "Speed |v| (m/s)", color: "#10e7a8", key: "speed" },
-        { label: "Vx (m/s)", color: "#00f0ff", key: "vx" },
-        { label: "Vy (m/s)", color: "#c084fc", key: "vy" }
+        { label: "Speed |v| (m/s)", color: isLight ? "#059669" : "#10e7a8", key: "speed" },
+        { label: "Vx (m/s)", color: isLight ? "#0284c7" : "#00f0ff", key: "vx" },
+        { label: "Vy (m/s)", color: isLight ? "#7c3aed" : "#c084fc", key: "vy" }
       ];
     } else {
       traces = [
-        { label: "Kinetic Energy (J)", color: "#ff3366", key: "ke" }
+        { label: "Kinetic Energy (J)", color: isLight ? "#e11d48" : "#ff3366", key: "ke" }
       ];
     }
 
@@ -174,7 +181,7 @@ export class SandboxGraphs {
     maxY = Math.ceil(maxY + span * 0.1);
 
     // Draw Y axis labels
-    ctx.fillStyle = "#7dd3fc";
+    ctx.fillStyle = isLight ? "#0369a1" : "#7dd3fc";
     ctx.font = "10px 'JetBrains Mono', monospace";
     ctx.textAlign = "right";
     for (let i = 0; i <= 4; i++) {
@@ -186,6 +193,7 @@ export class SandboxGraphs {
     // Draw X time span labels
     const tMin = this.history[0].t;
     const tMax = this.history[this.history.length - 1].t;
+    ctx.fillStyle = isLight ? "#334155" : "#7dd3fc";
     ctx.textAlign = "center";
     ctx.fillText(`${tMin.toFixed(1)}s`, padLeft, h - 8);
     ctx.fillText(`${tMax.toFixed(1)}s`, w - padRight, h - 8);
@@ -196,7 +204,7 @@ export class SandboxGraphs {
       ctx.strokeStyle = tr.color;
       ctx.lineWidth = 2;
       ctx.shadowColor = tr.color;
-      ctx.shadowBlur = 6;
+      ctx.shadowBlur = isLight ? 2 : 6;
       ctx.beginPath();
 
       for (let i = 0; i < this.history.length; i++) {
@@ -231,7 +239,7 @@ export class SandboxGraphs {
       const lastVal = this.history[this.history.length - 1][tr.key];
       ctx.fillStyle = tr.color;
       ctx.fillRect(legendX, 8, 10, 10);
-      ctx.fillStyle = "#e2e8f0";
+      ctx.fillStyle = isLight ? "#0f172a" : "#e2e8f0";
       ctx.font = "11px 'Space Grotesk', sans-serif";
       const legendText = `${tr.label}: ${lastVal.toFixed(2)}`;
       ctx.fillText(legendText, legendX + 14, 17);
