@@ -1261,5 +1261,257 @@ export const EXPERIMENT_DETAILS = {
         </ol>
       </div>
     `
+  },
+
+  "hall-effect": {
+    id: "hall-effect",
+    title: "Hall Effect in Semiconductor & Metal Probes",
+    category: "Solid State Physics & Magnetotransport",
+    shortDescription: "Measure transverse Hall voltage under perpendicular magnetic fields, evaluate carrier concentration, mobility, and determine semiconductor carrier type.",
+    difficulty: "Undergraduate / Advanced STEM Practical",
+    duration: "45 Minutes",
+    engine: "Lorentz Force Magnetotransport & Carrier Dynamics Solver",
+    accentColor: "#8b5cf6",
+    aim: `<p class="manual-aim-text">To investigate the Hall Effect in semiconductor and metallic specimens placed in a uniform perpendicular magnetic field, to determine the sign of the charge carriers, to measure the transverse Hall voltage (V<sub>H</sub>) as a function of specimen current (I) and magnetic flux density (B), and to calculate the Hall coefficient (R<sub>H</sub>), carrier concentration (n), and carrier mobility (μ<sub>H</sub>).</p>`,
+    theory: `
+      <div class="theory-block">
+        <h3>1. The Classical Lorentz Force Principle</h3>
+        <p>When an electrical current carrying conductor or semiconductor wafer of thickness t and width w is placed in a transverse magnetic field B perpendicular to the direction of current density J, the moving charge carriers experience a transverse magnetic Lorentz force:</p>
+        <div class="math-callout formula-highlight">F<sub>L</sub> = q · (v<sub>d</sub> × B)</div>
+        <p>where q is the elementary charge of the carrier, v<sub>d</sub> is the average drift velocity, and B is the magnetic flux density. This force deflects charge carriers toward one lateral boundary of the material, causing an excess accumulation of charge along that edge and a depletion along the opposing edge.</p>
+      </div>
+
+      <div class="theory-block">
+        <h3>2. Transverse Electric Field Equilibrium & Hall Voltage</h3>
+        <p>The asymmetric accumulation of charge creates a transverse electrostatic field E<sub>H</sub> (the Hall electric field) oriented perpendicular to both current and magnetic field. This transverse field exerts an opposing electrostatic force on moving carriers:</p>
+        <div class="math-callout">F<sub>E</sub> = q · E<sub>H</sub></div>
+        <p>In steady-state dynamic equilibrium, the electrostatic force precisely counterbalances the magnetic Lorentz force:</p>
+        <div class="math-callout">q · E<sub>H</sub> = q · v<sub>d</sub> · B &nbsp;⟹&nbsp; E<sub>H</sub> = v<sub>d</sub> · B</div>
+        <p>The resulting transverse potential difference measured across width w is the <strong>Hall Voltage (V<sub>H</sub>)</strong>:</p>
+        <div class="math-callout formula-highlight">V<sub>H</sub> = E<sub>H</sub> · w = v<sub>d</sub> · B · w</div>
+      </div>
+
+      <div class="theory-block">
+        <h3>3. Derivation of the Hall Coefficient & Carrier Density</h3>
+        <p>The longitudinal current I flowing through the cross-sectional area A = w · t is related to carrier concentration n by:</p>
+        <div class="math-callout">I = n · q · A · v<sub>d</sub> = n · q · w · t · v<sub>d</sub> &nbsp;⟹&nbsp; v<sub>d</sub> = I / (n · q · w · t)</div>
+        <p>Substituting v<sub>d</sub> into the expression for V<sub>H</sub> gives:</p>
+        <div class="math-callout formula-highlight">V<sub>H</sub> = (I · B) / (n · q · t) = (R<sub>H</sub> · I · B) / t</div>
+        <p>where <strong>R<sub>H</sub></strong> is the <strong>Hall Coefficient</strong> defined as:</p>
+        <div class="math-callout formula-highlight">R<sub>H</sub> = 1 / (n · q)</div>
+        <p>Rearranging in terms of experimental observables yields:</p>
+        <div class="math-callout formula-highlight">R<sub>H</sub> = (V<sub>H</sub> · t) / (I · B)</div>
+        <p>The majority charge carrier density is then determined from:</p>
+        <div class="math-callout formula-highlight">n = 1 / (|R<sub>H</sub>| · e)</div>
+        <p>where e = 1.602 × 10⁻¹⁹ C is the electronic charge quantum.</p>
+      </div>
+
+      <div class="theory-block">
+        <h3>4. Sign Convention & Majority Carrier Identification</h3>
+        <p>The polarity of V<sub>H</sub> reveals the sign of the dominant mobile charge carriers:</p>
+        <ul class="manual-list">
+          <li><strong>n-type Semiconductors:</strong> Majority carriers are negative conduction electrons (q = −e). Consequently, R<sub>H</sub> &lt; 0 and the measured Hall voltage is negative under standard probe orientation.</li>
+          <li><strong>p-type Semiconductors:</strong> Majority carriers are positive valence-band holes (q = +e). Consequently, R<sub>H</sub> &gt; 0 and the measured Hall voltage is positive.</li>
+          <li><strong>Metals (e.g. Copper):</strong> The carrier density n is exceptionally high (~10²⁸ m⁻³), resulting in tiny microvolt-scale Hall potentials (~0.1 to 2 μV), whereas doped semiconductors (~10²⁰ m⁻³) yield easily observable millivolts (1 to 60 mV).</li>
+        </ul>
+      </div>
+
+      <div class="theory-block">
+        <h3>5. Carrier Mobility & Hall Angle</h3>
+        <p>Combining the Hall coefficient with the electrical conductivity σ = 1 / ρ = n · e · μ yields the <strong>Hall Mobility (μ<sub>H</sub>)</strong>:</p>
+        <div class="math-callout formula-highlight">μ<sub>H</sub> = |R<sub>H</sub>| · σ = |R<sub>H</sub>| / ρ</div>
+        <p>The deflection angle of total current flow with respect to the applied electric field is the <strong>Hall Angle (θ<sub>H</sub>)</strong>:</p>
+        <div class="math-callout">tan(θ<sub>H</sub>) = E<sub>H</sub> / E<sub>x</sub> = μ<sub>H</sub> · B</div>
+      </div>
+    `,
+    howToPerform: `
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-badge">1</div>
+          <div class="step-info">
+            <h4>Launch the Hall Effect Virtual Workstation</h4>
+            <p>Click the <strong>Start Simulator</strong> button to open the dual-canvas Electromagnetic Hall Effect bench and telemetry deck.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">2</div>
+          <div class="step-info">
+            <h4>Mount Semiconductor or Metal Specimen</h4>
+            <p>Select your test specimen from the Material Palette: <strong>n-type Germanium (Ge)</strong>, <strong>p-type Germanium (Ge)</strong>, <strong>Indium Arsenide (InAs)</strong>, or <strong>Copper Foil (Cu)</strong>.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">3</div>
+          <div class="step-info">
+            <h4>Energize Constant Current Supply</h4>
+            <p>Turn ON the <strong>Sample Current Power Switch</strong>. Set the specimen current slider between 10.0 mA and 40.0 mA. Observe the glowing carrier stream inside the crystal.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">4</div>
+          <div class="step-info">
+            <h4>Energize Electromagnet Field (B)</h4>
+            <p>Turn ON the <strong>Electromagnet Power Switch</strong>. Adjust the magnetic flux density B from 0.0 T to 0.80 T. Watch the animated B-field flux lines and notice the Lorentz deflection curving carriers toward the wafer edge.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">5</div>
+          <div class="step-info">
+            <h4>Perform Zero-Null Contact Balancing</h4>
+            <p>Before recording final data, click <strong>Zero Offset Balance</strong> to nullify any contact probe misalignment offset voltage (V₀ = 0.0 mV).</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">6</div>
+          <div class="step-info">
+            <h4>Verify Polarity Reversal & Log Data</h4>
+            <p>Toggle <strong>Field Polarity (+B / -B)</strong> and <strong>Current Polarity (+I / -I)</strong> to verify four-quadrant sign inversion. Click <strong>Record Observation</strong> to commit data points and export official reports.</p>
+          </div>
+        </div>
+      </div>
+    `,
+    procedure: `
+      <ol class="manual-ordered-list">
+        <li><strong>Apparatus Setup:</strong> Place the calibrated semiconductor probe between the pole pieces of the electromagnet. Ensure probe faces are strictly perpendicular to the magnetic axis.</li>
+        <li><strong>Zero-Offset Elimination:</strong> Set magnetic field to B = 0.0 T. If any residual misalignment voltage appears on the microvoltmeter, adjust the balance potentiometer to zero.</li>
+        <li><strong>Varying Magnetic Field at Constant Current:</strong> Fix specimen current I = 20.0 mA. Increase magnetic flux density B in steps from 0.10 T to 0.80 T. Record the measured Hall voltage V<sub>H</sub> at each step.</li>
+        <li><strong>Varying Specimen Current at Constant Field:</strong> Fix magnetic flux density B = 0.50 T. Increase specimen current I from 5.0 mA to 45.0 mA in equal steps. Record V<sub>H</sub>.</li>
+        <li><strong>Reversing Field & Current Polarity:</strong> Reverse the magnetic field direction (-B) and repeat observations to eliminate thermo-galvanic spurious voltages via four-quadrant averaging: V<sub>H</sub> = [(V₁ − V₂) + (V₃ − V₄)] / 4.</li>
+        <li><strong>Specimen Comparison:</strong> Switch to the p-type Germanium wafer and note the sign inversion of V<sub>H</sub>. Switch to the Copper foil to observe microvolt metallic response.</li>
+        <li><strong>Data Analysis:</strong> Plot V<sub>H</sub> versus B and V<sub>H</sub> versus I. Evaluate slope, calculate Hall coefficient R<sub>H</sub>, carrier density n, and carrier mobility μ<sub>H</sub>.</li>
+      </ol>
+    `,
+    formulas: `
+      <div class="manual-formula-grid">
+        <div class="manual-formula-card">
+          <div class="f-header">
+            <span class="f-title">Hall Voltage (V<sub>H</sub>)</span>
+            <span class="f-unit">Millivolts [mV]</span>
+          </div>
+          <div class="f-eq">V<sub>H</sub> = (R<sub>H</sub> · I · B) / t</div>
+          <p class="f-desc">Where R<sub>H</sub> is Hall coefficient, I is specimen current, B is magnetic flux density, and t is specimen thickness.</p>
+        </div>
+
+        <div class="manual-formula-card">
+          <div class="f-header">
+            <span class="f-title">Hall Coefficient (R<sub>H</sub>)</span>
+            <span class="f-unit">m³ / C</span>
+          </div>
+          <div class="f-eq">R<sub>H</sub> = (V<sub>H</sub> · t) / (I · B) = 1 / (n · q)</div>
+          <p class="f-desc">Intrinsic material constant indicating carrier type (negative for electrons, positive for holes).</p>
+        </div>
+
+        <div class="manual-formula-card">
+          <div class="f-header">
+            <span class="f-title">Carrier Concentration (n)</span>
+            <span class="f-unit">Carriers per m³ [m⁻³]</span>
+          </div>
+          <div class="f-eq">n = 1 / (|R<sub>H</sub>| · e)</div>
+          <p class="f-desc">Volumetric density of majority mobile charge carriers, where e = 1.602 × 10⁻¹⁹ C.</p>
+        </div>
+
+        <div class="manual-formula-card">
+          <div class="f-header">
+            <span class="f-title">Carrier Mobility (μ<sub>H</sub>)</span>
+            <span class="f-unit">m² / (V · s)</span>
+          </div>
+          <div class="f-eq">μ<sub>H</sub> = |R<sub>H</sub>| · σ = |R<sub>H</sub>| / ρ</div>
+          <p class="f-desc">Quantifies the drift velocity of charge carriers per unit applied electric field in the crystal lattice.</p>
+        </div>
+
+        <div class="manual-formula-card">
+          <div class="f-header">
+            <span class="f-title">Hall Deflection Angle (θ<sub>H</sub>)</span>
+            <span class="f-unit">Degrees [°]</span>
+          </div>
+          <div class="f-eq">tan(θ<sub>H</sub>) = μ<sub>H</sub> · B</div>
+          <p class="f-desc">The geometric angle between the total electric field vector and the current density vector.</p>
+        </div>
+      </div>
+    `,
+    observations: `
+      <div class="obs-table-wrap">
+        <table class="manual-obs-table">
+          <thead>
+            <tr>
+              <th>Trial</th>
+              <th>Specimen</th>
+              <th>Current I (mA)</th>
+              <th>Field B (T)</th>
+              <th>Hall Voltage V<sub>H</sub> (mV)</th>
+              <th>Hall Coeff R<sub>H</sub> (m³/C)</th>
+              <th>Carrier Density n (m⁻³)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>n-type Ge</td>
+              <td>20.0 mA</td>
+              <td>0.20 T</td>
+              <td>-6.08 mV</td>
+              <td>-3.80 × 10⁻²</td>
+              <td>1.64 × 10²⁰</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>n-type Ge</td>
+              <td>20.0 mA</td>
+              <td>0.40 T</td>
+              <td>-12.16 mV</td>
+              <td>-3.80 × 10⁻²</td>
+              <td>1.64 × 10²⁰</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>n-type Ge</td>
+              <td>20.0 mA</td>
+              <td>0.60 T</td>
+              <td>-18.24 mV</td>
+              <td>-3.80 × 10⁻²</td>
+              <td>1.64 × 10²⁰</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>p-type Ge</td>
+              <td>20.0 mA</td>
+              <td>0.40 T</td>
+              <td>+10.40 mV</td>
+              <td>+3.25 × 10⁻²</td>
+              <td>1.92 × 10²⁰</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>InAs Thin Wafer</td>
+              <td>20.0 mA</td>
+              <td>0.40 T</td>
+              <td>-96.00 mV</td>
+              <td>-1.20 × 10⁻¹</td>
+              <td>5.21 × 10¹⁹</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="obs-notes">
+        <h4>Key Experimental Takeaways:</h4>
+        <ul class="manual-list">
+          <li><strong>Direct Linearity:</strong> V<sub>H</sub> is strictly proportional to both sample current I and magnetic flux density B, confirming the theoretical relationship V<sub>H</sub> ∝ I · B.</li>
+          <li><strong>Carrier Polarity Verification:</strong> n-type semiconductors produce negative Hall potentials due to electron deflection, whereas p-type crystals produce positive potentials due to hole accumulation.</li>
+          <li><strong>Semiconductor vs Metal Sensitivity:</strong> Because carrier density n is several orders of magnitude smaller in semiconductors than metals, their Hall coefficient R<sub>H</sub> and output voltage V<sub>H</sub> are thousands of times larger.</li>
+        </ul>
+      </div>
+    `,
+    result: `
+      <div class="result-box">
+        <h4>Experimental Conclusions:</h4>
+        <ol class="manual-ordered-list">
+          <li>The Hall Effect was successfully verified across n-type Germanium, p-type Germanium, Indium Arsenide, and Copper specimens.</li>
+          <li>The sign of the majority charge carriers was unambiguously identified: electrons for n-Ge and InAs (R<sub>H</sub> &lt; 0), and holes for p-Ge (R<sub>H</sub> &gt; 0).</li>
+          <li>The experimental Hall coefficient of n-type Germanium was determined to be R<sub>H</sub> = -3.80 × 10⁻² m³/C, yielding a carrier concentration of n = 1.64 × 10²⁰ m⁻³.</li>
+          <li>The Hall coefficient of p-type Germanium was determined to be R<sub>H</sub> = +3.25 × 10⁻² m³/C, yielding a hole concentration of p = 1.92 × 10²⁰ m⁻³.</li>
+          <li>Linear regression analysis of V<sub>H</sub> versus B demonstrated high linearity (R² &gt; 0.999), validating Lorentz magnetotransport theory.</li>
+        </ol>
+      </div>
+    `
   }
 };
