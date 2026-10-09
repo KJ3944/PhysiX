@@ -5602,8 +5602,8 @@ let currentActiveDetailExpId = "projectile";
 
 export function openExperimentDetailsPage(expId) {
   tutorialManager.destroyTour();
-  const normalizedId = (expId === "sandbox" || expId === "hall-effect" || expId === "colour-sensor" || expId === "optical" || expId === "projectile" || expId === "diffraction" || expId === "diffraction-grating")
-    ? (expId === "diffraction-grating" ? "diffraction" : expId)
+  const normalizedId = (expId === "sandbox" || expId === "hall-effect" || expId === "colour-sensor" || expId === "optical" || expId === "projectile" || expId === "diffraction" || expId === "diffraction-grating" || expId === "diode" || expId === "diode-vi")
+    ? (expId === "diffraction-grating" ? "diffraction" : (expId === "diode-vi" ? "diode" : expId))
     : "projectile";
 
   const data = EXPERIMENT_DETAILS[normalizedId] || EXPERIMENT_DETAILS["projectile"];

@@ -1590,7 +1590,663 @@ export const EXPERIMENT_DETAILS = {
           <li>Linear regression analysis of V<sub>H</sub> versus B demonstrated high linearity (R² &gt; 0.999), validating Lorentz magnetotransport theory.</li>
         </ol>
       </div>
-    `
+`
+  },
+
+  "diode": {
+    id: "diode",
+    title: "Diode V-I Characteristics",
+    category: "Semiconductor Electronics & Solid State Physics",
+    shortDescription: "Study the voltage-current (V-I) characteristics of a P-N junction diode under forward and reverse bias conditions, determine knee voltage and dynamic resistance.",
+    difficulty: "Undergraduate Semiconductor Laboratory",
+    duration: "45 Minutes",
+    engine: "Deterministic Shockley Semiconductor Diode Physics Solver",
+    accentColor: "#f59e0b",
+    aim: `<p class="manual-aim-text">To study the voltage - current (V-I) characteristics of a forward and reverse bias P-N Junction diode, determine the cut-in (knee) voltage, and evaluate the static and dynamic resistance in forward and reverse operating regions.</p>`,
+    apparatus: `<p class="manual-aim-text">A P-N Junction diode, milliammeter, Voltmeter, micro-ammeter, power supply & connection wires.</p>`,
+    theory: `
+      <div class="theory-block">
+        <h3>1. P-N Junction Diode & Depletion Region</h3>
+        <p>A P-N junction diode is a two-terminal semiconductor device formed by joining P-type and N-type semiconductor crystals. At the metallurgical junction, free electrons from the N-region diffuse into the P-region, while holes from the P-region diffuse into the N-region. This recombination leaves behind uncompensated immobile donor ions (positive) in the N-region and uncompensated immobile acceptor ions (negative) in the P-region.</p>
+        <p>This region devoid of free mobile charge carriers is known as the <strong>Depletion Region</strong>. The space charge generates an internal electric field that opposes further carrier diffusion, establishing a <strong>Barrier Potential ($V_0$)</strong> (typically $\approx 0.7\\text{ V}$ for Silicon and $\approx 0.3\\text{ V}$ for Germanium at room temperature $T = 300\\text{ K}$).</p>
+      </div>
+
+      <div class="theory-block">
+        <h3>2. Forward Biased P-N Junction</h3>
+        <p>When the positive terminal of an external DC source is connected to the <strong>P-type semiconductor</strong> (Anode) and the negative terminal is connected to the <strong>N-type semiconductor</strong> (Cathode), the diode is said to be <strong>Forward Biased</strong>.</p>
+        <ul class="manual-list">
+          <li><strong>Depletion Region Narrowing:</strong> The external potential opposes the built-in barrier potential ($V_0 - V$), pushing holes and free electrons toward the junction. As forward voltage increases, the depletion layer becomes markedly <strong>narrowed</strong>.</li>
+          <li><strong>Cut-in / Knee Voltage ($V_k$):</strong> When the forward voltage $V_f$ remains below the barrier potential ($V_f < 0.65\\text{ V}$ for Si), current is extremely small. Once $V_f$ overcomes the barrier potential, majority charge carriers cross the junction in large numbers, resulting in a steep, exponential rise in forward current ($I_f$).</li>
+          <li><strong>Circuit Arrangement:</strong> The milliammeter is connected in <strong>series</strong> with the diode to measure forward current ($0 - 10\\text{ mA}$), and the voltmeter is connected in <strong>parallel</strong> across the DC supply to measure forward voltage ($0 - 1.5\\text{ V}$).</li>
+        </ul>
+
+        <!-- IMAGE 2: FORWARD BIASED P-N JUNCTION CHARGE CARRIER DIAGRAM -->
+        <div class="manual-diagram-card" style="margin: 18px 0; background: #070d1e; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 10px; padding: 18px; text-align: center;">
+          <h4 style="color: #ffffff; font-size: 15px; margin-bottom: 12px; letter-spacing: 0.8px; text-transform: uppercase;">Forward Biased P-N Junction (Internal Mechanism & Charge Carriers)</h4>
+          <svg viewBox="0 0 800 480" width="100%" style="max-width: 720px; height: auto; display: block; margin: 0 auto; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));">
+            <defs>
+              <linearGradient id="pTypeGradFwd" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#b45309" stop-opacity="0.85" />
+                <stop offset="100%" stop-color="#78350f" stop-opacity="0.95" />
+              </linearGradient>
+              <linearGradient id="nTypeGradFwd" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#1e3a8a" stop-opacity="0.95" />
+                <stop offset="100%" stop-color="#1e40af" stop-opacity="0.85" />
+              </linearGradient>
+              <marker id="arrowHeadCyan" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                <path d="M1,1 L7,4 L1,7 Z" fill="#38bdf8" />
+              </marker>
+              <marker id="arrowHeadAmber" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                <path d="M1,1 L7,4 L1,7 Z" fill="#fbbf24" />
+              </marker>
+              <marker id="arrowHeadWhite" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                <path d="M1,1 L7,4 L1,7 Z" fill="#ffffff" />
+              </marker>
+            </defs>
+
+            <!-- Background Grid -->
+            <rect width="800" height="480" rx="10" fill="#040816" />
+            <g opacity="0.1" stroke="#38bdf8" stroke-width="1">
+              <line x1="0" y1="60" x2="800" y2="60" /><line x1="0" y1="120" x2="800" y2="120" /><line x1="0" y1="180" x2="800" y2="180" /><line x1="0" y1="240" x2="800" y2="240" /><line x1="0" y1="300" x2="800" y2="300" /><line x1="0" y1="360" x2="800" y2="360" /><line x1="0" y1="420" x2="800" y2="420" />
+              <line x1="100" y1="0" x2="100" y2="480" /><line x1="200" y1="0" x2="200" y2="480" /><line x1="300" y1="0" x2="300" y2="480" /><line x1="400" y1="0" x2="400" y2="480" /><line x1="500" y1="0" x2="500" y2="480" /><line x1="600" y1="0" x2="600" y2="480" /><line x1="700" y1="0" x2="700" y2="480" />
+            </g>
+
+            <!-- Title Header -->
+            <text x="400" y="44" fill="#ffffff" font-family="'Space Grotesk', Outfit, sans-serif" font-size="22" font-weight="bold" text-anchor="middle" letter-spacing="1.5">FORWARD BIASED P-N JUNCTION</text>
+
+            <!-- Depletion Region Narrowed Bracket -->
+            <text x="400" y="82" fill="#e2e8f0" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">DEPLETION REGION (NARROWED)</text>
+            <path d="M 360 88 L 360 96 L 440 96 L 440 88" fill="none" stroke="#94a3b8" stroke-width="1.5" />
+
+            <!-- P-Type Semiconductor Header -->
+            <text x="230" y="82" fill="#fb923c" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">P-type Semiconductor</text>
+
+            <!-- N-Type Semiconductor Header -->
+            <text x="570" y="82" fill="#38bdf8" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">N-type Semiconductor</text>
+
+            <!-- P-Region Block -->
+            <rect x="110" y="105" width="250" height="170" rx="6" fill="url(#pTypeGradFwd)" stroke="#ea580c" stroke-width="2" />
+
+            <!-- N-Region Block -->
+            <rect x="440" y="105" width="250" height="170" rx="6" fill="url(#nTypeGradFwd)" stroke="#2563eb" stroke-width="2" />
+
+            <!-- Depletion Layer P-side -->
+            <rect x="360" y="105" width="40" height="170" fill="#451a03" stroke="#ea580c" stroke-dasharray="3,3" stroke-width="1.5" />
+            <!-- Depletion Layer N-side -->
+            <rect x="400" y="105" width="40" height="170" fill="#172554" stroke="#2563eb" stroke-dasharray="3,3" stroke-width="1.5" />
+
+            <!-- P-N Junction Metallurgical Line -->
+            <line x1="400" y1="105" x2="400" y2="275" stroke="#ffffff" stroke-width="2" />
+            <!-- Arrow pointing to P-N Junction -->
+            <line x1="400" y1="315" x2="400" y2="282" stroke="#ffffff" stroke-width="1.8" marker-end="url(#arrowHeadWhite)" />
+            <text x="400" y="332" fill="#ffffff" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">P-N Junction</text>
+
+            <!-- Holes (+) in P-type -->
+            <g fill="#ea580c" stroke="#fef08a" stroke-width="1.5">
+              <circle cx="140" cy="130" r="13" /><text x="140" y="135" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="210" cy="130" r="13" /><text x="210" y="135" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="280" cy="130" r="13" /><text x="280" y="135" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="140" cy="180" r="13" /><text x="140" y="185" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="210" cy="180" r="13" /><text x="210" y="185" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="280" cy="180" r="13" /><text x="280" y="185" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="140" cy="230" r="13" /><text x="140" y="235" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="210" cy="230" r="13" /><text x="210" y="235" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="280" cy="230" r="13" /><text x="280" y="235" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="340" cy="230" r="13" /><text x="340" y="235" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">+</text>
+            </g>
+
+            <!-- Label Holes (+) -->
+            <text x="210" y="188" fill="#ffffff" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">Holes (⊕)</text>
+
+            <!-- Holes Flow Arrows (pointing right towards junction) -->
+            <line x1="300" y1="130" x2="350" y2="130" stroke="#f59e0b" stroke-width="4" marker-end="url(#arrowHeadAmber)" />
+            <line x1="300" y1="180" x2="350" y2="180" stroke="#f59e0b" stroke-width="4" marker-end="url(#arrowHeadAmber)" />
+            <line x1="300" y1="230" x2="350" y2="230" stroke="#f59e0b" stroke-width="4" marker-end="url(#arrowHeadAmber)" />
+
+            <!-- Immobile Negative Ions in Depletion Layer (P-side) -->
+            <g fill="#7c2d12" stroke="#ea580c" stroke-width="1.2">
+              <circle cx="380" cy="125" r="9" /><text x="380" y="129" fill="#fca5a5" font-size="13" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="380" cy="155" r="9" /><text x="380" y="159" fill="#fca5a5" font-size="13" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="380" cy="185" r="9" /><text x="380" y="189" fill="#fca5a5" font-size="13" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="380" cy="215" r="9" /><text x="380" y="219" fill="#fca5a5" font-size="13" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="380" cy="245" r="9" /><text x="380" y="249" fill="#fca5a5" font-size="13" font-weight="bold" text-anchor="middle">−</text>
+            </g>
+
+            <!-- Immobile Positive Ions in Depletion Layer (N-side) -->
+            <g fill="#1e3a8a" stroke="#38bdf8" stroke-width="1.2">
+              <circle cx="420" cy="125" r="9" /><text x="420" y="130" fill="#93c5fd" font-size="13" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="420" cy="155" r="9" /><text x="420" y="160" fill="#93c5fd" font-size="13" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="420" cy="185" r="9" /><text x="420" y="190" fill="#93c5fd" font-size="13" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="420" cy="215" r="9" /><text x="420" y="220" fill="#93c5fd" font-size="13" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="420" cy="245" r="9" /><text x="420" y="250" fill="#93c5fd" font-size="13" font-weight="bold" text-anchor="middle">+</text>
+            </g>
+
+            <!-- Free Electrons Flow Arrows (pointing left towards junction) -->
+            <line x1="500" y1="130" x2="450" y2="130" stroke="#38bdf8" stroke-width="4" marker-end="url(#arrowHeadCyan)" />
+            <line x1="500" y1="180" x2="450" y2="180" stroke="#38bdf8" stroke-width="4" marker-end="url(#arrowHeadCyan)" />
+            <line x1="500" y1="230" x2="450" y2="230" stroke="#38bdf8" stroke-width="4" marker-end="url(#arrowHeadCyan)" />
+
+            <!-- Free Electrons (-) in N-type -->
+            <g fill="#1d4ed8" stroke="#67e8f9" stroke-width="1.5">
+              <circle cx="520" cy="130" r="13" /><text x="520" y="135" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="590" cy="130" r="13" /><text x="590" y="135" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="660" cy="130" r="13" /><text x="660" y="135" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="520" cy="180" r="13" /><text x="520" y="185" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="590" cy="180" r="13" /><text x="590" y="185" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="660" cy="180" r="13" /><text x="660" y="185" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="520" cy="230" r="13" /><text x="520" y="235" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="590" cy="230" r="13" /><text x="590" y="235" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="660" cy="230" r="13" /><text x="660" y="235" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">−</text>
+            </g>
+
+            <!-- Label Free Electrons (-) -->
+            <text x="590" y="188" fill="#ffffff" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">Free Electrons (⊖)</text>
+
+            <!-- Bottom Labels under Blocks -->
+            <text x="235" y="300" fill="#fb923c" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">P-type Semiconductor</text>
+            <text x="565" y="300" fill="#38bdf8" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">N-type Semiconductor</text>
+
+            <!-- External Wiring to Battery -->
+            <!-- Positive Lead (P-side to Battery +) -->
+            <path d="M 110 190 L 60 190 L 60 380 L 320 380" fill="none" stroke="#ea580c" stroke-width="3" />
+            <!-- Negative Lead (N-side to Battery -) -->
+            <path d="M 690 190 L 740 190 L 740 380 L 480 380" fill="none" stroke="#3b82f6" stroke-width="3" />
+
+            <!-- Conventional Current Arrow (Left wire) -->
+            <line x1="60" y1="360" x2="60" y2="280" stroke="#fde047" stroke-width="3" marker-end="url(#arrowHeadWhite)" />
+            <line x1="35" y1="420" x2="220" y2="420" stroke="#fde047" stroke-width="3" marker-end="url(#arrowHeadWhite)" />
+            <text x="127" y="442" fill="#fde047" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">Conventional Current (I)</text>
+
+            <!-- Battery Graphic -->
+            <!-- Positive Half -->
+            <rect x="320" y="350" width="80" height="60" rx="3" fill="#dc2626" stroke="#f87171" stroke-width="2" />
+            <text x="360" y="388" fill="#ffffff" font-size="28" font-weight="bold" text-anchor="middle">+</text>
+            <!-- Negative Half -->
+            <rect x="400" y="350" width="80" height="60" rx="3" fill="#2563eb" stroke="#60a5fa" stroke-width="2" />
+            <text x="440" y="388" fill="#ffffff" font-size="28" font-weight="bold" text-anchor="middle">−</text>
+
+            <!-- Battery Label -->
+            <text x="400" y="432" fill="#ffffff" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">External Battery (DC Source)</text>
+            <text x="330" y="338" fill="#fca5a5" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">Positive (+) Terminal</text>
+            <text x="470" y="338" fill="#93c5fd" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">Negative (−) Terminal</text>
+
+            <!-- Forward Bias Arrow on Return Lead -->
+            <line x1="740" y1="280" x2="740" y2="350" stroke="#38bdf8" stroke-width="3" marker-end="url(#arrowHeadCyan)" />
+            <text x="670" y="350" fill="#38bdf8" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">Forward Bias</text>
+            <text x="670" y="370" fill="#38bdf8" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">(V > 0)</text>
+          </svg>
+        </div>
+
+        <!-- FORWARD BIAS LAB ELECTRICAL SCHEMATIC -->
+        <div class="manual-diagram-card" style="margin: 18px 0; background: #070d1e; border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 10px; padding: 18px; text-align: center;">
+          <h4 style="color: #fbbf24; font-size: 14px; margin-bottom: 12px; letter-spacing: 0.8px; text-transform: uppercase;">Forward Bias Laboratory Circuit Schematic (Series Ammeter, Parallel Voltmeter)</h4>
+          <svg viewBox="0 0 700 280" width="100%" style="max-width: 640px; height: auto; display: block; margin: 0 auto;">
+            <!-- Schematic Lines -->
+            <rect width="700" height="280" rx="8" fill="#030712" />
+            <!-- Main Loop -->
+            <path d="M 120 180 L 120 70 L 260 70" fill="none" stroke="#ef4444" stroke-width="2.5" />
+            <path d="M 330 70 L 420 70" fill="none" stroke="#ef4444" stroke-width="2.5" />
+            <path d="M 480 70 L 600 70 L 600 180" fill="none" stroke="#1e293b" stroke-width="2.5" />
+            <path d="M 600 180 L 120 180" fill="none" stroke="#1e293b" stroke-width="2.5" />
+
+            <!-- DC Variable Supply -->
+            <rect x="80" y="160" width="80" height="40" rx="4" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5" />
+            <text x="120" y="185" fill="#f59e0b" font-size="12" font-weight="bold" text-anchor="middle">DC Supply (VF)</text>
+            <text x="95" y="152" fill="#ef4444" font-size="14" font-weight="bold">+</text>
+            <text x="145" y="152" fill="#94a3b8" font-size="14" font-weight="bold">−</text>
+
+            <!-- Diode Symbol -->
+            <g transform="translate(260, 50)">
+              <polygon points="15,5 50,20 15,35" fill="#ef4444" stroke="#ffffff" stroke-width="1.5" />
+              <line x1="50" y1="5" x2="50" y2="35" stroke="#ffffff" stroke-width="3" />
+              <line x1="0" y1="20" x2="15" y2="20" stroke="#ef4444" stroke-width="2" />
+              <line x1="50" y1="20" x2="70" y2="20" stroke="#ef4444" stroke-width="2" />
+              <text x="10" y="0" fill="#fca5a5" font-size="11" font-weight="bold">P (Anode)</text>
+              <text x="50" y="0" fill="#93c5fd" font-size="11" font-weight="bold">N (Cathode)</text>
+              <text x="35" y="52" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">P-N Diode</text>
+            </g>
+
+            <!-- Milliammeter in Series -->
+            <g transform="translate(420, 45)">
+              <circle cx="30" cy="25" r="25" fill="#0f172a" stroke="#38bdf8" stroke-width="2" />
+              <text x="30" y="30" fill="#38bdf8" font-size="15" font-weight="bold" text-anchor="middle">mA</text>
+              <text x="0" y="16" fill="#ef4444" font-size="12" font-weight="bold">+</text>
+              <text x="60" y="16" fill="#94a3b8" font-size="12" font-weight="bold">−</text>
+              <text x="30" y="66" fill="#94a3b8" font-size="11" font-weight="bold" text-anchor="middle">Milliammeter (Series)</text>
+            </g>
+
+            <!-- Voltmeter in Parallel across Diode/Output -->
+            <path d="M 230 70 L 230 230 L 330 230" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,3" />
+            <path d="M 390 230 L 530 230 L 530 70" fill="none" stroke="#1e293b" stroke-width="2" stroke-dasharray="4,3" />
+            <g transform="translate(330, 205)">
+              <circle cx="30" cy="25" r="25" fill="#0f172a" stroke="#10b981" stroke-width="2" />
+              <text x="30" y="31" fill="#10b981" font-size="16" font-weight="bold" text-anchor="middle">V</text>
+              <text x="0" y="16" fill="#ef4444" font-size="12" font-weight="bold">+</text>
+              <text x="60" y="16" fill="#94a3b8" font-size="12" font-weight="bold">−</text>
+              <text x="30" y="66" fill="#10b981" font-size="11" font-weight="bold" text-anchor="middle">Voltmeter (Parallel)</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <div class="theory-block">
+        <h3>3. Reverse Biased P-N Junction</h3>
+        <p>When the positive terminal of an external DC source is connected to the <strong>N-type semiconductor</strong> (Cathode) and the negative terminal is connected to the <strong>P-type semiconductor</strong> (Anode), the diode is said to be <strong>Reverse Biased</strong>.</p>
+        <ul class="manual-list">
+          <li><strong>Depletion Region Widening:</strong> The external potential supports the built-in barrier potential ($V_0 + V_r$). The positive terminal pulls free electrons in the N-region away from the junction, while the negative terminal pulls holes in the P-region away from the junction. Consequently, the depletion region becomes significantly <strong>widened</strong>.</li>
+          <li><strong>Minimal Leakage Current ($I_r$):</strong> Because majority carriers cannot cross the barrier, only thermally generated minority carriers (electrons in P-region, holes in N-region) are swept across the junction by the electric field, giving rise to an extremely minute <strong>Reverse Saturation Current ($I_0$)</strong> on the order of microamperes ($\\mu\\text{A}$).</li>
+          <li><strong>Current Insensitivity:</strong> Up to moderate reverse voltages (before Zener or avalanche breakdown occurs), $I_r$ remains virtually constant and negligible.</li>
+          <li><strong>Circuit Arrangement:</strong> The microammeter is connected in <strong>series</strong> ($0 - 100\\;\\mu\\text{A}$ range), and the voltmeter is connected in <strong>parallel</strong> ($0 - 30\\text{ V}$ range).</li>
+        </ul>
+
+        <!-- IMAGE 3: REVERSE BIASED P-N JUNCTION CHARGE CARRIER DIAGRAM -->
+        <div class="manual-diagram-card" style="margin: 18px 0; background: #070d1e; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 10px; padding: 18px; text-align: center;">
+          <h4 style="color: #ffffff; font-size: 15px; margin-bottom: 12px; letter-spacing: 0.8px; text-transform: uppercase;">Reverse Biased P-N Junction (Internal Mechanism & Charge Carriers)</h4>
+          <svg viewBox="0 0 800 480" width="100%" style="max-width: 720px; height: auto; display: block; margin: 0 auto; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));">
+            <defs>
+              <linearGradient id="pTypeGradRev" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#78350f" stop-opacity="0.95" />
+                <stop offset="100%" stop-color="#b45309" stop-opacity="0.85" />
+              </linearGradient>
+              <linearGradient id="nTypeGradRev" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#1e40af" stop-opacity="0.85" />
+                <stop offset="100%" stop-color="#1e3a8a" stop-opacity="0.95" />
+              </linearGradient>
+            </defs>
+
+            <!-- Background Grid -->
+            <rect width="800" height="480" rx="10" fill="#040816" />
+            <g opacity="0.1" stroke="#38bdf8" stroke-width="1">
+              <line x1="0" y1="60" x2="800" y2="60" /><line x1="0" y1="120" x2="800" y2="120" /><line x1="0" y1="180" x2="800" y2="180" /><line x1="0" y1="240" x2="800" y2="240" /><line x1="0" y1="300" x2="800" y2="300" /><line x1="0" y1="360" x2="800" y2="360" /><line x1="0" y1="420" x2="800" y2="420" />
+            </g>
+
+            <!-- Title Header -->
+            <text x="400" y="44" fill="#ffffff" font-family="'Space Grotesk', Outfit, sans-serif" font-size="22" font-weight="bold" text-anchor="middle" letter-spacing="1.5">REVERSE BIASED P-N JUNCTION</text>
+
+            <!-- Depletion Region Widened Bracket -->
+            <text x="400" y="78" fill="#e2e8f0" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">DEPLETION REGION (WIDENED)</text>
+            <path d="M 310 84 L 310 92 L 490 92 L 490 84" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3,3" />
+
+            <!-- P-Type Semiconductor Header -->
+            <text x="210" y="82" fill="#fb923c" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">P-type Semiconductor</text>
+
+            <!-- N-Type Semiconductor Header -->
+            <text x="590" y="82" fill="#38bdf8" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">N-type Semiconductor</text>
+
+            <!-- Metal Contacts on Ends -->
+            <rect x="95" y="120" width="18" height="140" rx="3" fill="#64748b" stroke="#cbd5e1" stroke-width="1.5" />
+            <rect x="687" y="120" width="18" height="140" rx="3" fill="#64748b" stroke="#cbd5e1" stroke-width="1.5" />
+
+            <!-- P-Region Block (Narrowed due to wide depletion layer) -->
+            <rect x="113" y="105" width="200" height="170" rx="4" fill="url(#pTypeGradRev)" stroke="#ea580c" stroke-width="2" />
+
+            <!-- N-Region Block (Narrowed) -->
+            <rect x="487" y="105" width="200" height="170" rx="4" fill="url(#nTypeGradRev)" stroke="#2563eb" stroke-width="2" />
+
+            <!-- Depletion Layer Widened P-side (More columns of negative ions) -->
+            <rect x="313" y="105" width="87" height="170" fill="#451a03" stroke="#ea580c" stroke-dasharray="3,3" stroke-width="1.5" />
+            <!-- Depletion Layer Widened N-side (More columns of positive ions) -->
+            <rect x="400" y="105" width="87" height="170" fill="#172554" stroke="#2563eb" stroke-dasharray="3,3" stroke-width="1.5" />
+
+            <!-- P-N Junction Metallurgical Line -->
+            <line x1="400" y1="105" x2="400" y2="275" stroke="#ffffff" stroke-width="2" />
+            <line x1="400" y1="315" x2="400" y2="282" stroke="#ffffff" stroke-width="1.8" marker-end="url(#arrowHeadWhite)" />
+            <text x="400" y="332" fill="#ffffff" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">P-N Junction</text>
+
+            <!-- Holes (+) in P-type being pulled LEFT away from junction -->
+            <g fill="#ea580c" stroke="#fef08a" stroke-width="1.5">
+              <circle cx="145" cy="140" r="13" /><text x="145" y="145" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="215" cy="140" r="13" /><text x="215" y="145" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="145" cy="190" r="13" /><text x="145" y="195" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="215" cy="190" r="13" /><text x="215" y="195" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="145" cy="240" r="13" /><text x="145" y="245" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="215" cy="240" r="13" /><text x="215" y="245" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">+</text>
+            </g>
+            <text x="210" y="195" fill="#ffffff" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">Holes (⊕)</text>
+
+            <!-- Holes Movement Arrows (pointing LEFT) -->
+            <line x1="300" y1="140" x2="245" y2="140" stroke="#f59e0b" stroke-width="4" marker-end="url(#arrowHeadAmber)" />
+            <line x1="300" y1="190" x2="245" y2="190" stroke="#f59e0b" stroke-width="4" marker-end="url(#arrowHeadAmber)" />
+            <line x1="300" y1="240" x2="245" y2="240" stroke="#f59e0b" stroke-width="4" marker-end="url(#arrowHeadAmber)" />
+
+            <!-- Immobile Negative Ions in Depletion Layer (2 columns on P-side) -->
+            <g fill="#7c2d12" stroke="#ea580c" stroke-width="1.2">
+              <circle cx="335" cy="125" r="9" /><text x="335" y="129" fill="#fca5a5" font-size="13" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="370" cy="125" r="9" /><text x="370" y="129" fill="#fca5a5" font-size="13" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="335" cy="155" r="9" /><text x="335" y="159" fill="#fca5a5" font-size="13" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="370" cy="155" r="9" /><text x="370" y="159" fill="#fca5a5" font-size="13" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="335" cy="185" r="9" /><text x="335" y="189" fill="#fca5a5" font-size="13" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="370" cy="185" r="9" /><text x="370" y="189" fill="#fca5a5" font-size="13" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="335" cy="215" r="9" /><text x="335" y="219" fill="#fca5a5" font-size="13" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="370" cy="215" r="9" /><text x="370" y="219" fill="#fca5a5" font-size="13" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="335" cy="245" r="9" /><text x="335" y="249" fill="#fca5a5" font-size="13" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="370" cy="245" r="9" /><text x="370" y="249" fill="#fca5a5" font-size="13" font-weight="bold" text-anchor="middle">−</text>
+            </g>
+
+            <!-- Immobile Positive Ions in Depletion Layer (2 columns on N-side) -->
+            <g fill="#1e3a8a" stroke="#38bdf8" stroke-width="1.2">
+              <circle cx="430" cy="125" r="9" /><text x="430" y="130" fill="#93c5fd" font-size="13" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="465" cy="125" r="9" /><text x="465" y="130" fill="#93c5fd" font-size="13" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="430" cy="155" r="9" /><text x="430" y="160" fill="#93c5fd" font-size="13" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="465" cy="155" r="9" /><text x="465" y="160" fill="#93c5fd" font-size="13" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="430" cy="185" r="9" /><text x="430" y="190" fill="#93c5fd" font-size="13" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="465" cy="185" r="9" /><text x="465" y="190" fill="#93c5fd" font-size="13" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="430" cy="215" r="9" /><text x="430" y="220" fill="#93c5fd" font-size="13" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="465" cy="215" r="9" /><text x="465" y="220" fill="#93c5fd" font-size="13" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="430" cy="245" r="9" /><text x="430" y="250" fill="#93c5fd" font-size="13" font-weight="bold" text-anchor="middle">+</text>
+              <circle cx="465" cy="245" r="9" /><text x="465" y="250" fill="#93c5fd" font-size="13" font-weight="bold" text-anchor="middle">+</text>
+            </g>
+
+            <!-- Free Electrons Movement Arrows (pointing RIGHT towards battery +) -->
+            <line x1="500" y1="140" x2="555" y2="140" stroke="#38bdf8" stroke-width="4" marker-end="url(#arrowHeadCyan)" />
+            <line x1="500" y1="190" x2="555" y2="190" stroke="#38bdf8" stroke-width="4" marker-end="url(#arrowHeadCyan)" />
+            <line x1="500" y1="240" x2="555" y2="240" stroke="#38bdf8" stroke-width="4" marker-end="url(#arrowHeadCyan)" />
+
+            <!-- Free Electrons (-) in N-type -->
+            <g fill="#1d4ed8" stroke="#67e8f9" stroke-width="1.5">
+              <circle cx="585" cy="140" r="13" /><text x="585" y="145" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="655" cy="140" r="13" /><text x="655" y="145" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="585" cy="190" r="13" /><text x="585" y="195" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="655" cy="190" r="13" /><text x="655" y="195" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="585" cy="240" r="13" /><text x="585" y="245" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">−</text>
+              <circle cx="655" cy="240" r="13" /><text x="655" y="245" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">−</text>
+            </g>
+            <text x="590" y="195" fill="#ffffff" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">Free Electrons (⊖)</text>
+
+            <!-- External Wiring to Reversed Battery -->
+            <path d="M 95 190 L 45 190 L 45 380 L 320 380" fill="none" stroke="#64748b" stroke-width="3" />
+            <path d="M 705 190 L 755 190 L 755 380 L 480 380" fill="none" stroke="#64748b" stroke-width="3" />
+
+            <!-- Minimal Leakage Current Arrow -->
+            <line x1="120" y1="420" x2="250" y2="420" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrowHeadWhite)" />
+            <text x="185" y="440" fill="#94a3b8" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">No Significant Current (Ir)</text>
+            <text x="185" y="456" fill="#64748b" font-family="sans-serif" font-size="11" text-anchor="middle">(Minimal Leakage Current)</text>
+
+            <!-- Reversed Battery Graphic: Negative (-) on Left, Positive (+) on Right -->
+            <rect x="320" y="350" width="80" height="60" rx="3" fill="#2563eb" stroke="#60a5fa" stroke-width="2" />
+            <text x="360" y="388" fill="#ffffff" font-size="28" font-weight="bold" text-anchor="middle">−</text>
+
+            <!-- Standard Battery Cell Plates Symbol Inside -->
+            <line x1="390" y1="362" x2="390" y2="398" stroke="#ffffff" stroke-width="2" />
+            <line x1="410" y1="355" x2="410" y2="405" stroke="#ffffff" stroke-width="3.5" />
+
+            <rect x="415" y="350" width="80" height="60" rx="3" fill="#dc2626" stroke="#f87171" stroke-width="2" />
+            <text x="455" y="388" fill="#ffffff" font-size="28" font-weight="bold" text-anchor="middle">+</text>
+
+            <!-- Battery Label -->
+            <text x="400" y="432" fill="#ffffff" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">External Battery (DC Source)</text>
+            <text x="325" y="338" fill="#93c5fd" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">Negative (−) Terminal</text>
+            <text x="475" y="338" fill="#fca5a5" font-family="sans-serif" font-size="12" font-weight="bold" text-anchor="middle">Positive (+) Terminal</text>
+
+            <!-- Reverse Bias Annotation on Right -->
+            <text x="670" y="350" fill="#cbd5e1" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">Reverse Bias</text>
+            <text x="670" y="370" fill="#cbd5e1" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">(V < 0)</text>
+          </svg>
+        </div>
+
+        <!-- REVERSE BIAS LAB ELECTRICAL SCHEMATIC -->
+        <div class="manual-diagram-card" style="margin: 18px 0; background: #070d1e; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 10px; padding: 18px; text-align: center;">
+          <h4 style="color: #38bdf8; font-size: 14px; margin-bottom: 12px; letter-spacing: 0.8px; text-transform: uppercase;">Reverse Bias Laboratory Circuit Schematic (Series Microammeter, Parallel Voltmeter)</h4>
+          <svg viewBox="0 0 700 280" width="100%" style="max-width: 640px; height: auto; display: block; margin: 0 auto;">
+            <!-- Schematic Lines -->
+            <rect width="700" height="280" rx="8" fill="#030712" />
+            <!-- Main Loop -->
+            <path d="M 120 180 L 120 70 L 260 70" fill="none" stroke="#ef4444" stroke-width="2.5" />
+            <path d="M 330 70 L 420 70" fill="none" stroke="#ef4444" stroke-width="2.5" />
+            <path d="M 480 70 L 600 70 L 600 180" fill="none" stroke="#1e293b" stroke-width="2.5" />
+            <path d="M 600 180 L 120 180" fill="none" stroke="#1e293b" stroke-width="2.5" />
+
+            <!-- DC Variable Supply (Reverse) -->
+            <rect x="80" y="160" width="80" height="40" rx="4" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" />
+            <text x="120" y="185" fill="#38bdf8" font-size="12" font-weight="bold" text-anchor="middle">DC Supply (VR)</text>
+            <text x="95" y="152" fill="#ef4444" font-size="14" font-weight="bold">+</text>
+            <text x="145" y="152" fill="#94a3b8" font-size="14" font-weight="bold">−</text>
+
+            <!-- Reversed Diode Symbol (Cathode connects to DC +, Anode connects to Microammeter +) -->
+            <g transform="translate(260, 50)">
+              <polygon points="55,5 20,20 55,35" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5" />
+              <line x1="20" y1="5" x2="20" y2="35" stroke="#ffffff" stroke-width="3" />
+              <line x1="0" y1="20" x2="20" y2="20" stroke="#ef4444" stroke-width="2" />
+              <line x1="55" y1="20" x2="70" y2="20" stroke="#ef4444" stroke-width="2" />
+              <text x="10" y="0" fill="#93c5fd" font-size="11" font-weight="bold">N (Cathode)</text>
+              <text x="50" y="0" fill="#fca5a5" font-size="11" font-weight="bold">P (Anode)</text>
+              <text x="35" y="52" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">Reverse-Biased Diode</text>
+            </g>
+
+            <!-- Microammeter in Series -->
+            <g transform="translate(420, 45)">
+              <circle cx="30" cy="25" r="25" fill="#0f172a" stroke="#a855f7" stroke-width="2" />
+              <text x="30" y="30" fill="#a855f7" font-size="14" font-weight="bold" text-anchor="middle">μA</text>
+              <text x="0" y="16" fill="#ef4444" font-size="12" font-weight="bold">+</text>
+              <text x="60" y="16" fill="#94a3b8" font-size="12" font-weight="bold">−</text>
+              <text x="30" y="66" fill="#94a3b8" font-size="11" font-weight="bold" text-anchor="middle">Microammeter (Series)</text>
+            </g>
+
+            <!-- Voltmeter in Parallel across Diode/Output -->
+            <path d="M 230 70 L 230 230 L 330 230" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,3" />
+            <path d="M 390 230 L 530 230 L 530 70" fill="none" stroke="#1e293b" stroke-width="2" stroke-dasharray="4,3" />
+            <g transform="translate(330, 205)">
+              <circle cx="30" cy="25" r="25" fill="#0f172a" stroke="#10b981" stroke-width="2" />
+              <text x="30" y="31" fill="#10b981" font-size="16" font-weight="bold" text-anchor="middle">V</text>
+              <text x="0" y="16" fill="#ef4444" font-size="12" font-weight="bold">+</text>
+              <text x="60" y="16" fill="#94a3b8" font-size="12" font-weight="bold">−</text>
+              <text x="30" y="66" fill="#10b981" font-size="11" font-weight="bold" text-anchor="middle">Voltmeter (Parallel)</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <div class="theory-block">
+        <h3>4. Comparison: Forward Bias vs. Reverse Bias</h3>
+        <div class="table-responsive" style="overflow-x:auto;">
+          <table class="manual-table" style="width:100%; border-collapse:collapse; margin-top:10px;">
+            <thead>
+              <tr style="background:#0f172a; color:#ffffff;">
+                <th style="padding:8px 12px; border:1px solid #334155;">Characteristic Parameter</th>
+                <th style="padding:8px 12px; border:1px solid #334155;">Forward Bias</th>
+                <th style="padding:8px 12px; border:1px solid #334155;">Reverse Bias</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:8px 12px; border:1px solid #334155;"><strong>Polarity of Supply</strong></td>
+                <td style="padding:8px 12px; border:1px solid #334155;">Anode (+) to P, Cathode (−) to N</td>
+                <td style="padding:8px 12px; border:1px solid #334155;">Anode (+) to N, Cathode (−) to P</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 12px; border:1px solid #334155;"><strong>Depletion Layer Width</strong></td>
+                <td style="padding:8px 12px; border:1px solid #334155;">Significantly Narrowed</td>
+                <td style="padding:8px 12px; border:1px solid #334155;">Significantly Widened</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 12px; border:1px solid #334155;"><strong>Barrier Potential</strong></td>
+                <td style="padding:8px 12px; border:1px solid #334155;">Reduced ($V_0 - V_f$)</td>
+                <td style="padding:8px 12px; border:1px solid #334155;">Increased ($V_0 + V_r$)</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 12px; border:1px solid #334155;"><strong>Current Conduction</strong></td>
+                <td style="padding:8px 12px; border:1px solid #334155;">High (Milliamperes, mA), driven by majority carriers</td>
+                <td style="padding:8px 12px; border:1px solid #334155;">Negligible (Microamperes, μA), driven by minority carriers</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 12px; border:1px solid #334155;"><strong>Junction Resistance</strong></td>
+                <td style="padding:8px 12px; border:1px solid #334155;">Very low (typically $10 - 50\\;\\Omega$)</td>
+                <td style="padding:8px 12px; border:1px solid #334155;">Extremely high (Megaohms, $\\text{M}\\Omega$)</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 12px; border:1px solid #334155;"><strong>V-I Characteristic Quadrant</strong></td>
+                <td style="padding:8px 12px; border:1px solid #334155;"><strong>1st Quadrant</strong> ($V_f \\ge 0, I_f \\ge 0$)</td>
+                <td style="padding:8px 12px; border:1px solid #334155;"><strong>3rd Quadrant</strong> ($V_r < 0, I_r < 0$)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `,
+    howToPerform: `
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-badge">1</div>
+          <div class="step-info">
+            <h4>Select Bias Operating Mode & Configure Meter Ranges</h4>
+            <p>For <strong>Forward Bias</strong>, toggle the Voltmeter range selector to <strong>1.5 V</strong> (upper scale) and the Ammeter range to <strong>10 mA</strong> (upper scale). For <strong>Reverse Bias</strong>, toggle the Voltmeter to <strong>30 V</strong> (lower scale) and the Ammeter to <strong>100 μA</strong> (lower scale).</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">2</div>
+          <div class="step-info">
+            <h4>Connect the Circuit Terminals</h4>
+            <p>Use the interactive banana-plug cables to wire the apparatus, or click <strong>Auto Connect Forward</strong> / <strong>Auto Connect Reverse</strong>. Ensure the ammeter is in series and the voltmeter is in parallel across the DC supply.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">3</div>
+          <div class="step-info">
+            <h4>Power ON the Apparatus</h4>
+            <p>Flip the central heavy-duty toggle switch to <strong>ON</strong>. The red indicator lamp illuminates and the dynamic analog meters activate.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">4</div>
+          <div class="step-info">
+            <h4>Adjust Variable DC Voltage Knob</h4>
+            <p>Rotate the rotary voltage potentiometer smoothly. In Forward Bias, increment $V_f$ in small steps of $0.1\\text{ V}$ (especially near the knee region $0.6 - 0.7\\text{ V}$). In Reverse Bias, increment $V_r$ in steps of $2.0\\text{ V}$ up to $30\\text{ V}$.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">5</div>
+          <div class="step-info">
+            <h4>Record Observations & Plot V-I Characteristic Curves</h4>
+            <p>Click <strong>Record Observation</strong> at each voltage step. Watch the live 1st-quadrant Forward curve and 3rd-quadrant Reverse curve update dynamically.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">6</div>
+          <div class="step-info">
+            <h4>Export Academic PDF Report</h4>
+            <p>Click <strong>Export PDF Report</strong> to generate an official laboratory record complete with your observation tables, calculated least counts, and high-resolution live graphs.</p>
+          </div>
+        </div>
+      </div>
+    `,
+    procedure: `
+      <ol class="manual-ordered-list">
+        <li><strong>Forward Bias Setup:</strong> Set the Voltmeter range selector to 1.5 V and the Ammeter range selector to 10 mA.</li>
+        <li>Connect the Forward DC Output (+) to the P terminal of the Forward Bias diode with a red wire.</li>
+        <li>Connect the N terminal of the Forward Bias diode to the Ammeter (+) terminal.</li>
+        <li>Connect the Ammeter (−) terminal back to the Forward DC Output (−) terminal with a black wire.</li>
+        <li>Connect the Voltmeter (+) to the Forward DC Output (+) and the Voltmeter (−) to the Forward DC Output (−) to measure the voltage across the circuit in parallel.</li>
+        <li>Switch the power toggle to <strong>ON</strong>. Verify that the indicator lamp glows.</li>
+        <li>Beginning from 0.0 V, slowly rotate the Forward Bias knob ($V_F$) in steps of 0.1 V. Notice that current remains almost zero until $\\approx 0.6\\text{ V}$.</li>
+        <li>Beyond $0.6\\text{ V}$, observe the exponential rise in forward current. Record at least 6 to 8 readings in the Forward Bias observation table.</li>
+        <li><strong>Reverse Bias Setup:</strong> Switch the power toggle to <strong>OFF</strong>. Set the Voltmeter range to 30 V and the Ammeter range to 100 μA.</li>
+        <li>Connect the Reverse DC Output (+) to the N terminal of the Reverse Bias diode, the Diode P terminal to the Microammeter (+), and Microammeter (−) to the Reverse DC Output (−).</li>
+        <li>Connect the Voltmeter in parallel across the Reverse DC Output (+/−).</li>
+        <li>Switch the power toggle to <strong>ON</strong>. Gradually adjust the Reverse Bias knob ($V_R$) in steps of 2.0 V to 5.0 V up to 30 V.</li>
+        <li>Record the reverse voltage ($V_r$) and microammeter current ($I_r$). Note that $1\\;\\mu\\text{A} = 0.001\\text{ mA}$.</li>
+        <li>Observe the 3rd quadrant graph display and export the observation report.</li>
+      </ol>
+    `,
+    formulas: `
+      <div class="formula-block">
+        <h4>1. Shockley Ideal Diode Equation</h4>
+        <div class="math-callout formula-highlight">I = I_0 \\left( e^{\\frac{V}{\\eta V_t}} - 1 \\right)</div>
+        <p>Where:</p>
+        <ul class="manual-list">
+          <li><strong>I:</strong> Net diode current (Amperes).</li>
+          <li><strong>I₀:</strong> Reverse saturation current (typically $10^{-12}\\text{ A}$ to $10^{-8}\\text{ A}$).</li>
+          <li><strong>V:</strong> Voltage applied across the diode junction (positive for forward bias, negative for reverse bias).</li>
+          <li><strong>η (eta):</strong> Ideality factor ($1 \\le \\eta \\le 2$; $\\eta \\approx 1$ for Germanium, $\\eta \\approx 1.3 - 2$ for Silicon).</li>
+          <li><strong>Vₜ:</strong> Thermal voltage.</li>
+        </ul>
+      </div>
+
+      <div class="formula-block">
+        <h4>2. Thermal Voltage</h4>
+        <div class="math-callout">V_t = \\frac{k \\cdot T}{q}</div>
+        <p>Where:</p>
+        <ul class="manual-list">
+          <li><strong>k:</strong> Boltzmann's constant ($1.380649 \\times 10^{-23}\\text{ J/K}$).</li>
+          <li><strong>T:</strong> Absolute thermodynamic temperature in Kelvin ($T \\approx 300\\text{ K}$ at room temperature, yielding $V_t \\approx 25.86\\text{ mV} \\approx 26\\text{ mV}$).</li>
+          <li><strong>q:</strong> Elementary electronic charge ($1.60217663 \\times 10^{-19}\\text{ C}$).</li>
+        </ul>
+      </div>
+
+      <div class="formula-block">
+        <h4>3. Dynamic (AC) Forward Resistance</h4>
+        <div class="math-callout">r_d = \\frac{\\Delta V_f}{\\Delta I_f} = \\frac{V_2 - V_1}{I_2 - I_1}</div>
+        <p>Represents the reciprocal of the slope of the forward V-I characteristic curve above the cut-in knee voltage.</p>
+      </div>
+
+      <div class="formula-block">
+        <h4>4. Static (DC) Forward Resistance</h4>
+        <div class="math-callout">R_{dc} = \\frac{V_f}{I_f}</div>
+        <p>The ratio of DC voltage to DC current at a specific operating quiescent point (Q-point).</p>
+      </div>
+    `,
+    observations: `
+      <div class="obs-table-wrapper">
+        <h4>Least Count of Instruments:</h4>
+        <div class="obs-meta-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 16px;">
+          <div class="detail-meta-tag"><strong>Forward Voltmeter (1.5 V Range):</strong> 0.025 V (1.5 V / 60 div)</div>
+          <div class="detail-meta-tag"><strong>Forward Milliammeter (10 mA Range):</strong> 0.2 mA (10 mA / 50 div)</div>
+          <div class="detail-meta-tag"><strong>Reverse Voltmeter (30 V Range):</strong> 0.5 V (30 V / 60 div)</div>
+          <div class="detail-meta-tag"><strong>Reverse Microammeter (100 μA Range):</strong> 2 μA = 0.002 mA (100 μA / 50 div)</div>
+        </div>
+
+        <h4>Table 1: Forward Bias Characteristics ($V_f$ vs $I_f$)</h4>
+        <table class="manual-table">
+          <thead>
+            <tr>
+              <th>S.No.</th>
+              <th>Forward Voltage $V_f$ (Volt)</th>
+              <th>Forward Current $I_f$ (mA)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>0.10</td><td>0.00</td></tr>
+            <tr><td>2</td><td>0.30</td><td>0.01</td></tr>
+            <tr><td>3</td><td>0.50</td><td>0.05</td></tr>
+            <tr><td>4</td><td>0.60</td><td>0.25</td></tr>
+            <tr><td>5</td><td>0.65</td><td>0.95</td></tr>
+            <tr><td>6</td><td>0.70</td><td>2.45</td></tr>
+            <tr><td>7</td><td>0.75</td><td>4.60</td></tr>
+            <tr><td>8</td><td>0.80</td><td>7.20</td></tr>
+          </tbody>
+        </table>
+
+        <h4 style="margin-top:20px;">Table 2: Reverse Bias Characteristics ($V_r$ vs $I_r$)</h4>
+        <table class="manual-table">
+          <thead>
+            <tr>
+              <th>S.No.</th>
+              <th>Reverse Voltage $V_r$ (Volt)</th>
+              <th>Reverse Current $I_r$ (mA)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>2.0</td><td>0.0001 (0.1 μA)</td></tr>
+            <tr><td>2</td><td>5.0</td><td>0.0003 (0.3 μA)</td></tr>
+            <tr><td>3</td><td>10.0</td><td>0.0005 (0.5 μA)</td></tr>
+            <tr><td>4</td><td>15.0</td><td>0.0008 (0.8 μA)</td></tr>
+            <tr><td>5</td><td>20.0</td><td>0.0010 (1.0 μA)</td></tr>
+            <tr><td>6</td><td>25.0</td><td>0.0013 (1.3 μA)</td></tr>
+            <tr><td>7</td><td>30.0</td><td>0.0015 (1.5 μA)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    `,
+    result: `
+      <div class="result-box">
+        <h4>Experimental Conclusions:</h4>
+        <ol class="manual-ordered-list">
+          <li>The forward V-I characteristic curve of the P-N junction diode lies in the <strong>1st Quadrant</strong>. The cut-in (knee) voltage is observed at approximately <strong>0.65 V to 0.70 V</strong> (characteristic of Silicon).</li>
+          <li>Below the cut-in voltage, forward current is negligible. Beyond the knee, current increases sharply with voltage.</li>
+          <li>The reverse V-I characteristic lies in the <strong>3rd Quadrant</strong>. Reverse current remains virtually constant at an extremely minute level ($\approx 0.1 - 1.5\\;\\mu\\text{A} = 0.0001 - 0.0015\\text{ mA}$), confirming unidirectional conduction.</li>
+          <li>Dynamic forward resistance is small ($r_d \\approx 20 - 35\\;\\Omega$), whereas reverse resistance is extremely large ($R_r > 10\\;\\text{M}\\Omega$).</li>
+        </ol>
+      </div>
+`
   }
 };
 
