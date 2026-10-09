@@ -1334,6 +1334,68 @@
   </header>
 
   <!-- =====================================
+       EXPERIMENT SWITCHER BANNER
+  ===================================== -->
+  <div class="exp-switch-container">
+    <div class="exp-switch-bar">
+      <button type="button" id="btn-switch-exp-projectile" class="exp-switch-btn active" data-exp="projectile">
+        <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
+          <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
+        </svg>
+        <span>Exp 1: 2D Projectile Motion</span>
+      </button>
+
+      <button type="button" id="btn-switch-exp-optical" class="exp-switch-btn" data-exp="optical">
+        <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <circle cx="12" cy="12" r="6"></circle>
+          <circle cx="12" cy="12" r="2"></circle>
+        </svg>
+        <span>Exp 2: Optical Fibre NA</span>
+      </button>
+
+      <button type="button" id="btn-switch-exp-colour" class="exp-switch-btn" data-exp="colour-sensor">
+        <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 2a10 10 0 0 1 10 10" stroke="#f43f5e" stroke-width="2.5"></path>
+          <path d="M22 12a10 10 0 0 1-10 10" stroke="#10b981" stroke-width="2.5"></path>
+          <path d="M12 22a10 10 0 0 1-10-10" stroke="#3b82f6" stroke-width="2.5"></path>
+        </svg>
+        <span>Exp 3: Study of Colour Sensor</span>
+      </button>
+
+      <button type="button" id="btn-switch-exp-hall" class="exp-switch-btn" data-exp="hall-effect">
+        <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        <span>Exp 4: Hall Effect Experiment</span>
+      </button>
+
+      <button type="button" id="btn-switch-exp-diffraction" class="exp-switch-btn" data-exp="diffraction">
+        <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2">
+          <line x1="4" y1="4" x2="4" y2="20"></line>
+          <line x1="8" y1="4" x2="8" y2="20"></line>
+          <line x1="12" y1="4" x2="12" y2="20"></line>
+          <line x1="16" y1="4" x2="16" y2="20"></line>
+          <line x1="20" y1="4" x2="20" y2="20"></line>
+        </svg>
+        <span>Exp 5: Diffraction Grating</span>
+      </button>
+
+      <button type="button" id="btn-switch-exp-sandbox" class="exp-switch-btn" data-exp="sandbox">
+        <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="#00f0ff" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+          <circle cx="8.5" cy="8.5" r="2" fill="#00f0ff"></circle>
+          <path d="m21 15-5-5L5 21"></path>
+        </svg>
+        <span>Exp 6: Physics Sandbox</span>
+        <span class="exp-pill-badge sandbox-pill-badge">PLAYGROUND</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- =====================================
        EXPERIMENT 1: 2D PROJECTILE MOTION
   ===================================== -->
   <div id="exp-projectile-section" class="exp-section-wrapper">
@@ -2795,7 +2857,7 @@
   </div><!-- /#exp-colour-sensor-section -->
 
   <!-- =====================================
-       EXPERIMENT 4: PHYSICS SANDBOX
+       EXPERIMENT 6: PHYSICS SANDBOX
   ===================================== -->
   <div id="exp-sandbox-section" class="exp-section-wrapper hidden">
     
@@ -3374,9 +3436,500 @@
   </div><!-- /#exp-sandbox-section -->
 
   <!-- =====================================
-       EXPERIMENT 5: DIFFRACTION OF LIGHT USING DIFFRACTION GRATING
+       EXPERIMENT 4: HALL EFFECT EXPERIMENT
   ===================================== -->
-  <div id="exp-diffraction-section" class="exp-section-wrapper hidden">
+  <div id="exp-hall-effect-section" class="exp-section-wrapper hidden">
+    
+    <!-- LABORATORY PROCEDURE GUIDE RIBBON -->
+    <section class="cs-setup-container">
+      <div class="cs-procedure-ribbon">
+        <div class="cs-proc-step" id="hall-step-indicator-1">
+          <span class="step-num">1</span>
+          <div class="step-details">
+            <strong>Power Supplies</strong>
+            <span>Switch ON Current &amp; Magnet</span>
+          </div>
+        </div>
+        <div class="proc-arrow">›</div>
+        <div class="cs-proc-step" id="hall-step-indicator-2">
+          <span class="step-num">2</span>
+          <div class="step-details">
+            <strong>Specimen Mount</strong>
+            <span>Select n-Ge, p-Ge, InAs, or Cu</span>
+          </div>
+        </div>
+        <div class="proc-arrow">›</div>
+        <div class="cs-proc-step" id="hall-step-indicator-3">
+          <span class="step-num">3</span>
+          <div class="step-details">
+            <strong>Current Calibration</strong>
+            <span>Set Sample Current (10 - 40 mA)</span>
+          </div>
+        </div>
+        <div class="proc-arrow">›</div>
+        <div class="cs-proc-step" id="hall-step-indicator-4">
+          <span class="step-num">4</span>
+          <div class="step-details">
+            <strong>Magnetic Field</strong>
+            <span>Adjust Field B (0.0 - 0.8 T)</span>
+          </div>
+        </div>
+        <div class="proc-arrow">›</div>
+        <div class="cs-proc-step" id="hall-step-indicator-5">
+          <span class="step-num">5</span>
+          <div class="step-details">
+            <strong>Data Capture</strong>
+            <span>Zero Offset &amp; Measure V_H</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN DUAL-CANVAS SIMULATOR WORKSTATION -->
+    <main class="dashboard cs-dashboard hall-dashboard">
+      
+      <!-- LEFT: ELECTROMAGNETIC BENCH SIMULATION VIEWPORT -->
+      <section class="simulation-card cs-bench-card hall-bench-card">
+        <div class="simulation-top-bar">
+          <div class="current-lab-badge">
+            <span class="live-dot" style="background:#8b5cf6; box-shadow:0 0 8px #8b5cf6;"></span>
+            <span>● ELECTROMAGNETIC HALL EFFECT BENCH</span>
+          </div>
+
+          <div class="cs-bench-hud-pill">
+            <span id="hall-specimen-hud-badge">n-type Germanium (Ge) • Thickness t = 0.5 mm</span>
+          </div>
+        </div>
+
+        <div class="cs-canvas-wrapper hall-canvas-wrapper">
+          <canvas id="hall-bench-canvas" width="800" height="380"></canvas>
+        </div>
+
+        <!-- HARDWARE CONTROLS & SPECIMEN PALETTE DECK -->
+        <div class="cs-hardware-deck hall-hardware-deck" style="flex-direction:column; gap:12px; padding:14px 18px;">
+          
+          <!-- SPECIMEN QUICK SELECTION BAR -->
+          <div class="hall-specimens-bar" style="width:100%;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span class="cs-deck-label" style="display:flex; align-items:center; gap:6px;">
+                <svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                Hall Probe Specimen Wafer Bay
+              </span>
+              <span style="font-size:11px; color:#94a3b8; font-family:var(--font-mono);">Thickness t = 0.5 mm</span>
+            </div>
+            <div class="cs-swatches-grid hall-swatches-grid">
+              <button type="button" class="cs-swatch-chip hall-specimen-chip active" data-specimen="n-ge" style="--swatch-color:#38bdf8;" title="n-type Germanium Crystal Wafer (Electrons)">
+                <span class="swatch-dot" style="background:#38bdf8;"></span>
+                <span>n-type Ge</span>
+              </button>
+              <button type="button" class="cs-swatch-chip hall-specimen-chip" data-specimen="p-ge" style="--swatch-color:#f59e0b;" title="p-type Germanium Crystal Wafer (Holes)">
+                <span class="swatch-dot" style="background:#f59e0b;"></span>
+                <span>p-type Ge</span>
+              </button>
+              <button type="button" class="cs-swatch-chip hall-specimen-chip" data-specimen="inas" style="--swatch-color:#a855f7;" title="Indium Arsenide High-Mobility Wafer">
+                <span class="swatch-dot" style="background:#a855f7;"></span>
+                <span>n-type InAs</span>
+              </button>
+              <button type="button" class="cs-swatch-chip hall-specimen-chip" data-specimen="cu" style="--swatch-color:#f97316;" title="Polycrystalline Pure Copper Foil Reference">
+                <span class="swatch-dot" style="background:#f97316;"></span>
+                <span>Copper Foil</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- INDUSTRIAL CONCAVE BUTTONS CONTROLLER PANEL (MATCHING REFERENCE IMAGE) -->
+          <div class="hall-controller-plate">
+            <!-- 4 Corner Screws -->
+            <span class="screw-head screw-tl"></span>
+            <span class="screw-head screw-tr"></span>
+            <span class="screw-head screw-bl"></span>
+            <span class="screw-head screw-br"></span>
+
+            <!-- 1. Red Concave Button: ELECTROMAGNETIC POWER SUPPLY -->
+            <div class="concave-btn-unit">
+              <div class="concave-btn-wrapper">
+                <button type="button" id="hall-btn-power-magnet" class="concave-btn concave-btn-red" title="Electromagnetic Power Supply (ON / OFF)">
+                  <span class="concave-btn-rim"></span>
+                  <span class="concave-btn-dish">
+                    <svg class="concave-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+                  </span>
+                </button>
+                <span class="concave-led-dot led-red active" id="hall-led-magnet" title="Electromagnet Power Status"></span>
+              </div>
+              <span class="concave-btn-label">ELECTROMAGNETIC<br>POWER SUPPLY</span>
+            </div>
+
+            <!-- 2. Black Concave Button: TOGGLE SPECIMEN CONSTANT CURRENT SUPPLY -->
+            <div class="concave-btn-unit">
+              <div class="concave-btn-wrapper">
+                <button type="button" id="hall-btn-power-sample" class="concave-btn concave-btn-black" title="Toggle Specimen Constant Current Supply (ON / OFF)">
+                  <span class="concave-btn-rim"></span>
+                  <span class="concave-btn-dish">
+                    <span class="concave-concentric-ring"></span>
+                  </span>
+                </button>
+                <span class="concave-led-dot led-amber active" id="hall-led-sample" title="Current Supply Status"></span>
+              </div>
+              <span class="concave-btn-label">TOGGLE SPECIMEN<br>CONSTANT CURRENT SUPPLY</span>
+            </div>
+
+            <!-- 3. Blue Concave Button: MAGNETIC FIELD POLARITY -->
+            <div class="concave-btn-unit">
+              <div class="concave-btn-wrapper">
+                <button type="button" id="hall-btn-pol-b" class="concave-btn concave-btn-blue" title="Magnetic Field Polarity (+B / -B)">
+                  <span class="concave-btn-rim"></span>
+                  <span class="concave-btn-dish">
+                    <span class="concave-concentric-ring"></span>
+                  </span>
+                </button>
+                <span class="concave-led-dot led-blue active" id="hall-led-b-pol" title="Magnetic Polarity Status (+B / -B)"></span>
+              </div>
+              <span class="concave-btn-label">MAGNETIC FIELD<br>POLARITY</span>
+            </div>
+
+            <!-- 4. Green Concave Button: SPECIMEN CURRENT DIRECTION -->
+            <div class="concave-btn-unit">
+              <div class="concave-btn-wrapper">
+                <button type="button" id="hall-btn-pol-i" class="concave-btn concave-btn-green" title="Specimen Current Direction (+I / -I)">
+                  <span class="concave-btn-rim"></span>
+                  <span class="concave-btn-dish">
+                    <span class="concave-concentric-ring"></span>
+                  </span>
+                </button>
+                <span class="concave-led-dot led-green active" id="hall-led-i-pol" title="Current Direction Status (+I / -I)"></span>
+              </div>
+              <span class="concave-btn-label">SPECIMEN CURRENT<br>DIRECTION</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-bench-footer">
+          <span class="cs-hint-text">
+            <svg class="svg-icon svg-icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            Interactive Controls: Click specimen chips to switch materials, toggle power and polarity switches, or adjust current and magnetic field sliders.
+          </span>
+        </div>
+      </section>
+
+      <!-- RIGHT: DIGITAL VOLTMETER & GAUSSMETER DECK -->
+      <aside class="controls-panel cs-screen-panel hall-screen-panel">
+        
+        <div class="cs-screen-header">
+          <div class="cs-screen-title-group">
+            <h3>Digital Microvoltmeter &amp; Gaussmeter</h3>
+            <p>Transverse potential V_H &amp; carrier kinetics</p>
+          </div>
+          <div id="hall-match-badge" class="cs-status-pill pill-live">
+            Active Hall Equilibrium
+          </div>
+        </div>
+
+        <!-- Secondary Visualization Canvas (Graph OR Microscopic Lattice) -->
+        <div class="cs-target-canvas-wrapper hall-target-canvas-wrapper">
+          <canvas id="hall-graph-canvas" width="380" height="300"></canvas>
+        </div>
+
+        <!-- Display Mode Toggle: Characteristic Graph vs Quantum Carrier Lattice -->
+        <div class="hall-mode-toggle" style="display:flex; gap:8px; margin-top:8px;">
+          <button type="button" id="hall-btn-mode-graph" class="cs-scale-btn active" style="flex:1;" title="Display Characteristic V_H vs B Curve">
+            V_H vs B Curve
+          </button>
+          <button type="button" id="hall-btn-mode-lattice" class="cs-scale-btn" style="flex:1;" title="Display Microscopic Carrier Lattice Dynamics">
+            Carrier Lattice View
+          </button>
+        </div>
+
+        <!-- Specimen Longitudinal Current (I_S) Control Group -->
+        <div class="control-group" style="margin-top:12px;">
+          <div class="control-header">
+            <span class="control-name">Specimen Current (I_S)</span>
+            <strong id="hall-current-val" class="val-dist" style="color:#10b981;">+ 20.0 mA</strong>
+          </div>
+
+          <div class="cs-slider-row">
+            <button type="button" id="hall-btn-dec-current" class="cs-btn-step" title="Decrease Current by 5.0 mA">-5.0</button>
+            <input type="range" id="hall-slider-current" min="0.0" max="50.0" step="1.0" value="20.0" />
+            <button type="button" id="hall-btn-inc-current" class="cs-btn-step" title="Increase Current by 5.0 mA">+5.0</button>
+          </div>
+
+          <!-- Quick Current Presets -->
+          <div class="cs-presets-bar">
+            <button type="button" class="cs-preset-btn hall-preset-btn-cur" data-cur="5.0">5mA</button>
+            <button type="button" class="cs-preset-btn hall-preset-btn-cur" data-cur="10.0">10mA</button>
+            <button type="button" class="cs-preset-btn hall-preset-btn-cur" data-cur="20.0">20mA</button>
+            <button type="button" class="cs-preset-btn hall-preset-btn-cur" data-cur="30.0">30mA</button>
+            <button type="button" class="cs-preset-btn hall-preset-btn-cur" data-cur="40.0">40mA</button>
+          </div>
+        </div>
+
+        <!-- Magnetic Flux Density (B) Control Group -->
+        <div class="control-group">
+          <div class="control-header">
+            <span class="control-name">Magnetic Flux Density (B)</span>
+            <strong id="hall-field-val" class="val-dist" style="color:#38bdf8;">+ 0.40 T (400 mT)</strong>
+          </div>
+
+          <div class="cs-slider-row">
+            <button type="button" id="hall-btn-dec-field" class="cs-btn-step" title="Decrease Magnetic Field by 0.10 T">-0.10</button>
+            <input type="range" id="hall-slider-field" min="0.0" max="0.80" step="0.02" value="0.40" />
+            <button type="button" id="hall-btn-inc-field" class="cs-btn-step" title="Increase Magnetic Field by 0.10 T">+0.10</button>
+          </div>
+
+          <!-- Quick Field Presets -->
+          <div class="cs-presets-bar">
+            <button type="button" class="cs-preset-btn hall-preset-btn-field" data-field="0.10">0.1T</button>
+            <button type="button" class="cs-preset-btn hall-preset-btn-field" data-field="0.25">0.25T</button>
+            <button type="button" class="cs-preset-btn hall-preset-btn-field" data-field="0.40">0.4T</button>
+            <button type="button" class="cs-preset-btn hall-preset-btn-field" data-field="0.60">0.6T</button>
+            <button type="button" class="cs-preset-btn hall-preset-btn-field" data-field="0.80">0.8T</button>
+          </div>
+        </div>
+
+        <!-- Contact Misalignment Zero-Null Offset Potentiometer -->
+        <div class="control-group">
+          <div class="control-header">
+            <span class="control-name">Contact Misalignment (V_offset)</span>
+            <strong id="hall-offset-val" class="val-dist" style="color:#c084fc;">0.00 mV</strong>
+          </div>
+
+          <div class="cs-slider-row">
+            <input type="range" id="hall-slider-offset" min="-2.00" max="2.00" step="0.05" value="0.00" style="flex:1;" />
+            <button type="button" id="hall-btn-zero-offset" class="btn-obs-action" style="height:32px; font-size:11px; padding:0 10px; border-radius:8px;" title="Auto-Balance Potentiometer to Exactly Zero Offset">
+              Zero Balance
+            </button>
+          </div>
+        </div>
+
+        <!-- Action Buttons Deck -->
+        <div class="buttons cs-action-buttons">
+          <button type="button" id="hall-btn-record" class="launch-btn cs-record-btn" title="Capture and Record Current Hall Effect Measurement">
+            <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            Record Observation
+          </button>
+          <button type="button" id="hall-btn-view-results" class="clear-btn" title="View Comprehensive Laboratory Report">
+            <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+            Lab Report
+          </button>
+        </div>
+
+      </aside>
+    </main>
+
+    <!-- REAL-TIME MAGNETOTRANSPORT TELEMETRY CARDS -->
+    <section class="results-container">
+      <div class="results-card">
+        
+        <div class="result-box card-distance">
+          <div class="result-icon icon-dist">
+            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+          </div>
+          <div class="result-meta">
+            <span class="result-label">Hall Voltage (V_H)</span>
+            <span id="hall-hud-vh" class="result-val">-12.16 mV</span>
+            <span class="result-sub">V_H = (R_H · I · B) / t</span>
+          </div>
+        </div>
+
+        <div class="result-box card-spot">
+          <div class="result-icon icon-spot">
+            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 1 10 10"></path></svg>
+          </div>
+          <div class="result-meta">
+            <span class="result-label">Magnetic Field (B)</span>
+            <span id="hall-hud-b" class="result-val">0.400 T (+B)</span>
+            <span class="result-sub">Perpendicular flux density</span>
+          </div>
+        </div>
+
+        <div class="result-box card-na">
+          <div class="result-icon icon-na">
+            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          </div>
+          <div class="result-meta">
+            <span class="result-label">Hall Coefficient (R_H)</span>
+            <span id="hall-hud-rh" class="result-val">-3.80 × 10⁻² m³/C</span>
+            <span id="hall-hud-rh-sub" class="result-sub">R_H &lt; 0 (Electrons predominate)</span>
+          </div>
+        </div>
+
+        <div class="result-box card-angle">
+          <div class="result-icon icon-angle">
+            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="12 6 17 15 7 15"></polygon></svg>
+          </div>
+          <div class="result-meta">
+            <span class="result-label">Carrier Density (n)</span>
+            <span id="hall-hud-n" class="result-val">1.64 × 10²⁰ m⁻³</span>
+            <span id="hall-hud-carrier-sub" class="result-sub">Type: Electrons (n-type)</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- WORKSTATION: CHALLENGES & OBSERVATIONS -->
+    <section class="lab-workstation-container">
+      
+      <!-- 1. HALL EFFECT MASTERY CHALLENGES -->
+      <div class="workstation-card challenges-card">
+        <div class="workstation-header">
+          <div class="workstation-title-group">
+            <div class="workstation-icon-glow challenge-icon-glow">
+              <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </div>
+            <div>
+              <h3>Hall Effect Mastery Missions</h3>
+              <p>Accomplish magnetotransport practical challenges to earn student mastery XP</p>
+            </div>
+          </div>
+          <div class="challenge-xp-badge">
+            <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span id="hall-challenges-completed-count">0 / 3 Complete</span>
+            <span class="xp-separator">•</span>
+            <span id="hall-user-total-challenge-xp" class="xp-highlight">+0 XP</span>
+          </div>
+        </div>
+
+        <!-- 3 Challenges Grid -->
+        <div class="challenges-grid">
+          <!-- Challenge 1: Carrier Type & Polarity Inversion -->
+          <div class="challenge-item" id="hall-ch-card-1">
+            <div class="challenge-badge-icon">
+              <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="12 6 17 15 7 15"></polygon></svg>
+            </div>
+            <div class="challenge-info">
+              <div class="challenge-title-row">
+                <h4>1. Carrier Type &amp; Polarity Law</h4>
+                <span class="challenge-reward-pill">+100 XP</span>
+              </div>
+              <p>Test both <strong>n-type Ge</strong> and <strong>p-type Ge</strong> specimens, verify opposite Hall voltage polarities, and observe sign reversal when toggling field polarity (-B).</p>
+              <div class="challenge-footer">
+                <span class="challenge-status-tag pending" id="hall-ch-tag-1">0 / 3 Verified</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Challenge 2: Magnetic Field Linear Sweep -->
+          <div class="challenge-item" id="hall-ch-card-2">
+            <div class="challenge-badge-icon">
+              <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            </div>
+            <div class="challenge-info">
+              <div class="challenge-title-row">
+                <h4>2. Magnetic Linearity Sweep</h4>
+                <span class="challenge-reward-pill">+125 XP</span>
+              </div>
+              <p>Record observations across at least 4 distinct magnetic field values (B ≥ 0.1T, 0.3T, 0.5T, 0.7T) at constant current to verify V_H ∝ B linearity.</p>
+              <div class="challenge-footer">
+                <span class="challenge-status-tag pending" id="hall-ch-tag-2">0 / 4 Field Points Logged</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Challenge 3: Quantum Carrier Concentration -->
+          <div class="challenge-item" id="hall-ch-card-3">
+            <div class="challenge-badge-icon">
+              <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+            </div>
+            <div class="challenge-info">
+              <div class="challenge-title-row">
+                <h4>3. Quantum Carrier Concentration</h4>
+                <span class="challenge-reward-pill">+150 XP</span>
+              </div>
+              <p>Balance the Zero-Null potentiometer (V_offset = 0.00 mV), record trial data, and determine carrier density n within 5% of theoretical physics values.</p>
+              <div class="challenge-footer">
+                <span class="challenge-status-tag pending" id="hall-ch-tag-3">Pending Zero-Null Analysis</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. OBSERVATIONS LOGBOOK & DATA EXPORT -->
+      <div class="workstation-card observations-card">
+        <div class="workstation-header">
+          <div class="workstation-title-group">
+            <div class="workstation-icon-glow obs-icon-glow">
+              <svg class="svg-icon svg-icon-md" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            </div>
+            <div>
+              <h3>Hall Effect Experimental Observations</h3>
+              <p>Documented trials of current, magnetic field, transverse Hall voltage, Hall coefficient, and carrier concentration</p>
+            </div>
+          </div>
+          <div class="obs-actions-group">
+            <button type="button" id="hall-btn-export-csv" class="btn-obs-action btn-obs-export" title="Export Observation Data to CSV">
+              <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Export CSV
+            </button>
+            <button type="button" id="hall-btn-export-pdf" class="btn-obs-action btn-obs-export-pdf" title="Export Official PhysiX Lab Report (PDF)">
+              <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              Export PDF
+            </button>
+            <button type="button" id="hall-btn-clear-obs" class="btn-obs-action btn-obs-clear" title="Clear All Recorded Observations">
+              <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              Clear Observations
+            </button>
+            <span class="obs-count-pill" id="hall-obs-count-badge">0 Readings</span>
+          </div>
+        </div>
+
+        <!-- Summary Statistics Bar -->
+        <div class="of-stats-summary-bar">
+          <div class="of-stat-item">
+            <span class="of-stat-lbl">Mean Hall Voltage</span>
+            <strong id="hall-mean-vh" class="of-stat-val text-green">--</strong>
+          </div>
+          <div class="of-stat-item">
+            <span class="of-stat-lbl">Mean Hall Coefficient</span>
+            <strong id="hall-mean-rh" class="of-stat-val text-cyan">--</strong>
+          </div>
+          <div class="of-stat-item">
+            <span class="of-stat-lbl">Mean Carrier Density</span>
+            <strong id="hall-mean-density" class="of-stat-val text-purple">--</strong>
+          </div>
+          <div class="of-stat-item">
+            <span class="of-stat-lbl">Specimens Evaluated</span>
+            <strong id="hall-total-samples" class="of-stat-val">0</strong>
+          </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="obs-table-wrapper">
+          <div id="hall-obs-empty" class="obs-empty-state">
+            <div class="obs-empty-icon">
+              <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            </div>
+            <h4>No Hall Effect Readings Recorded</h4>
+            <p>Mount a specimen, set current I_S and magnetic field B, and click <strong>"Record Observation"</strong> to log data.</p>
+          </div>
+
+          <table id="hall-obs-table" class="obs-table hidden">
+            <thead>
+              <tr>
+                <th>Reading #</th>
+                <th>Specimen</th>
+                <th>Current (I)</th>
+                <th>Field (B)</th>
+                <th>Hall Voltage (V_H)</th>
+                <th>Hall Coeff (R_H)</th>
+                <th>Carrier Density (n)</th>
+                <th>Type</th>
+                <th>Logged At</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="hall-obs-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+    </div>
+
+    <!-- ==========================================
+         EXPERIMENT 5: DIFFRACTION OF LIGHT (DIFFRACTION GRATING)
+    ========================================== -->
+    <div id="exp-diffraction-section" class="exp-section-wrapper hidden">
     
     <!-- LABORATORY PROCEDURE GUIDE RIBBON -->
     <section class="of-setup-container dg-setup-container">
@@ -4211,62 +4764,7 @@
           <div class="card-specular-rim"></div>
         </div>
 
-        <!-- 2. PHYSICS SANDBOX (ACTIVE) -->
-        <div class="lab-card active-lab" data-category="all" data-exp-target="sandbox" data-name="Physics Sandbox Playground">
-          <div class="card-header-bar">
-            <div class="card-icon-badge">
-              <svg class="badge-ring" viewBox="0 0 44 44">
-                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
-                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #00f0ff; filter: drop-shadow(0 0 5px #00f0ff);"></circle>
-              </svg>
-              <div class="badge-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="3" width="18" height="18" rx="3"></rect>
-                  <circle cx="8.5" cy="8.5" r="2" fill="#00f0ff"></circle>
-                  <path d="m21 15-5-5L5 21"></path>
-                </svg>
-              </div>
-            </div>
-            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-              </svg>
-            </button>
-          </div>
-
-          <div class="card-preview-art">
-            <svg viewBox="0 0 280 110" class="preview-svg">
-              <rect x="25" y="15" width="230" height="80" rx="8" fill="rgba(3, 7, 18, 0.4)" stroke="rgba(0, 240, 255, 0.15)"></rect>
-              <circle cx="70" cy="55" r="14" fill="rgba(0, 240, 255, 0.2)" stroke="#00f0ff" stroke-width="2" filter="drop-shadow(0 0 6px #00f0ff)"></circle>
-              <path d="M 70 55 L 110 40" stroke="#00f0ff" stroke-width="2"></path>
-              <polygon points="110,37 118,40 111,45" fill="#00f0ff"></polygon>
-              <rect x="155" y="45" width="28" height="28" rx="4" fill="rgba(168, 85, 247, 0.2)" stroke="#a855f7" stroke-width="2"></rect>
-              <circle cx="140" cy="55" r="8" fill="none" stroke="rgba(255, 255, 255, 0.5)" stroke-dasharray="2,2"></circle>
-              <circle cx="215" cy="65" r="10" fill="rgba(244, 63, 94, 0.2)" stroke="#f43f5e" stroke-width="2"></circle>
-              <text x="140" y="90" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="middle">Matter.js Newtonian 2D</text>
-            </svg>
-          </div>
-
-          <div class="card-content-block">
-            <h3 class="card-title">
-              <span class="title-grad">Physics</span>
-              <span class="title-main">Sandbox</span>
-            </h3>
-            <p class="card-desc">Interactive 2D playground: spawn balls, crates, static walls, apply live force vectors, and test collision kinematics</p>
-          </div>
-
-          <div class="card-action-bar">
-            <button type="button" class="lab-card-btn btn-perform" aria-label="Launch Physics Sandbox">
-              Perform
-            </button>
-          </div>
-
-          <div class="card-ambient-nebula"></div>
-          <div class="card-white-light-effect"></div>
-          <div class="card-specular-rim"></div>
-        </div>
-
-        <!-- 3. OPTICAL FIBRE NA (ACTIVE) -->
+        <!-- 2. OPTICAL FIBRE NA (ACTIVE EXP 2) -->
         <div class="lab-card active-lab" data-category="optics" data-exp-target="optical" data-name="Determination of Numerical Aperture of an Optical Fibre">
           <div class="card-header-bar">
             <div class="card-icon-badge">
@@ -4541,13 +5039,13 @@
           <div class="card-specular-rim"></div>
         </div>
 
-        <!-- 8. HALL EFFECT (EXP 5) -->
-        <div class="lab-card coming-lab" data-category="quantum" data-name="Determination of Hall Coefficient using Hall Effect Phenomenon">
+        <!-- 4. HALL EFFECT (ACTIVE EXP 4) -->
+        <div class="lab-card active-lab" data-category="quantum" data-exp-target="hall-effect" data-name="Hall Effect Experiment">
           <div class="card-header-bar">
             <div class="card-icon-badge">
               <svg class="badge-ring" viewBox="0 0 44 44">
                 <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
-                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #8b5cf6; stroke-dashoffset: 70;"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #8b5cf6; filter: drop-shadow(0 0 5px #8b5cf6);"></circle>
               </svg>
               <div class="badge-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -4593,7 +5091,7 @@
           <div class="card-specular-rim"></div>
         </div>
 
-        <!-- 9. DIFFRACTION GRATING (ACTIVE EXP 5) -->
+        <!-- 5. DIFFRACTION GRATING (ACTIVE EXP 5) -->
         <div class="lab-card active-lab" data-category="optics" data-exp-target="diffraction" data-name="Diffraction Grating">
           <div class="card-header-bar">
             <div class="card-icon-badge">
@@ -4642,6 +5140,61 @@
 
           <div class="card-action-bar">
             <button type="button" class="lab-card-btn btn-perform" aria-label="Perform Diffraction Grating experiment">
+              Perform
+            </button>
+          </div>
+
+          <div class="card-ambient-nebula"></div>
+          <div class="card-white-light-effect"></div>
+          <div class="card-specular-rim"></div>
+        </div>
+
+        <!-- 6. PHYSICS SANDBOX (ACTIVE EXP 6) -->
+        <div class="lab-card active-lab" data-category="all" data-exp-target="sandbox" data-name="Physics Sandbox Playground">
+          <div class="card-header-bar">
+            <div class="card-icon-badge">
+              <svg class="badge-ring" viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" class="ring-bg"></circle>
+                <circle cx="22" cy="22" r="19" class="ring-fill" style="stroke: #00f0ff; filter: drop-shadow(0 0 5px #00f0ff);"></circle>
+              </svg>
+              <div class="badge-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+                  <circle cx="8.5" cy="8.5" r="2" fill="#00f0ff"></circle>
+                  <path d="m21 15-5-5L5 21"></path>
+                </svg>
+              </div>
+            </div>
+            <button type="button" class="card-bookmark-btn" aria-label="Bookmark experiment" title="Bookmark experiment">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="card-preview-art">
+            <svg viewBox="0 0 280 110" class="preview-svg">
+              <rect x="25" y="15" width="230" height="80" rx="8" fill="rgba(3, 7, 18, 0.4)" stroke="rgba(0, 240, 255, 0.15)"></rect>
+              <circle cx="70" cy="55" r="14" fill="rgba(0, 240, 255, 0.2)" stroke="#00f0ff" stroke-width="2" filter="drop-shadow(0 0 6px #00f0ff)"></circle>
+              <path d="M 70 55 L 110 40" stroke="#00f0ff" stroke-width="2"></path>
+              <polygon points="110,37 118,40 111,45" fill="#00f0ff"></polygon>
+              <rect x="155" y="45" width="28" height="28" rx="4" fill="rgba(168, 85, 247, 0.2)" stroke="#a855f7" stroke-width="2"></rect>
+              <circle cx="140" cy="55" r="8" fill="none" stroke="rgba(255, 255, 255, 0.5)" stroke-dasharray="2,2"></circle>
+              <circle cx="215" cy="65" r="10" fill="rgba(244, 63, 94, 0.2)" stroke="#f43f5e" stroke-width="2"></circle>
+              <text x="140" y="90" fill="rgba(148,163,184,0.6)" font-family="monospace" font-size="8" text-anchor="middle">Matter.js Newtonian 2D</text>
+            </svg>
+          </div>
+
+          <div class="card-content-block">
+            <h3 class="card-title">
+              <span class="title-grad">Physics</span>
+              <span class="title-main">Sandbox</span>
+            </h3>
+            <p class="card-desc">Interactive 2D playground: spawn balls, crates, static walls, apply live force vectors, and test collision kinematics</p>
+          </div>
+
+          <div class="card-action-bar">
+            <button type="button" class="lab-card-btn btn-perform" aria-label="Launch Physics Sandbox">
               Perform
             </button>
           </div>
@@ -5017,13 +5570,11 @@
           </svg>
           <span>Exp 3: Colour Sensor</span>
         </button>
-        <button type="button" class="help-tab-btn" id="btn-help-tab-exp4">
-          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="#00f0ff" stroke-width="2">
-            <rect x="3" y="3" width="18" height="18" rx="3"></rect>
-            <circle cx="8.5" cy="8.5" r="2" fill="#00f0ff"></circle>
-            <path d="m21 15-5-5L5 21"></path>
+                <button type="button" class="help-tab-btn" id="btn-help-tab-exp4">
+          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
           </svg>
-          <span>Physics Sandbox</span>
+          <span>Exp 4: Hall Effect</span>
         </button>
         <button type="button" class="help-tab-btn" id="btn-help-tab-exp5">
           <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2">
@@ -5036,15 +5587,13 @@
           <span>Exp 4: Diffraction Grating</span>
         </button>
         <button type="button" class="help-tab-btn" id="btn-help-tab-exp6">
-          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
-            <polygon points="6 4 18 12 6 20 6 4"></polygon>
-            <line x1="18" y1="4" x2="18" y2="20"></line>
-            <line x1="2" y1="12" x2="6" y2="12"></line>
-            <line x1="18" y1="12" x2="22" y2="12"></line>
+          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="#00f0ff" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+            <circle cx="8.5" cy="8.5" r="2" fill="#00f0ff"></circle>
+            <path d="m21 15-5-5L5 21"></path>
           </svg>
-          <span>Exp 5: Diode V-I Characteristics</span>
+          <span>Exp 6: Physics Sandbox</span>
         </button>
-
       </div>
 
       <div class="help-content">
@@ -5483,7 +6032,7 @@
         <!-- ==========================================
              TAB 4: PHYSICS SANDBOX USER GUIDE
         ========================================== -->
-        <div id="help-pane-exp4" class="help-pane hidden">
+        <div id="help-pane-exp6" class="help-pane hidden">
           <div class="help-hero-card">
             <div class="help-hero-icon-box" style="background:rgba(0,240,255,0.15); border-color:rgba(0,240,255,0.3);">
               <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="#00f0ff" stroke-width="2">
@@ -5493,7 +6042,7 @@
               </svg>
             </div>
             <div class="help-hero-body">
-              <h3>Physics Sandbox: Newtonian Mechanics Laboratory</h3>
+              <h3>Experiment 6: Newtonian Physics Sandbox Laboratory</h3>
               <p>An interactive 2D rigid-body dynamics playground to explore Newton's three laws of motion ($F = ma$, $F_{AB} = -F_{BA}$), impulse kicks ($J = \Delta p$), conservation of mechanical energy ($E = KE + PE$), and planetary gravitational fields.</p>
               <button type="button" class="btn-help-start-tour" data-tour-exp="sandbox">
                 <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
@@ -5530,6 +6079,153 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- ==========================================
+             TAB 5: DIFFRACTION GRATING USER GUIDE
+        ========================================== -->
+        <!-- ==========================================
+             TAB 4: HALL EFFECT USER GUIDE
+        ========================================== -->
+        <div id="help-pane-exp4" class="help-pane hidden">
+          
+          <!-- Summary Banner -->
+          <div class="help-hero-card">
+            <div class="help-hero-icon-box" style="background:rgba(139, 92, 246, 0.2); border-color:rgba(139, 92, 246, 0.4);">
+              <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            </div>
+            <div class="help-hero-body">
+              <h3>Experiment 4: Hall Effect Virtual Laboratory</h3>
+              <p>Simulates electromagnetic Lorentz force magnetotransport across semiconductors and metals, measuring transverse Hall voltage V_H, determining charge carrier sign, and evaluating carrier concentration n and mobility μ_H under perpendicular magnetic fields.</p>
+              <button type="button" class="btn-help-start-tour" data-tour-exp="hall-effect">
+                <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                Launch Interactive Guided Tour
+              </button>
+            </div>
+          </div>
+
+          <!-- Step-by-Step Operations Guide -->
+          <div class="help-section-card">
+            <h4 class="help-section-title">
+              <span class="help-step-badge" style="background:#8b5cf6;">1</span>
+              Step-by-Step Operations Guide: How to Operate the Electromagnetic Hall Bench
+            </h4>
+            <div class="help-steps-grid">
+              <div class="help-step-item">
+                <span class="help-mini-num">1</span>
+                <div>
+                  <strong>Turn ON Power Supplies</strong>
+                  <p>Click the <strong>Sample I_S</strong> and <strong>Magnet B</strong> hardware switches. Both indicator LEDs will illuminate green to show power active.</p>
+                </div>
+              </div>
+              <div class="help-step-item">
+                <span class="help-mini-num">2</span>
+                <div>
+                  <strong>Select Specimen Crystal</strong>
+                  <p>Click on any specimen chip: <strong>n-type Ge</strong>, <strong>p-type Ge</strong>, <strong>n-type InAs</strong>, or <strong>Copper Foil</strong>. The probe wafer updates instantaneously.</p>
+                </div>
+              </div>
+              <div class="help-step-item">
+                <span class="help-mini-num">3</span>
+                <div>
+                  <strong>Adjust Sample Current (I_S)</strong>
+                  <p>Use the current slider or -5/+5 steppers to configure current between 0.0 and 50.0 mA. Quick presets (5mA, 10mA, 20mA, 30mA, 40mA) allow rapid setting.</p>
+                </div>
+              </div>
+              <div class="help-step-item">
+                <span class="help-mini-num">4</span>
+                <div>
+                  <strong>Set Magnetic Field Flux (B)</strong>
+                  <p>Drag the magnetic field slider from 0.0 to 0.80 Tesla. Watch the glowing magnetic flux lines between the electromagnet pole pieces.</p>
+                </div>
+              </div>
+              <div class="help-step-item">
+                <span class="help-mini-num">5</span>
+                <div>
+                  <strong>Zero-Null Misalignment Balance</strong>
+                  <p>Click <strong>Zero Balance</strong> to nullify contact misalignment offset voltage (V_offset = 0.00 mV), ensuring pure Hall potential readouts.</p>
+                </div>
+              </div>
+              <div class="help-step-item">
+                <span class="help-mini-num">6</span>
+                <div>
+                  <strong>Record Trial Data &amp; Export Report</strong>
+                  <p>Click <strong>Record Observation</strong> to commit data points. Open <strong>Lab Report</strong> to review grades, plots, and export official CSV/PDF documents.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Control Deck Breakdown -->
+          <div class="help-section-card">
+            <h4 class="help-section-title">
+              <span class="help-step-badge" style="background:#8b5cf6;">2</span>
+              Interactive Control Deck Breakdown &amp; Hardware Functions
+            </h4>
+            <div class="help-controls-table-wrap">
+              <table class="help-ui-table">
+                <thead>
+                  <tr>
+                    <th>Control Element</th>
+                    <th>Type</th>
+                    <th>Function &amp; Operating Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Sample I_S Switch</strong></td>
+                    <td><span class="ui-tag tag-btn">Button</span></td>
+                    <td class="help-ui-desc">Energizes constant DC current through the longitudinal leads of the specimen crystal.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Magnet B Switch</strong></td>
+                    <td><span class="ui-tag tag-btn">Button</span></td>
+                    <td class="help-ui-desc">Energizes the dual electromagnetic coils to produce a uniform magnetic field in the air gap.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>B Polarity Switch</strong></td>
+                    <td><span class="ui-tag tag-btn">Button</span></td>
+                    <td class="help-ui-desc">Reverses electromagnet polarity (+B / -B) to verify four-quadrant anti-symmetric Hall deflection.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>I Direction Switch</strong></td>
+                    <td><span class="ui-tag tag-btn">Button</span></td>
+                    <td class="help-ui-desc">Reverses longitudinal current flow (+I / -I) to isolate spurious thermoelectric offset voltages.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Zero Balance Knob</strong></td>
+                    <td><span class="ui-tag tag-slider">Slider</span></td>
+                    <td class="help-ui-desc">Balances the probe bridge potentiometer to cancel probe contact misalignment potential.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Mode Toggle</strong></td>
+                    <td><span class="ui-tag tag-btn">Button</span></td>
+                    <td class="help-ui-desc">Switches the secondary monitor between Characteristic V_H vs B regression plot and Microscopic Carrier Lattice.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Precautions & Best Practices -->
+          <div class="help-section-card">
+            <h4 class="help-section-title">
+              <span class="help-step-badge" style="background:#8b5cf6;">3</span>
+              Laboratory Precautions &amp; Practical Guidelines
+            </h4>
+            <div class="help-card-inner">
+              <div class="help-card-inner-header">
+                <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <h5>Experimental Guidelines for Precision Results</h5>
+              </div>
+              <ul class="manual-list" style="margin-top:8px;">
+                <li><strong>Specimen Current Limits:</strong> Keep specimen current within recommended limits (≤ 40 mA) to prevent thermal Joule heating (I²R) that causes thermal carrier generation.</li>
+                <li><strong>Four-Quadrant Averaging:</strong> To eliminate misalignment and Nernst-Ettingshausen errors, average readings across reversed field and current states: V_H = [(V₁ − V₂) + (V₃ − V₄)] / 4.</li>
+                <li><strong>Probe Perpendicularity:</strong> Ensure probe wafer faces are perpendicular to pole pieces so magnetic flux lines traverse normal to current flow.</li>
+              </ul>
+            </div>
+          </div>
+
         </div>
 
         <!-- ==========================================
@@ -5645,34 +6341,7 @@
         </button>
       </div>
 
-      <!-- THEORY EXPERIMENT SWITCHER TABS (HIDDEN - OPENS ACTIVE EXPERIMENT DIRECTLY) -->
-      <div class="theory-nav-tabs" style="display: none !important;">
-        <button type="button" class="theory-tab-btn active" id="btn-theory-tab-exp1">
-          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
-            <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
-          </svg>
-          <span>Exp 1: 2D Projectile Motion</span>
-        </button>
-        <button type="button" class="theory-tab-btn" id="btn-theory-tab-exp2">
-          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <circle cx="12" cy="12" r="6"></circle>
-            <circle cx="12" cy="12" r="2"></circle>
-          </svg>
-          <span>Exp 2: Optical Fibre NA</span>
-        </button>
-        <button type="button" class="theory-tab-btn" id="btn-theory-tab-exp3">
-          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M12 2a10 10 0 0 1 10 10" stroke="#f43f5e" stroke-width="2"></path>
-            <path d="M22 12a10 10 0 0 1-10 10" stroke="#10b981" stroke-width="2"></path>
-            <path d="M12 22a10 10 0 0 1-10-10" stroke="#3b82f6" stroke-width="2"></path>
-          </svg>
-          <span>Exp 3: Colour Sensor</span>
-        </button>
-      </div>
-
+      <!-- THEORY CONTENT -->
       <div class="theory-content">
         <!-- TAB 1: PROJECTILE MOTION -->
         <div id="theory-pane-exp1" class="theory-pane active">
@@ -5797,7 +6466,7 @@
           </div>
 
           <div class="formula-block" style="margin-top:14px;">
-            <h4>Theoretical Foundations & Colorimetry</h4>
+            <h4>Theoretical Foundations &amp; Colorimetry</h4>
             <ul style="color:#94a3b8; font-size:12.5px; line-height:1.6; padding-left:18px;">
               <li><strong>Photodiode Matrix:</strong> The TCS3200 contains an 8×8 array of 64 silicon photodiodes (16 Red, 16 Green, 16 Blue, and 16 Clear). Grouping them symmetrically eliminates non-uniform irradiance errors.</li>
               <li><strong>White Balance Normalization:</strong> Raw frequencies $f_R, f_G, f_B$ are scaled against a standard white reference card ($R_{norm} = (f_R / f_{R,white}) \times 255$) to reconstruct true 24-bit sRGB color.</li>
@@ -5806,120 +6475,231 @@
           </div>
         </div>
 
-        <!-- TAB 4: PHYSICS SANDBOX (NEWTONIAN MECHANICS) -->
+        <!-- TAB 4: HALL EFFECT -->
         <div id="theory-pane-exp4" class="theory-pane hidden">
           <div class="formula-block">
-            <h4>Newtonian Mechanics & Kinematics Formulae</h4>
+            <h4>Aim &amp; Apparatus</h4>
+            <p style="color:#cbd5e1; font-size:13px; margin-bottom:10px;">
+              <strong>Aim:</strong> To investigate the Hall Effect in semiconductor and metal probes, measure the transverse Hall voltage ($V_H$) as a function of magnetic flux density ($B$) and constant current ($I$), identify charge carrier type ($n\text{-type}$ vs $p\text{-type}$), and calculate carrier concentration ($n$) and Hall mobility ($\mu_H$).
+            </p>
+            <p style="color:#cbd5e1; font-size:13px; margin-bottom:10px;">
+              <strong>Apparatus:</strong> Electromagnet with soft-iron pole pieces (0 to 0.8 T), regulated constant current DC power supply (0 to 50 mA), electromagnet energizing power supply (0 to 5 A), calibrated Hall probe fixtures ($n\text{-Ge}$, $p\text{-Ge}$, $\text{InAs}$, and $\text{Cu}$), digital Hall Gaussmeter, digital DC microvoltmeter (nV to mV), zero-null bridge potentiometer, 4-quadrant polarity reversal commutator.
+            </p>
+          </div>
+
+          <div class="formula-block" style="margin-top:14px;">
+            <h4>Theoretical Principle &amp; Lorentz Force</h4>
+            <p style="color:#94a3b8; font-size:12.5px; line-height:1.6; margin-bottom:10px;">
+              When a current-carrying conductor or semiconductor is placed in a transverse magnetic field $\vec{B}$, mobile charge carriers with drift velocity $\vec{v}_d$ experience a magnetic Lorentz deflection force:
+              <br><div class="formula-latex">$\vec{F}_L = q(\vec{v}_d \times \vec{B})$</div><br>
+              This force deflects mobile charges laterally toward one side of the specimen, creating a charge separation. This accumulation establishes a transverse electrostatic electric field $\vec{E}_H$ (Hall field). In steady-state equilibrium, the transverse electric force balances the magnetic Lorentz force:
+              <br><div class="formula-latex">$q \cdot E_H = q \cdot v_d \cdot B \implies E_H = v_d \cdot B$</div>
+            </p>
+
+            <div class="formula-grid">
+              <div class="formula-item">
+                <span class="f-name">Hall Voltage Formula:</span>
+                <code>V_H = (R_H · I · B) / t</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Hall Coefficient:</span>
+                <code>R_H = (V_H · t) / (I · B) = 1 / (n · q)</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Carrier Concentration (Density):</span>
+                <code>n = 1 / (|R_H| · e)</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Hall Carrier Mobility:</span>
+                <code>μ_H = |R_H| · σ = |R_H| / ρ</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Hall Angle:</span>
+                <code>tan(θ_H) = E_H / E_x = μ_H · B</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Carrier Drift Velocity:</span>
+                <code>v_d = I / (n · e · w · t) = J / (n · e)</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Zero-Offset Cancellation:</span>
+                <code>V_H = [(V₁ - V₂) + (V₃ - V₄)] / 4</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Electrical Conductivity:</span>
+                <code>σ = n · e · μ = 1 / ρ</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="formula-block" style="margin-top:14px;">
+            <h4>Carrier Type Identification (n-type vs p-type)</h4>
+            <ul style="color:#94a3b8; font-size:12.5px; line-height:1.6; padding-left:18px;">
+              <li><strong>n-type Semiconductor ($R_H &lt; 0$):</strong> Conduction is dominated by negative electrons ($q = -e$). Electrons accumulate at the lateral edge, creating a negative potential with respect to the opposite edge. Observed in $n\text{-Ge}$ and $\text{InAs}$ crystals.</li>
+              <li><strong>p-type Semiconductor ($R_H &gt; 0$):</strong> Conduction is dominated by positive holes ($q = +e$). Holes accumulate at the same lateral edge, producing a positive Hall voltage. Observed in $p\text{-Ge}$ crystals.</li>
+              <li><strong>Semiconductor vs Metal Contrast:</strong> Metals (like Copper) have extremely high carrier concentration ($n \sim 10^{28}\text{ m}^{-3}$), producing minute microvolt signals ($V_H \sim \mu\text{V}$). Semiconductors have significantly lower carrier concentrations ($n \sim 10^{20} - 10^{22}\text{ m}^{-3}$), yielding strong millivolt signals ($V_H \sim \text{mV}$).</li>
+            </ul>
+          </div>
+
+          <div class="formula-block" style="margin-top:14px;">
+            <h4>Step-by-Step Experimental Procedure</h4>
+            <ol style="color:#94a3b8; font-size:12.5px; line-height:1.6; padding-left:18px;">
+              <li>Mount the Hall probe perpendicular between the soft-iron pole pieces of the electromagnet.</li>
+              <li>With zero magnetic field ($B = 0\text{ T}$), pass a constant current $I$ (e.g., $5\text{ mA}$) through the probe and balance the zero-offset potentiometer to null misalignment voltage.</li>
+              <li>Energize the electromagnet to set a calibrated magnetic flux density $B$ (0.1 to 0.8 T) monitored on the digital Gaussmeter.</li>
+              <li>Record $V_1$ (forward $I$, forward $B$). Reverse field polarity to obtain $V_2$ (forward $I$, reverse $B$).</li>
+              <li>Reverse current polarity to obtain $V_3$ (reverse $I$, forward $B$) and $V_4$ (reverse $I$, reverse $B$). Compute true Hall voltage: $V_H = \frac{(V_1 - V_2) + (V_3 - V_4)}{4}$.</li>
+              <li>Plot $V_H$ vs $B$ at constant $I$ (slope gives $m_B = \frac{R_H I}{t}$) and $V_H$ vs $I$ at constant $B$ (slope gives $m_I = \frac{R_H B}{t}$).</li>
+              <li>Calculate Hall coefficient $R_H$, carrier concentration $n = \frac{1}{|R_H| e}$, and mobility $\mu_H = |R_H| \sigma$.</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- TAB 5: DIFFRACTION GRATING -->
+        <div id="theory-pane-exp5" class="theory-pane hidden">
+          <div class="formula-block">
+            <h4>Aim &amp; Apparatus</h4>
+            <p style="color:#cbd5e1; font-size:13px; margin-bottom:10px;">
+              <strong>Aim:</strong> To determine the wavelength of monochromatic laser light ($\lambda$), determine the grating element pitch ($d$), and analyze angular dispersion ($D$) and resolving power ($R$) using a plane transmission diffraction grating under normal incidence.
+            </p>
+            <p style="color:#cbd5e1; font-size:13px; margin-bottom:10px;">
+              <strong>Apparatus:</strong> Tunable diode laser source ($\lambda = 650\text{ nm}$ Red, $532\text{ nm}$ Green, $405\text{ nm}$ Violet), calibrated transmission diffraction grating (300, 600, 1200 lines/mm), precision optical bench rail (0.50 to 2.00 m), projection screen with millimeter scale, photoelectric detector.
+            </p>
+          </div>
+
+          <div class="formula-block" style="margin-top:14px;">
+            <h4>Diffraction &amp; Interference Principle</h4>
+            <p style="color:#94a3b8; font-size:12.5px; line-height:1.6; margin-bottom:10px;">
+              A diffraction grating consists of an array of $N$ parallel, equally spaced transparent slits of width $a$ separated by opaque intervals $b$. The grating element is $d = a + b = 1/N$. Under normal incidence, wavelets diffracted from adjacent slits have optical path difference $\Delta x = d \sin\theta$. Constructive multi-beam interference yields principal maxima when:
+              <br><div class="formula-latex">$d \cdot \sin\theta = m \cdot \lambda \quad (m = 0, \pm 1, \pm 2, \dots)$</div>
+            </p>
+
+            <div class="formula-grid">
+              <div class="formula-item">
+                <span class="f-name">Grating Equation (Normal Incidence):</span>
+                <code>d · sin(θ) = m · λ</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Grating Pitch (Slit Spacing):</span>
+                <code>d = (a + b) = 1 / N = 10⁻³ / (lines/mm) m</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Fringe Angular Displacement:</span>
+                <code>tan(θ) = y / L ⟹ sin(θ) = y / √(L² + y²)</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Wavelength Determination:</span>
+                <code>λ = (d · sin θ_m) / m = (d · y_m) / (m · √(L² + y_m²))</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Angular Dispersion:</span>
+                <code>D = dθ / dλ = m / (d · cos θ)</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Chromatic Resolving Power:</span>
+                <code>R = λ / Δλ = m · N_total</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Maximum Observable Order:</span>
+                <code>m_max = ⌊d / λ⌋ (since sin θ ≤ 1)</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Absent Spectra (Missing Orders):</span>
+                <code>d / a = m / p ⟹ (a + b) / a = m / p</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="formula-block" style="margin-top:14px;">
+            <h4>Governing Wave Optics Principles</h4>
+            <ul style="color:#94a3b8; font-size:12.5px; line-height:1.6; padding-left:18px;">
+              <li><strong>Fraunhofer Far-Field Diffraction:</strong> Incident planar wavefronts diffracted by $N$ parallel equidistant slits undergo coherent multi-beam interference, producing narrow, high-intensity principal maxima.</li>
+              <li><strong>Order of Spectrum ($m$):</strong> The central spot ($m=0$) corresponds to undiffracted light ($\theta = 0^\circ$). First-order maxima ($m=\pm 1$) and second-order maxima ($m=\pm 2$) appear symmetrically on either side.</li>
+              <li><strong>Chromatic Dispersion:</strong> Because $\sin\theta \propto \lambda$, longer wavelengths (Red $\sim 650\text{ nm}$) diffract at larger angles than shorter wavelengths (Violet $\sim 405\text{ nm}$), reversing the dispersion sequence of a prism.</li>
+              <li><strong>Missing Orders (Extinction):</strong> If a principal maximum condition ($d\sin\theta = m\lambda$) coincides with a single-slit diffraction minimum ($a\sin\theta = p\lambda$), the overall diffraction envelope vanishes and that order is absent.</li>
+            </ul>
+          </div>
+
+          <div class="formula-block" style="margin-top:14px;">
+            <h4>Step-by-Step Experimental Procedure</h4>
+            <ol style="color:#94a3b8; font-size:12.5px; line-height:1.6; padding-left:18px;">
+              <li>Set up the optical bench rail and direct the diode laser beam perpendicular to the diffraction grating face ($\theta_i = 0^\circ$).</li>
+              <li>Position the projection screen at a fixed distance $L$ (e.g., $1.00\text{ m}$) from the grating.</li>
+              <li>Mark the central bright spot ($m = 0$) on the millimeter grid scale.</li>
+              <li>Measure the lateral distances $y_{+1}$ and $y_{-1}$ to the first-order spots on either side. Calculate average displacement $y_1 = \frac{y_{+1} + y_{-1}}{2}$.</li>
+              <li>Calculate the diffraction angle $\sin\theta_1 = \frac{y_1}{\sqrt{L^2 + y_1^2}}$ and compute laser wavelength $\lambda = d \sin\theta_1$.</li>
+              <li>Repeat the measurement for the second order ($m = 2$) and for different grating elements ($N = 300, 600, 1200\text{ lines/mm}$).</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- TAB 6: PHYSICS SANDBOX -->
+        <div id="theory-pane-exp6" class="theory-pane hidden">
+          <div class="formula-block">
+            <h4>Aim &amp; Sandbox Architecture</h4>
+            <p style="color:#cbd5e1; font-size:13px; margin-bottom:10px;">
+              <strong>Aim:</strong> To investigate 2D classical Newtonian rigid-body mechanics, impulse-momentum relationships, momentum conservation during elastic and inelastic collisions, kinetic and potential energy conversions, and gravitational field dynamics.
+            </p>
+            <p style="color:#cbd5e1; font-size:13px; margin-bottom:10px;">
+              <strong>Apparatus &amp; Engine:</strong> Matter.js 2D rigid-body dynamic physics engine with Verlet integration, interactive circular and rectangular dynamic bodies, variable mass and restitution tuner ($e \in [0.0, 1.0]$), directional thrust vector generators, impulse kick engines, real-time velocity/momentum telemetry HUD, planetary gravity environment selectors.
+            </p>
+          </div>
+
+          <div class="formula-block" style="margin-top:14px;">
+            <h4>Newtonian Rigid-Body Mechanics Principles</h4>
+            <p style="color:#94a3b8; font-size:12.5px; line-height:1.6; margin-bottom:10px;">
+              Every rigid body in the simulation obeys Newton's laws of motion. When external forces or collision impulses act upon a body of mass $m$, its linear momentum $\vec{p} = m\vec{v}$ changes according to the impulse-momentum theorem:
+              <br><div class="formula-latex">$\vec{J} = \int \vec{F}_{\text{net}} \, dt = \Delta\vec{p} = m(\vec{v}_f - \vec{v}_i)$</div>
+            </p>
+
             <div class="formula-grid">
               <div class="formula-item">
                 <span class="f-name">Newton's Second Law:</span>
-                <code>F = ma</code>
+                <code>F_net = m · a = dp / dt</code>
               </div>
               <div class="formula-item">
-                <span class="f-name">Acceleration:</span>
-                <code>a = \frac{v - u}{t}</code>
+                <span class="f-name">Impulse-Momentum Theorem:</span>
+                <code>J = ∫ F dt = Δp = m(v_f - v_i)</code>
               </div>
               <div class="formula-item">
-                <span class="f-name">Weight:</span>
-                <code>W = mg</code>
+                <span class="f-name">Conservation of Linear Momentum:</span>
+                <code>∑ m_i · v_i = ∑ m_i · v_f</code>
               </div>
               <div class="formula-item">
-                <span class="f-name">Frictional Force:</span>
-                <code>F^f = \mu N</code>
+                <span class="f-name">Coefficient of Restitution:</span>
+                <code>e = -(v₂f - v₁f) / (v₂i - v₁i)</code>
               </div>
               <div class="formula-item">
                 <span class="f-name">Kinetic Energy:</span>
-                <code>KE = \frac{1}{2} mv^2</code>
+                <code>KE = (1/2)m v² = p² / (2m)</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Gravitational Potential Energy:</span>
+                <code>PE = m · g · h</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Coulomb Kinetic Friction:</span>
+                <code>f_k = μ_k · N = μ_k · m · g</code>
+              </div>
+              <div class="formula-item">
+                <span class="f-name">Inelastic Collision KE Loss:</span>
+                <code>ΔKE = (1/2) · [m₁m₂/(m₁+m₂)] · (1 - e²) · (v₁ - v₂)²</code>
               </div>
             </div>
           </div>
 
           <div class="formula-block" style="margin-top:14px;">
-            <h4>Theoretical Foundations & Physical Principles</h4>
+            <h4>Interactive Controls &amp; Sandbox Usage Guide</h4>
             <ul style="color:#94a3b8; font-size:12.5px; line-height:1.6; padding-left:18px;">
-              <li><strong>Newton's Second Law of Motion ($F = ma$):</strong> The net external force applied to a body produces an acceleration proportional to that force and inversely proportional to its inertial mass ($a = F_{\text{net}} / m$).</li>
-              <li><strong>Linear Acceleration ($a = \frac{v - u}{t}$):</strong> Measures the instantaneous time rate of change of linear velocity from initial velocity $u$ to final velocity $v$ over elapsed duration $t$.</li>
-              <li><strong>Gravitational Weight ($W = mg$):</strong> The downward gravitational attraction exerted on an object of mass $m$ in a local planetary gravitational field of magnitude $g$ (e.g. Earth $g \approx 9.81\text{ m/s}^2$).</li>
-              <li><strong>Dry Friction Force ($F^f = \mu N$):</strong> Opposes tangential relative motion between contacting surfaces, where $\mu$ is the friction coefficient and $N$ is the normal load.</li>
-              <li><strong>Translational Kinetic Energy ($KE = \frac{1}{2} mv^2$):</strong> The work done to accelerate a body from rest to speed $v$. Doubling the velocity quadruples its kinetic energy ($KE \propto v^2$).</li>
+              <li><strong>Spawn Objects:</strong> Click the Ball or Box buttons to spawn interactive rigid bodies of configurable mass ($m = 0.5 - 20\text{ kg}$) and radius/dimensions.</li>
+              <li><strong>Drag &amp; Toss:</strong> Click and drag any body with mouse/pointer to grab; release with motion to impart hand velocity and investigate projectile trajectories.</li>
+              <li><strong>Continuous Thrust vs Impulse:</strong> Use directional thrusters for constant force acceleration ($a = F/m$), or trigger instant impulse kicks ($\Delta v = J/m$) to analyze abrupt momentum transfers.</li>
+              <li><strong>Restitution Slider ($e$):</strong> Set $e = 1.0$ for perfectly elastic collisions (total mechanical energy conserved), or $e = 0.0$ for perfectly inelastic impacts where kinetic energy is dissipated into deformation.</li>
+              <li><strong>Planetary Gravity Presets:</strong> Toggle between Earth ($9.81\text{ m/s}^2$), Moon ($1.62\text{ m/s}^2$), Mars ($3.72\text{ m/s}^2$), Jupiter ($24.79\text{ m/s}^2$), and Zero-G Microgravity ($0.00\text{ m/s}^2$) to test gravitational potential variations.</li>
+              <li><strong>Friction &amp; Air Drag:</strong> Adjust surface friction and aerodynamic drag coefficients to examine dissipation rates and terminal velocities.</li>
             </ul>
           </div>
         </div>
-
-        <!-- TAB 5: DIFFRACTION GRATING (WAVE OPTICS) -->
-        <div id="theory-pane-exp5" class="theory-pane hidden">
-          <div class="formula-block">
-            <h4>Diffraction Grating Governing Formulae</h4>
-            <div class="formula-grid">
-              <div class="formula-item">
-                <span class="f-name">Grating Equation:</span>
-                <code>d \sin\theta = n\lambda</code>
-              </div>
-              <div class="formula-item">
-                <span class="f-name">Wavelength:</span>
-                <code>\lambda = \frac{d \sin\theta}{n}</code>
-              </div>
-              <div class="formula-item">
-                <span class="f-name">Grating Element:</span>
-                <code>d = \frac{1}{N}</code>
-              </div>
-              <div class="formula-item">
-                <span class="f-name">If N is lines per mm:</span>
-                <code>d = \frac{10^{-3}}{N}</code>
-              </div>
-              <div class="formula-item">
-                <span class="f-name">Therefore:</span>
-                <code>\lambda = \frac{10^{-3} \sin\theta}{nN}</code>
-              </div>
-            </div>
-          </div>
-
-          <div class="formula-block" style="margin-top:14px;">
-            <h4>Theoretical Foundations & Wave Optics</h4>
-            <ul style="color:#94a3b8; font-size:12.5px; line-height:1.6; padding-left:18px;">
-              <li><strong>Fraunhofer Multi-Slit Interference:</strong> When a plane monochromatic laser wavefront strikes a transmission grating having $N$ rulings per mm, each slit acts as a coherent secondary Huygens emitter.</li>
-              <li><strong>Condition for Principal Maxima ($d\sin\theta = n\lambda$):</strong> Constructive interference occurs at angles $\theta$ where the path difference between light from adjacent slits equals an integral multiple of the wavelength $n\lambda$, where $n = 0, \pm 1, \pm 2, \dots$ is the spectral order.</li>
-              <li><strong>Grating Element Pitch ($d = 10^{-3} / N$):</strong> Because rulings are specified per millimeter, multiplying by $10^{-3}$ converts the slit spacing $d$ into SI meters ($m$), allowing direct calculation of optical wavelength in meters or nanometers ($1\text{ nm} = 10^{-9}\text{ m}$).</li>
-              <li><strong>Detector Screen Fringe Offset ($y = L \tan\theta$):</strong> On a flat detector screen aligned at focal distance $L$, the spatial position $y$ of the $n$-th diffraction peak from the central beam datum satisfies $\tan\theta = y / L$.</li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- TAB 6: DIODE V-I CHARACTERISTICS -->
-        <div id="theory-pane-exp6" class="theory-pane hidden">
-          <div class="formula-block">
-            <h4>Diode V-I Governing Equations</h4>
-            <div class="formula-grid">
-              <div class="formula-item">
-                <span class="f-name">Shockley Diode Equation:</span>
-                <code>I = I_0 \left( e^{\frac{V}{\eta V_t}} - 1 \right)</code>
-              </div>
-              <div class="formula-item">
-                <span class="f-name">Thermal Voltage:</span>
-                <code>V_t = \frac{kT}{q}</code>
-              </div>
-              <div class="formula-item">
-                <span class="f-name">Dynamic (AC) Resistance:</span>
-                <code>r_d = \frac{\Delta V_f}{\Delta I_f}</code>
-              </div>
-              <div class="formula-item">
-                <span class="f-name">Static (DC) Resistance:</span>
-                <code>R_{dc} = \frac{V_f}{I_f}</code>
-              </div>
-            </div>
-          </div>
-
-          <div class="formula-block" style="margin-top:14px;">
-            <h4>Theoretical Foundations</h4>
-            <ul style="color:#94a3b8; font-size:12.5px; line-height:1.6; padding-left:18px;">
-              <li><strong>P-N Junction &amp; Barrier Potential ($V_0$):</strong> Electron-hole diffusion across the metallurgical junction creates a depletion region of uncompensated immobile ions, establishing a built-in barrier potential ($V_0 \approx 0.7\text{ V}$ for Si).</li>
-              <li><strong>Forward Bias:</strong> Applying positive potential to P-type and negative to N-type narrows the depletion region ($V_0 - V$). Above the cut-in knee voltage ($V_k$), majority charge carriers overcome the barrier, leading to exponential current growth.</li>
-              <li><strong>Reverse Bias:</strong> Applying negative potential to P-type and positive to N-type widens the depletion region ($V_0 + V_r$). Only thermally generated minority carriers cross the junction, resulting in a tiny, voltage-independent reverse saturation current ($I_0 \sim \mu\text{A}$).</li>
-              <li><strong>Quadrant Symmetry:</strong> The forward characteristic lies in the <strong>1st Quadrant</strong> ($+V_f, +I_f$), while the reverse characteristic lies in the <strong>3rd Quadrant</strong> ($-V_r, -I_r$).</li>
-            </ul>
-          </div>
-        </div>
-
       </div>
     </div>
   </div>
@@ -5945,18 +6725,7 @@
         </button>
       </div>
 
-      <!-- QUIZ EXPERIMENT SWITCHER TABS (HIDDEN - OPENS ACTIVE EXPERIMENT DIRECTLY) -->
-      <div class="quiz-exp-tabs" id="quiz-exp-tabs" style="display: none !important;">
-        <button type="button" class="quiz-exp-tab-btn active" data-quiz-exp="projectile">
-          <span>🚀 Exp 1: Projectile Motion</span>
-        </button>
-        <button type="button" class="quiz-exp-tab-btn" data-quiz-exp="optical">
-          <span>✨ Exp 2: Optical Fibre NA</span>
-        </button>
-        <button type="button" class="quiz-exp-tab-btn" data-quiz-exp="colour-sensor">
-          <span>🌈 Exp 3: Colour Sensor</span>
-        </button>
-      </div>
+
 
       <!-- ACTIVE QUIZ VIEW -->
       <div id="quiz-active-view" class="quiz-view">
@@ -5975,7 +6744,7 @@
         </div>
 
         <div class="quiz-question-container">
-          <h3 id="quiz-question-text" class="quiz-question">Loading question...</h3>
+          <h3 id="quiz-question-text" class="quiz-question"></h3>
           <div id="quiz-options-list" class="quiz-options-grid"></div>
         </div>
 
@@ -6014,8 +6783,6 @@
           <button id="btn-quiz-to-sim" class="quiz-btn quiz-btn-sim">Back to Active Lab Experiment</button>
         </div>
       </div>
-    </div>
-  </div>
     </div>
   </div>
 
@@ -7111,6 +7878,88 @@
         <div class="of-formula-recap">
           <strong>Governing Optoelectronic Equations:</strong>
           <code>I_ph = η (q P_opt λ)/(hc) ⟹ f_out ∝ I_ph | r = f_R / (f_R + f_G + f_B) | E ∝ 1/d²</code>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================
+       HALL EFFECT RESULTS & REPORT MODAL
+  ===================================== -->
+  <div id="hall-results-modal" class="modal-overlay hidden">
+    <div class="modal-card modal-card-report">
+      <div class="modal-header">
+        <div>
+          <h2>
+            <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            Experiment 4: Laboratory Performance Report
+          </h2>
+          <p>Hall Effect in Semiconductor &amp; Metal Probes • Magnetotransport &amp; Carrier Dynamics</p>
+        </div>
+        <button id="hall-btn-close-results" class="modal-close-btn" title="Close Report">
+          <svg class="svg-icon svg-icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="of-report-content">
+        <!-- Performance Honors Banner -->
+        <div class="of-report-banner" style="border-left:4px solid #8b5cf6;">
+          <div class="of-report-badge-icon">
+            <svg class="svg-icon svg-icon-lg" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+          </div>
+          <div>
+            <span class="of-banner-sub">Performance Evaluation</span>
+            <h3 id="hall-res-grade">Master Solid-State Physicist (Grade A+)</h3>
+            <p>Experimental readings, transverse Hall potentials, and carrier concentrations verified against Lorentz magnetotransport equations.</p>
+          </div>
+        </div>
+
+        <!-- 4 Metric Cards -->
+        <div class="of-report-metrics-grid">
+          <div class="of-rep-metric">
+            <span>Mean Hall Voltage</span>
+            <strong id="hall-res-vh" class="text-green">-12.16 mV</strong>
+          </div>
+          <div class="of-rep-metric">
+            <span>Readings Logged</span>
+            <strong id="hall-res-count" class="text-cyan">0</strong>
+          </div>
+          <div class="of-rep-metric">
+            <span>Mean Carrier Density</span>
+            <strong id="hall-res-density" class="text-purple">1.64 × 10²⁰ m⁻³</strong>
+          </div>
+          <div class="of-rep-metric">
+            <span>Total XP Earned</span>
+            <strong id="hall-res-xp" class="text-yellow">+0 XP</strong>
+          </div>
+        </div>
+
+        <!-- Readings Summary Table -->
+        <div class="of-report-table-section">
+          <h4>Observation Readings Recorded</h4>
+          <div class="of-report-table-wrapper">
+            <table class="obs-table">
+              <thead>
+                <tr>
+                  <th>Reading #</th>
+                  <th>Specimen</th>
+                  <th>Current</th>
+                  <th>Field (B)</th>
+                  <th>Hall Voltage</th>
+                  <th>Carrier Density</th>
+                </tr>
+              </thead>
+              <tbody id="hall-res-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Theoretical Summary Formula -->
+        <div class="of-formula-recap">
+          <strong>Governing Magnetotransport Equations:</strong>
+          <code>V_H = (R_H · I · B) / t | R_H = 1 / (n · q) | n = 1 / (|R_H| · e) | μ_H = |R_H| · σ</code>
         </div>
       </div>
     </div>

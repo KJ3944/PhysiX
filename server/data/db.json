@@ -45,8 +45,7 @@
         "badge-profile-saved",
         "badge-high-velocity",
         "badge-optimal-angle",
-        "badge-lab-veteran",
-        "badge-semiconductor-specialist"
+        "badge-lab-veteran"
       ],
       "quizHighScore": 10,
       "observations": [
@@ -524,15 +523,15 @@
     "oyzXOlVh6waIwwKg8N0g4DUrO702": {
       "userId": "oyzXOlVh6waIwwKg8N0g4DUrO702",
       "profile": {
-        "name": "Jeshurun Selvakumar",
+        "name": "",
         "avatar": "quantum",
-        "handle": "@jeshurunselvakumar",
-        "edu": "Undergraduate Student",
-        "occ": "MIT Physics Lab / Student",
-        "interests": "2D Kinematics, Planetary Gravity, Orbital Dynamics",
-        "bio": "Exploring 2D projectile kinematics, parabolic trajectories, vector breakdown components, and gravitational effects across the solar system.",
+        "handle": "",
+        "edu": "",
+        "occ": "",
+        "interests": "",
+        "bio": "",
         "createdAt": "2026-09-21T16:15:28.210Z",
-        "updatedAt": "2026-10-09T12:59:31.262Z",
+        "updatedAt": "2026-09-21T16:25:33.550Z",
         "email": "jeshurunselvakumar640@gmail.com",
         "streak": 2,
         "highestStreak": 2,
@@ -555,16 +554,46 @@
       "flightLogs": [],
       "observations": [],
       "challenges": {},
-      "bonusXp": 2935,
+      "bonusXp": 1475,
       "badges": [
         "badge-profile-saved",
-        "badge-lab-veteran",
-        "badge-diffraction-calibrator",
-        "badge-high-dispersion",
-        "badge-second-order",
-        "badge-spectroscopy-sleuth",
-        "badge-diffraction-master",
-        "badge-semiconductor-specialist"
+        "badge-lab-veteran"
+      ],
+      "quizHighScore": 0
+    },
+    "vpQrV8uzcNYwdgcqexqrY7u8TGv1": {
+      "userId": "vpQrV8uzcNYwdgcqexqrY7u8TGv1",
+      "profile": {
+        "name": "Kshitij Jadhav",
+        "avatar": "quantum",
+        "handle": "@kshitijjadhav",
+        "edu": "Undergraduate Student",
+        "occ": "MIT Physics Lab / Student",
+        "interests": "2D Kinematics, Planetary Gravity, Orbital Dynamics",
+        "bio": "Exploring 2D projectile kinematics, parabolic trajectories, vector breakdown components, and gravitational effects across the solar system.",
+        "createdAt": "2026-10-07T15:20:56.054Z",
+        "updatedAt": "2026-10-07T17:50:36.847Z"
+      },
+      "telemetry": {
+        "totalLaunches": 0,
+        "maxRange": 0,
+        "maxHeight": 0,
+        "maxVelocity": 0,
+        "totalAirtime": 0,
+        "targetHits": 0,
+        "planetsUsed": {
+          "Earth": 0,
+          "Moon": 0,
+          "Mars": 0,
+          "Jupiter": 0
+        }
+      },
+      "flightLogs": [],
+      "observations": [],
+      "challenges": {},
+      "bonusXp": 300,
+      "badges": [
+        "badge-profile-saved"
       ],
       "quizHighScore": 0
     }

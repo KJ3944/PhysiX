@@ -1,3 +1,4 @@
+import { renderMathInDOM, formatMarkdownWithMath, initMathRenderer } from "./math-renderer.js";
 import Matter from "matter-js";
 import "./style.css";
 import "./light-mode.css";
@@ -19,11 +20,13 @@ import { api } from "./api.js";
 import { ICONS, AVATAR_SVGS, BADGE_SVGS } from "./icons.js";
 import { createOpticalFibreExperiment } from "./optical-fibre.js";
 import { createColourSensorExperiment } from "./colour-sensor.js";
+import { createHallEffectExperiment } from "./hall-effect.js";
 import { createPhysicsSandboxExperiment } from "./sandbox/sandbox-experiment.js";
 import { createDiffractionGratingExperiment } from "./diffraction-grating.js";
 import { createDiodeExperiment } from "./diode-vi.js";
 import {
   tutorialManager,
+  normalizeExpId,
   isExperimentTutorialCompleted,
   markExperimentTutorialCompleted,
   syncTutorialsWithCloud,
@@ -348,6 +351,7 @@ let homepageInstance = null;
 let activeExperimentId = "projectile";
 let opticalExperimentInstance = null;
 let colourSensorExperimentInstance = null;
+let hallEffectExperimentInstance = null;
 let physicsSandboxExperimentInstance = null;
 let diffractionExperimentInstance = null;
 let diodeExperimentInstance = null;
@@ -1638,7 +1642,23 @@ function syncChallengeToLocalState(challengeId, persistToStorage = true) {
     }
   }
 
-  // Exp 4: Physics Sandbox
+  // Exp 4: Hall Effect
+  if (challengeId.startsWith("hall-effect.")) {
+    const hallKey = challengeId.replace("hall-effect.", "");
+    if (persistToStorage && canPerformCloudOperation()) {
+      try {
+        const savedHall = JSON.parse(localStorage.getItem("physix_hall_challenges") || "{}");
+        if (!savedHall[hallKey]) savedHall[hallKey] = {};
+        savedHall[hallKey].completed = true;
+        localStorage.setItem("physix_hall_challenges", JSON.stringify(savedHall));
+      } catch (e) {}
+    }
+    if (hallEffectExperimentInstance && typeof hallEffectExperimentInstance.hydrateChallenges === "function") {
+      hallEffectExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+    }
+  }
+
+  // Exp 5: Physics Sandbox
   if (challengeId.startsWith("sandbox.")) {
     const sbKey = challengeId.replace("sandbox.", "");
     if (persistToStorage && canPerformCloudOperation()) {
@@ -1854,7 +1874,29 @@ function hydrateAllExperimentChallenges(completedChallengeIds) {
     colourSensorExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
   }
 
-  // 4. Exp 4: Physics Sandbox
+  // 4. Exp 4: Hall Effect
+  try {
+    const savedHall = JSON.parse(localStorage.getItem("physix_hall_challenges") || "{}");
+    if (set.has("hall-effect.zeroOffsetCalib")) {
+      if (!savedHall.zeroOffsetCalib) savedHall.zeroOffsetCalib = { xp: 100 };
+      savedHall.zeroOffsetCalib.completed = true;
+    }
+    if (set.has("hall-effect.carrierIdentification")) {
+      if (!savedHall.carrierIdentification) savedHall.carrierIdentification = { xp: 125 };
+      savedHall.carrierIdentification.completed = true;
+    }
+    if (set.has("hall-effect.mobilityExtraction")) {
+      if (!savedHall.mobilityExtraction) savedHall.mobilityExtraction = { xp: 150 };
+      savedHall.mobilityExtraction.completed = true;
+    }
+    localStorage.setItem("physix_hall_challenges", JSON.stringify(savedHall));
+  } catch (e) {}
+
+  if (hallEffectExperimentInstance && typeof hallEffectExperimentInstance.hydrateChallenges === "function") {
+    hallEffectExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+  }
+
+  // 5. Exp 5: Physics Sandbox
   try {
     const savedSb = JSON.parse(localStorage.getItem("physix_sb_challenges") || "{}");
     if (set.has("sandbox.thrust")) {
@@ -3628,9 +3670,9 @@ function initQuiz(expId) {
     if (chosenExp === "projectile") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 1";
     else if (chosenExp === "optical") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 2";
     else if (chosenExp === "colour-sensor") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 3";
-    else if (chosenExp === "sandbox") quizBadgeHeader.textContent = "MASTERY EVALUATION • PHYSICS SANDBOX";
-    else if (chosenExp === "diffraction") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 4";
-    else if (chosenExp === "diode") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 5";
+    else if (chosenExp === "hall-effect") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 4";
+    else if (chosenExp === "diffraction") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 5";
+    else if (chosenExp === "sandbox") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 6";
   }
 
   if (quizModalTitle) {
@@ -3655,19 +3697,26 @@ function initQuiz(expId) {
         </svg>
         Colour Sensor TCS3200 Quiz (10Q)
       `;
-    } else if (chosenExp === "sandbox") {
+    } else if (chosenExp === "hall-effect") {
       quizModalTitle.innerHTML = `
-        <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#38bdf8;">
+        <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#3b82f6;">
           <circle cx="12" cy="12" r="9"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line>
         </svg>
-        Newtonian Mechanics & Kinematics Quiz (10Q)
+        Hall Effect & Semiconductor Physics Quiz (10Q)
       `;
     } else if (chosenExp === "diffraction") {
       quizModalTitle.innerHTML = `
-        <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#10b981;">
+        <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#a855f7;">
           <circle cx="12" cy="12" r="9"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line>
         </svg>
-        Diffraction Grating & Wave Optics Quiz (10Q)
+        Diffraction Grating Spectrometry Quiz (10Q)
+      `;
+    } else if (chosenExp === "sandbox") {
+      quizModalTitle.innerHTML = `
+        <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#00f0ff;">
+          <circle cx="12" cy="12" r="9"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        Physics Sandbox Newtonian Dynamics Quiz (10Q)
       `;
     }
   }
@@ -3679,10 +3728,12 @@ function initQuiz(expId) {
       quizModalDesc.textContent = "Randomized 10-question evaluation sampled from 50-question Optical Fibre & TIR bank";
     } else if (chosenExp === "colour-sensor") {
       quizModalDesc.textContent = "Randomized 10-question evaluation sampled from 50-question Colour Sensor & Photometry bank";
-    } else if (chosenExp === "sandbox") {
-      quizModalDesc.textContent = "Randomized 10-question evaluation on Newton's Second Law, Acceleration, Friction, and Energy";
+    } else if (chosenExp === "hall-effect") {
+      quizModalDesc.textContent = "Randomized 10-question evaluation sampled from 50-question Hall Effect & Electromagnetism bank";
     } else if (chosenExp === "diffraction") {
-      quizModalDesc.textContent = "Randomized 10-question evaluation on the Grating Equation, Spectral Orders, and Wavelength determination";
+      quizModalDesc.textContent = "Randomized 10-question evaluation sampled from Diffraction Grating & Multi-Slit Optics bank";
+    } else if (chosenExp === "sandbox") {
+      quizModalDesc.textContent = "Randomized 10-question evaluation sampled from Newtonian Rigid-Body Dynamics bank";
     }
   }
 
@@ -3703,20 +3754,16 @@ function renderQuizQuestion(index) {
   if (quizProgressBar) quizProgressBar.style.width = `${progressPercent}%`;
   if (quizProgressPercent) quizProgressPercent.textContent = `${Math.round(progressPercent)}%`;
 
-  if (quizQuestionText) quizQuestionText.innerHTML = `${index + 1}. ${renderMathInText(q.question)}`;
-  if (quizOptionsList) quizOptionsList.innerHTML = "";
+  if (quizQuestionText) quizQuestionText.textContent = `${index + 1}. ${q.question}`;
 
   const savedAnswer = quizState.userAnswers[q.id];
   const chosenOption = savedAnswer ? savedAnswer.chosenOption : null;
 
   const letters = ["A", "B", "C", "D"];
+  const fragment = document.createDocumentFragment();
   q.options.forEach((opt, optIdx) => {
     const card = document.createElement("div");
-    card.className = "quiz-option-card";
-    if (opt === chosenOption) {
-      card.classList.add("selected");
-    }
-
+    card.className = `quiz-option-card${opt === chosenOption ? " selected" : ""}`;
     card.innerHTML = `
       <div style="display:flex; align-items:center; gap:12px;">
         <span class="quiz-option-marker">${letters[optIdx]}</span>
@@ -3726,8 +3773,13 @@ function renderQuizQuestion(index) {
     `;
 
     card.addEventListener("click", () => handleSelectOption(q, opt));
-    quizOptionsList?.appendChild(card);
+    fragment.appendChild(card);
   });
+
+  if (quizOptionsList) {
+    quizOptionsList.innerHTML = "";
+    quizOptionsList.appendChild(fragment);
+  }
 
   // Previous Button
   if (btnQuizPrev) {
@@ -4040,16 +4092,25 @@ btnQuizToSim.addEventListener("click", () => {
 // MODALS & NAVIGATION LOGIC
 // ==========================================
 // Quiz Modal
-btnOpenQuiz.addEventListener("click", () => {
-  if (!isUserAuthenticated()) {
-    openLoginModal("Please sign in or create a free account to test your physics skills and earn student XP!");
-    return;
+btnOpenQuiz?.addEventListener("click", (e) => {
+  e?.preventDefault?.();
+  e?.stopPropagation?.();
+  try {
+    if (tutorialManager && typeof tutorialManager.skipTutorial === "function" && tutorialManager.isActive) {
+      tutorialManager.skipTutorial();
+    }
+  } catch (err) {}
+  const norm = (typeof normalizeExpId === "function")
+    ? normalizeExpId(activeExperimentId || "projectile")
+    : (activeExperimentId || "projectile");
+  initQuiz(norm);
+  if (quizModal) {
+    quizModal.classList.remove("hidden");
   }
-  initQuiz(activeExperimentId || "projectile");
-  quizModal.classList.remove("hidden");
 });
-btnCloseQuiz.addEventListener("click", () => {
-  quizModal.classList.add("hidden");
+btnCloseQuiz?.addEventListener("click", (e) => {
+  e?.preventDefault?.();
+  quizModal?.classList.add("hidden");
 });
 
 // Explorer Modal
@@ -4060,107 +4121,89 @@ btnCloseExplorer.addEventListener("click", () => {
   explorerModal.classList.add("hidden");
 });
 
-// Theory Modal - Opens Active Experiment Theory Directly
-function openActiveExperimentTheory() {
-  const panes = [
-    document.getElementById("theory-pane-exp1"),
-    document.getElementById("theory-pane-exp2"),
-    document.getElementById("theory-pane-exp3"),
-    document.getElementById("theory-pane-exp4"),
-    document.getElementById("theory-pane-exp5"),
-    document.getElementById("theory-pane-exp6")
-  ];
-  panes.forEach(pane => {
+// Theory & Formulas Controller (Exclusive to Active Experiment)
+function showTheoryForExperiment(expId) {
+  const norm = (typeof normalizeExpId === "function")
+    ? normalizeExpId(expId || activeExperimentId)
+    : (expId || activeExperimentId || "projectile");
+  const theoryPanes = {
+    "projectile": document.getElementById("theory-pane-exp1"),
+    "optical": document.getElementById("theory-pane-exp2"),
+    "colour-sensor": document.getElementById("theory-pane-exp3"),
+    "hall-effect": document.getElementById("theory-pane-exp4"),
+    "diffraction": document.getElementById("theory-pane-exp5"),
+    "sandbox": document.getElementById("theory-pane-exp6")
+  };
+
+  const titles = {
+    "projectile": {
+      title: "Exp 1: 2D Projectile Motion — Theory & Formulas",
+      desc: "Mathematical foundations used by the 2D kinematics simulation engine"
+    },
+    "optical": {
+      title: "Exp 2: Optical Fibre NA — Theory & Formulas",
+      desc: "Total internal reflection, acceptance cone, and numerical aperture formulas"
+    },
+    "colour-sensor": {
+      title: "Exp 3: Study of Colour Sensor — Theory & Formulas",
+      desc: "TCS3200 spectral response, photocurrent, and light-to-frequency conversions"
+    },
+    "hall-effect": {
+      title: "Exp 4: Hall Effect Experiment — Theory & Formulas",
+      desc: "Lorentz force, Hall voltage, carrier concentration, and mobility relationships"
+    },
+    "diffraction": {
+      title: "Exp 5: Diffraction Grating — Theory & Formulas",
+      desc: "Fraunhofer multi-slit diffraction, grating equation, and dispersion formulas"
+    },
+    "sandbox": {
+      title: "Exp 6: Physics Sandbox — Theory & Formulas",
+      desc: "Newtonian rigid-body mechanics, impulse momentum, and energy conservation"
+    }
+  };
+
+  Object.values(theoryPanes).forEach(pane => {
     if (pane) {
-      pane.classList.remove("active");
       pane.classList.add("hidden");
+      pane.classList.remove("active");
     }
   });
 
-  let targetPane = document.getElementById("theory-pane-exp1");
-  const modalDesc = document.getElementById("theory-modal-desc");
-
-  if (activeExperimentId === "diode" || activeExperimentId === "diode-vi") {
-    targetPane = document.getElementById("theory-pane-exp6");
-    const modalTitle = document.getElementById("theory-modal-title");
-    if (modalTitle) {
-      modalTitle.innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#f59e0b;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> Diode V-I Characteristics Theory & Formulas`;
-    }
-    if (modalDesc) modalDesc.textContent = "Complete Theory, Shockley Equation, Forward Knee Voltage & Dual Circuit Diagrams";
-
-    if (targetPane && EXPERIMENT_DETAILS && EXPERIMENT_DETAILS["diode"]) {
-      const d = EXPERIMENT_DETAILS["diode"];
-      targetPane.innerHTML = `
-        <div class="theory-detail-content" style="display:flex; flex-direction:column; gap:16px;">
-          <div class="formula-block" style="border-left: 3px solid #f59e0b; padding-left: 12px;">
-            <h4 style="color:#fbbf24; margin-bottom:6px;">Aim of Experiment</h4>
-            <div style="color:#cbd5e1; font-size:13px; line-height:1.6;">${d.aim}</div>
-          </div>
-          <div class="formula-block" style="border-left: 3px solid #38bdf8; padding-left: 12px;">
-            <h4 style="color:#38bdf8; margin-bottom:6px;">Apparatus Required</h4>
-            <div style="color:#cbd5e1; font-size:13px; line-height:1.6;">${d.apparatus}</div>
-          </div>
-          <div class="formula-block">
-            <h4 style="color:#f8fafc; margin-bottom:10px;">Governing Formulas & Mathematical Expressions</h4>
-            <div class="formula-grid">
-              <div class="formula-item">
-                <span class="f-name">Shockley Diode Equation:</span>
-                <code>I = I_0 \\left( e^{\\frac{V}{\\eta V_t}} - 1 \\right)</code>
-              </div>
-              <div class="formula-item">
-                <span class="f-name">Thermal Voltage:</span>
-                <code>V_t = \\frac{kT}{q}</code>
-              </div>
-              <div class="formula-item">
-                <span class="f-name">Dynamic (AC) Resistance:</span>
-                <code>r_d = \\frac{\\Delta V_f}{\\Delta I_f}</code>
-              </div>
-              <div class="formula-item">
-                <span class="f-name">Static (DC) Resistance:</span>
-                <code>R_{dc} = \\frac{V_f}{I_f}</code>
-              </div>
-            </div>
-            <div style="margin-top:10px; font-size:12px; color:#94a3b8; line-height:1.6;">
-              Where $I$ is diode current, $I_0$ is reverse saturation current ($~\\mu\\text{A}$), $V$ is applied voltage, $\\eta$ is ideality factor ($\\approx 1$ for Ge, $\\approx 2$ for Si at moderate currents), $V_t$ is thermal voltage ($\\approx 25.86\\text{ mV}$ at $300\\text{ K}$), $k$ is Boltzmann constant ($1.381 \\times 10^{-23}\\text{ J/K}$), $T$ is absolute temperature in Kelvin, and $q$ is electronic charge ($1.602 \\times 10^{-19}\\text{ C}$).
-            </div>
-          </div>
-          <div class="theory-main-body" style="color:#cbd5e1; font-size:13px; line-height:1.6;">
-            ${d.theory}
-          </div>
-        </div>
-      `;
-    }
-  } else if (activeExperimentId === "diffraction") {
-    targetPane = document.getElementById("theory-pane-exp5");
-    if (modalDesc) modalDesc.textContent = "Grating Equation, Element Spacing, Spectral Orders & Wavelength Equations";
-  } else if (activeExperimentId === "sandbox") {
-    targetPane = document.getElementById("theory-pane-exp4");
-    if (modalDesc) modalDesc.textContent = "Newton's Second Law, Acceleration, Weight, Friction & Kinetic Energy";
-  } else if (activeExperimentId === "colour-sensor") {
-    targetPane = document.getElementById("theory-pane-exp3");
-    if (modalDesc) modalDesc.textContent = "TCS3200 Photodiode Matrix, Colorimetry & Frequency Equations";
-  } else if (activeExperimentId === "optical") {
-    targetPane = document.getElementById("theory-pane-exp2");
-    if (modalDesc) modalDesc.textContent = "Total Internal Reflection, Acceptance Angle & Numerical Aperture Equations";
-  } else {
-    targetPane = document.getElementById("theory-pane-exp1");
-    if (modalDesc) modalDesc.textContent = "2D Projectile Motion Kinematics, Range & Time of Flight Equations";
+  const activePane = theoryPanes[norm] || theoryPanes["projectile"];
+  if (activePane) {
+    activePane.classList.remove("hidden");
+    activePane.classList.add("active");
   }
 
-  if (targetPane) {
-    targetPane.classList.remove("hidden");
-    targetPane.classList.add("active");
+  const modalTitle = document.querySelector("#theory-modal .modal-header h2");
+  const modalDesc = document.querySelector("#theory-modal .modal-header p");
+  const info = titles[norm] || titles["projectile"];
+  if (modalTitle) {
+    modalTitle.innerHTML = `
+      <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+      </svg>
+      ${info.title}
+    `;
   }
-
-  theoryModal.classList.remove("hidden");
-  renderMathInElement(theoryModal);
+  if (modalDesc) modalDesc.textContent = info.desc;
 }
 
-btnOpenTheory.addEventListener("click", () => {
-  openActiveExperimentTheory();
+btnOpenTheory?.addEventListener("click", (e) => {
+  e?.preventDefault?.();
+  e?.stopPropagation?.();
+  try {
+    if (tutorialManager && typeof tutorialManager.skipTutorial === "function" && tutorialManager.isActive) {
+      tutorialManager.skipTutorial();
+    }
+  } catch (err) {}
+  showTheoryForExperiment(activeExperimentId);
+  theoryModal?.classList.remove("hidden");
+  renderMathInDOM(theoryModal);
 });
-btnCloseTheory.addEventListener("click", () => {
-  theoryModal.classList.add("hidden");
+btnCloseTheory?.addEventListener("click", (e) => {
+  e?.preventDefault?.();
+  theoryModal?.classList.add("hidden");
 });
 
 // Help & Interactive User Guide Modal
@@ -4197,11 +4240,12 @@ btnHelpExp5?.addEventListener("click", () => switchHelpTab(5));
 btnHelpExp6?.addEventListener("click", () => switchHelpTab(6));
 
 btnOpenHelp?.addEventListener("click", () => {
-  if (activeExperimentId === "diode" || activeExperimentId === "diode-vi") {
+  if (activeExperimentId === "sandbox") {
     switchHelpTab(6);
   } else if (activeExperimentId === "diffraction") {
     switchHelpTab(5);
-  } else if (activeExperimentId === "sandbox") {
+  } else if (activeExperimentId === "hall-effect") {
+    switchHelpTab(4);
     switchHelpTab(4);
   } else if (activeExperimentId === "colour-sensor") {
     switchHelpTab(3);
@@ -4230,6 +4274,25 @@ let aiConversationHistory = [];
 let lastRecordedFlightForAi = null;
 
 function getLiveSimulationContext() {
+  if (activeExperimentId === "hall-effect" && hallEffectExperimentInstance) {
+    const hState = hallEffectExperimentInstance.getState ? hallEffectExperimentInstance.getState() : {};
+    const rhVal = typeof hState.hallCoeff === "number" ? hState.hallCoeff.toExponential(3) : "0.00e0";
+    const nVal = typeof hState.carrierDensity === "number" ? hState.carrierDensity.toExponential(3) : "0.00e0";
+    return {
+      experiment: "Hall Effect Experiment",
+      activeLab: "Determination of Hall Coefficient, Carrier Type, and Mobility",
+      specimen: hState.specimenName || "n-type Germanium",
+      specimenType: hState.carrierType || "electrons",
+      sampleCurrentMa: hState.currentMa || 0,
+      magneticFieldTesla: typeof hState.magneticFieldT === "number" ? hState.magneticFieldT.toFixed(4) : "0.0000",
+      hallVoltageMv: typeof hState.hallVoltageMv === "number" ? hState.hallVoltageMv.toFixed(3) : "0.000",
+      hallCoefficientRh: rhVal + " m³/C",
+      carrierConcentrationN: nVal + " m⁻³",
+      powerSupplyOn: !!hState.specimenPowerOn,
+      magnetPowerOn: !!hState.magnetPowerOn
+    };
+  }
+
   if (activeExperimentId === "colour-sensor" && colourSensorExperimentInstance) {
     const csState = colourSensorExperimentInstance.getState();
     return {
@@ -4474,88 +4537,7 @@ function closeAiCopilot() {
 }
 
 function formatMarkdownToHtml(markdownText) {
-  if (!markdownText) return "";
-  let text = renderMathInText(markdownText)
-    .replace(/^#### (.*$)/gim, '<h5>$1</h5>')
-    .replace(/^### (.*$)/gim, '<h4>$1</h4>')
-    .replace(/^## (.*$)/gim, '<h3>$1</h3>')
-    .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/gim, '<em>$1</em>')
-    .replace(/`([^`]+)`/gim, '<code class="font-mono">$1</code>');
-
-  const lines = text.split("\n");
-  const formattedLines = [];
-  let inList = false;
-  let inTable = false;
-
-  for (let line of lines) {
-    const trimmed = line.trim();
-
-    // Horizontal Rule
-    if (trimmed === "***" || trimmed === "---" || trimmed === "___") {
-      if (inList) { formattedLines.push("</ul>"); inList = false; }
-      if (inTable) { formattedLines.push("</tbody></table>"); inTable = false; }
-      formattedLines.push("<hr />");
-      continue;
-    }
-
-    // Blockquote
-    if (trimmed.startsWith("> ")) {
-      if (inList) { formattedLines.push("</ul>"); inList = false; }
-      if (inTable) { formattedLines.push("</tbody></table>"); inTable = false; }
-      formattedLines.push(`<blockquote>${trimmed.substring(2)}</blockquote>`);
-      continue;
-    }
-
-    // Markdown Table
-    if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
-      if (inList) { formattedLines.push("</ul>"); inList = false; }
-      const cells = trimmed.split("|").slice(1, -1).map(c => c.trim());
-      // Check if separator row
-      if (cells.every(c => /^:?-+:?$/.test(c))) {
-        continue;
-      }
-      if (!inTable) {
-        formattedLines.push("<table><thead><tr>");
-        cells.forEach(c => formattedLines.push(`<th>${c}</th>`));
-        formattedLines.push("</tr></thead><tbody>");
-        inTable = true;
-      } else {
-        formattedLines.push("<tr>");
-        cells.forEach(c => formattedLines.push(`<td>${c}</td>`));
-        formattedLines.push("</tr>");
-      }
-      continue;
-    } else if (inTable) {
-      formattedLines.push("</tbody></table>");
-      inTable = false;
-    }
-
-    // List item
-    if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
-      if (!inList) {
-        formattedLines.push("<ul>");
-        inList = true;
-      }
-      formattedLines.push(`<li>${trimmed.substring(2)}</li>`);
-    } else {
-      if (inList) {
-        formattedLines.push("</ul>");
-        inList = false;
-      }
-      if (trimmed.length > 0) {
-        if (!trimmed.startsWith("<h") && !trimmed.startsWith("<div") && !trimmed.startsWith("<blockquote") && !trimmed.startsWith("<table") && !trimmed.startsWith("<hr")) {
-          formattedLines.push(`<p>${trimmed}</p>`);
-        } else {
-          formattedLines.push(trimmed);
-        }
-      }
-    }
-  }
-  if (inList) formattedLines.push("</ul>");
-  if (inTable) formattedLines.push("</tbody></table>");
-
-  return formattedLines.join("");
+  return formatMarkdownWithMath(markdownText);
 }
 
 function appendAiMessage(role, text) {
@@ -4732,12 +4714,14 @@ window.addEventListener("keydown", (e) => {
 const expProjSection = document.getElementById("exp-projectile-section");
 const expOptSection = document.getElementById("exp-optical-section");
 const expColourSection = document.getElementById("exp-colour-sensor-section");
+const expHallSection = document.getElementById("exp-hall-effect-section");
 const expSandboxSection = document.getElementById("exp-sandbox-section");
 const expDiffractionSection = document.getElementById("exp-diffraction-section");
 const expDiodeSection = document.getElementById("exp-diode-section");
 const btnSwitchProj = document.getElementById("btn-switch-exp-projectile");
 const btnSwitchOpt = document.getElementById("btn-switch-exp-optical");
 const btnSwitchColour = document.getElementById("btn-switch-exp-colour");
+const btnSwitchHall = document.getElementById("btn-switch-exp-hall");
 const btnSwitchSandbox = document.getElementById("btn-switch-exp-sandbox");
 const btnSwitchDiffraction = document.getElementById("btn-switch-exp-diffraction");
 const btnSwitchDiode = document.getElementById("btn-switch-exp-diode");
@@ -4796,6 +4780,7 @@ function switchExperiment(expId, updateUrl = true) {
   expProjSection?.classList.add("hidden");
   expOptSection?.classList.add("hidden");
   expColourSection?.classList.add("hidden");
+  expHallSection?.classList.add("hidden");
   expSandboxSection?.classList.add("hidden");
   expDiffractionSection?.classList.add("hidden");
   expDiodeSection?.classList.add("hidden");
@@ -4803,6 +4788,7 @@ function switchExperiment(expId, updateUrl = true) {
   btnSwitchProj?.classList.remove("active");
   btnSwitchOpt?.classList.remove("active");
   btnSwitchColour?.classList.remove("active");
+  btnSwitchHall?.classList.remove("active");
   btnSwitchSandbox?.classList.remove("active");
   btnSwitchDiffraction?.classList.remove("active");
   btnSwitchDiode?.classList.remove("active");
@@ -4891,7 +4877,48 @@ function switchExperiment(expId, updateUrl = true) {
       }
     }
 
-    showToast("Switched to Physics Sandbox");
+    showToast("Switched to Exp 6: Physics Sandbox");
+  } else if (normalizedId === "hall-effect") {
+    expHallSection?.classList.remove("hidden");
+    btnSwitchHall?.classList.add("active");
+
+    if (!hallEffectExperimentInstance) {
+      hallEffectExperimentInstance = createHallEffectExperiment({
+        onXpAwarded: (amount, reason) => addStudentXp(amount, reason),
+        onExperimentRecorded: (id, data) => {
+          if (auth.currentUser && canPerformCloudOperation()) {
+            recordExperimentInFirestore(auth.currentUser.uid, id, data).then(res => {
+              if (res && typeof res.totalXP === "number") {
+                setAuthoritativeUserXp(auth.currentUser.uid, res.totalXP);
+                loadUserProfile();
+              }
+              if (res && res.experimentsPerformed >= 5) {
+                unlockBadge("badge-lab-veteran", "Laboratory Veteran (Explored Labs 5+ Times)");
+              }
+            }).catch(() => {});
+          }
+        },
+        showToast,
+        getActiveUserId,
+        loadUserProfile,
+        getStoredUserProfile,
+        unlockBadge: (badgeId, badgeName) => unlockBadge(badgeId, badgeName),
+        isUserAuthenticated,
+        openLoginModal,
+        onChallengeCompleted: (data) => completeChallengeAuthoritatively(data)
+      });
+      hallEffectExperimentInstance.init();
+      if (activeAuthoritativeCompletedChallenges.length > 0 && typeof hallEffectExperimentInstance.hydrateChallenges === "function") {
+        hallEffectExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+      }
+    } else {
+      if (activeAuthoritativeCompletedChallenges.length > 0 && typeof hallEffectExperimentInstance.hydrateChallenges === "function") {
+        hallEffectExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+      }
+      hallEffectExperimentInstance.renderAll();
+    }
+
+    showToast("Switched to Exp 4: Hall Effect Experiment");
   } else if (normalizedId === "colour-sensor") {
     expColourSection?.classList.remove("hidden");
     btnSwitchColour?.classList.add("active");
@@ -5031,6 +5058,7 @@ function switchExperiment(expId, updateUrl = true) {
 btnSwitchProj?.addEventListener("click", () => switchExperiment("projectile"));
 btnSwitchOpt?.addEventListener("click", () => switchExperiment("optical"));
 btnSwitchColour?.addEventListener("click", () => switchExperiment("colour-sensor"));
+btnSwitchHall?.addEventListener("click", () => switchExperiment("hall-effect"));
 btnSwitchSandbox?.addEventListener("click", () => switchExperiment("sandbox"));
 btnSwitchDiffraction?.addEventListener("click", () => switchExperiment("diffraction"));
 btnSwitchDiode?.addEventListener("click", () => switchExperiment("diode"));
@@ -5048,8 +5076,8 @@ allExperimentCards.forEach(card => {
     const name = card.getAttribute("data-name") || "";
 
     let expId = null;
-    if (target === "diode" || target === "diode-vi" || name.toLowerCase().includes("diode") || name.toLowerCase().includes("p-n junction")) expId = "diode";
-    else if (target === "diffraction" || target === "diffraction-grating" || name.toLowerCase().includes("diffraction")) expId = "diffraction-grating";
+    if (target === "diffraction" || target === "diffraction-grating" || name.toLowerCase().includes("diffraction")) expId = "diffraction-grating";
+    else if (target === "hall-effect" || name.toLowerCase().includes("hall effect")) expId = "hall-effect";
     else if (target === "sandbox" || name.toLowerCase().includes("sandbox")) expId = "sandbox";
     else if (target === "colour-sensor" || name.toLowerCase().includes("colour sensor")) expId = "colour-sensor";
     else if (target === "optical" || name.toLowerCase().includes("optical fibre")) expId = "optical";
@@ -5089,40 +5117,7 @@ document.querySelectorAll(".card-bookmark-btn").forEach(btn => {
   });
 });
 
-// Theory Modal Subtabs Controller
-const btnTheoryExp1 = document.getElementById("btn-theory-tab-exp1");
-const btnTheoryExp2 = document.getElementById("btn-theory-tab-exp2");
-const btnTheoryExp3 = document.getElementById("btn-theory-tab-exp3");
-const paneTheoryExp1 = document.getElementById("theory-pane-exp1");
-const paneTheoryExp2 = document.getElementById("theory-pane-exp2");
-const paneTheoryExp3 = document.getElementById("theory-pane-exp3");
 
-btnTheoryExp1?.addEventListener("click", () => {
-  btnTheoryExp1.classList.add("active");
-  btnTheoryExp2?.classList.remove("active");
-  btnTheoryExp3?.classList.remove("active");
-  paneTheoryExp1?.classList.remove("hidden");
-  paneTheoryExp2?.classList.add("hidden");
-  paneTheoryExp3?.classList.add("hidden");
-});
-
-btnTheoryExp2?.addEventListener("click", () => {
-  btnTheoryExp2.classList.add("active");
-  btnTheoryExp1?.classList.remove("active");
-  btnTheoryExp3?.classList.remove("active");
-  paneTheoryExp2?.classList.remove("hidden");
-  paneTheoryExp1?.classList.add("hidden");
-  paneTheoryExp3?.classList.add("hidden");
-});
-
-btnTheoryExp3?.addEventListener("click", () => {
-  btnTheoryExp3.classList.add("active");
-  btnTheoryExp1?.classList.remove("active");
-  btnTheoryExp2?.classList.remove("active");
-  paneTheoryExp3?.classList.remove("hidden");
-  paneTheoryExp1?.classList.add("hidden");
-  paneTheoryExp2?.classList.add("hidden");
-});
 
 // Observations Event Listeners (Exp 1)
 btnRecordObservation?.addEventListener("click", recordCurrentObservation);
@@ -5206,10 +5201,9 @@ function applyTheme(theme) {
   if (diffractionExperimentInstance) {
     diffractionExperimentInstance.renderAll();
   }
-
-  // Update Diode V-I Characteristics (Exp 6) simulation canvases & meters
-  if (diodeExperimentInstance) {
-    diodeExperimentInstance.renderAll();
+  // Update Hall Effect (Exp 4) simulation canvases
+  if (hallEffectExperimentInstance) {
+    hallEffectExperimentInstance.renderAll();
   }
 }
 
@@ -5251,16 +5245,19 @@ function updateAuthStateRestrictions() {
 
   const challengesCardExp2 = document.querySelector("#exp-optical-section .challenges-card");
   const challengesCardExp3 = document.querySelector("#exp-colour-sensor-section .challenges-card");
+  const challengesCardExp4 = document.querySelector("#exp-hall-effect-section .challenges-card");
   const challengesCardExp5 = document.querySelector("#exp-diffraction-section .challenges-card");
   const challengesCardExp6 = document.querySelector("#exp-diode-section .challenges-card");
   if (isAuth) {
     challengesCardExp2?.classList.remove("challenges-locked");
     challengesCardExp3?.classList.remove("challenges-locked");
+    challengesCardExp4?.classList.remove("challenges-locked");
     challengesCardExp5?.classList.remove("challenges-locked");
     challengesCardExp6?.classList.remove("challenges-locked");
   } else {
     challengesCardExp2?.classList.add("challenges-locked");
     challengesCardExp3?.classList.add("challenges-locked");
+    challengesCardExp4?.classList.add("challenges-locked");
     challengesCardExp5?.classList.add("challenges-locked");
     challengesCardExp6?.classList.add("challenges-locked");
   }
@@ -5275,6 +5272,12 @@ function updateAuthStateRestrictions() {
     colourSensorExperimentInstance.renderAll();
     if (colourSensorExperimentInstance.updateChallengeCounters) {
       colourSensorExperimentInstance.updateChallengeCounters();
+    }
+  }
+  if (hallEffectExperimentInstance) {
+    hallEffectExperimentInstance.renderAll();
+    if (hallEffectExperimentInstance.updateChallengeCounters) {
+      hallEffectExperimentInstance.updateChallengeCounters();
     }
   }
   if (physicsSandboxExperimentInstance) {
@@ -5337,6 +5340,11 @@ async function completeVerifiedUserInitialization(user) {
         if (csSaved.primaryCalib?.completed) localCandidates.push("colour-sensor.primaryCalib");
         if (csSaved.mysteryDetective?.completed) localCandidates.push("colour-sensor.mysteryDetective");
         if (csSaved.distanceSweep?.completed) localCandidates.push("colour-sensor.distanceSweep");
+
+        const hallSaved = JSON.parse(localStorage.getItem("physix_hall_challenges") || "{}");
+        if (hallSaved.zeroOffsetCalib?.completed) localCandidates.push("hall-effect.zeroOffsetCalib");
+        if (hallSaved.carrierIdentification?.completed) localCandidates.push("hall-effect.carrierIdentification");
+        if (hallSaved.mobilityExtraction?.completed) localCandidates.push("hall-effect.mobilityExtraction");
 
         const sbSaved = JSON.parse(localStorage.getItem("physix_sb_challenges") || "{}");
         if (sbSaved.thrust?.completed) localCandidates.push("sandbox.thrust");
@@ -5422,6 +5430,11 @@ async function completeVerifiedUserInitialization(user) {
       if (csSaved.primaryCalib?.completed) localCandidates.push("colour-sensor.primaryCalib");
       if (csSaved.mysteryDetective?.completed) localCandidates.push("colour-sensor.mysteryDetective");
       if (csSaved.distanceSweep?.completed) localCandidates.push("colour-sensor.distanceSweep");
+
+      const hallSaved = JSON.parse(localStorage.getItem("physix_hall_challenges") || "{}");
+      if (hallSaved.zeroOffsetCalib?.completed) localCandidates.push("hall-effect.zeroOffsetCalib");
+      if (hallSaved.carrierIdentification?.completed) localCandidates.push("hall-effect.carrierIdentification");
+      if (hallSaved.mobilityExtraction?.completed) localCandidates.push("hall-effect.mobilityExtraction");
 
       const sbSaved = JSON.parse(localStorage.getItem("physix_sb_challenges") || "{}");
       if (sbSaved.thrust?.completed) localCandidates.push("sandbox.thrust");
@@ -5588,8 +5601,8 @@ let currentActiveDetailExpId = "projectile";
 
 export function openExperimentDetailsPage(expId) {
   tutorialManager.destroyTour();
-  const normalizedId = (expId === "diode" || expId === "diode-vi" || expId === "sandbox" || expId === "colour-sensor" || expId === "optical" || expId === "projectile" || expId === "diffraction" || expId === "diffraction-grating")
-    ? (expId === "diffraction-grating" ? "diffraction" : (expId === "diode-vi" ? "diode" : expId))
+  const normalizedId = (expId === "sandbox" || expId === "hall-effect" || expId === "colour-sensor" || expId === "optical" || expId === "projectile" || expId === "diffraction" || expId === "diffraction-grating")
+    ? (expId === "diffraction-grating" ? "diffraction" : expId)
     : "projectile";
 
   const data = EXPERIMENT_DETAILS[normalizedId] || EXPERIMENT_DETAILS["projectile"];
@@ -5629,6 +5642,7 @@ export function openExperimentDetailsPage(expId) {
   if (formulasContent) formulasContent.innerHTML = data.formulas || "";
   if (obsContent) obsContent.innerHTML = data.observations || "";
   if (resultContent) resultContent.innerHTML = data.result || "";
+  renderMathInDOM(detailPage);
 
   renderMathInElement(detailPage);
 
@@ -5737,8 +5751,8 @@ function initExperimentsPage() {
     const name = card.getAttribute("data-name") || "";
 
     let expId = null;
-    if (target === "diode" || target === "diode-vi" || name.toLowerCase().includes("diode") || name.toLowerCase().includes("p-n junction")) expId = "diode";
-    else if (target === "diffraction" || target === "diffraction-grating" || name.toLowerCase().includes("diffraction")) expId = "diffraction-grating";
+    if (target === "diffraction" || target === "diffraction-grating" || name.toLowerCase().includes("diffraction")) expId = "diffraction-grating";
+    else if (target === "hall-effect" || name.toLowerCase().includes("hall effect")) expId = "hall-effect";
     else if (target === "sandbox" || name.toLowerCase().includes("sandbox")) expId = "sandbox";
     else if (target === "colour-sensor" || name.toLowerCase().includes("colour sensor")) expId = "colour-sensor";
     else if (target === "optical" || name.toLowerCase().includes("optical fibre")) expId = "optical";
@@ -5845,7 +5859,7 @@ export function handleRoute(path = window.location.pathname, hash = window.locat
     expPage?.classList.remove("hidden");
     initExperimentsPage();
     window.scrollTo({ top: 0, behavior: "instant" });
-  } else if (cleanHash === "#diode" || cleanHash === "#diode-vi" || cleanHash === "#diffraction" || cleanHash === "#diffraction-grating" || cleanHash === "#sandbox" || cleanHash === "#optical" || cleanHash === "#colour-sensor" || cleanHash === "#projectile") {
+  } else if (cleanHash === "#diffraction" || cleanHash === "#diffraction-grating" || cleanHash === "#hall-effect" || cleanHash === "#sandbox" || cleanHash === "#optical" || cleanHash === "#colour-sensor" || cleanHash === "#projectile") {
     // Direct link to simulation
     document.body.classList.remove("on-homepage");
     document.body.classList.remove("on-standalone-page");
@@ -6024,7 +6038,7 @@ if (initialPath.startsWith("/experiment/") || initialPath.startsWith("/simulatio
   initSplashScreen(() => {
     handleRoute(initialPath, initialHash);
   });
-} else if (initialHash === "#diffraction" || initialHash === "#diffraction-grating" || initialHash === "#sandbox" || initialHash === "#optical" || initialHash === "#colour-sensor" || initialHash === "#projectile") {
+} else if (initialHash === "#diffraction" || initialHash === "#diffraction-grating" || initialHash === "#hall-effect" || initialHash === "#sandbox" || initialHash === "#optical" || initialHash === "#colour-sensor" || initialHash === "#projectile") {
   document.body.classList.remove("on-homepage");
   physixHome?.classList.add("hidden");
   initSplashScreen(() => {

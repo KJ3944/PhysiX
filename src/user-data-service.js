@@ -691,6 +691,9 @@ export function getExperimentNameById(id) {
     case "colour-sensor":
     case "exp-colour-sensor":
       return "Study of Colour Sensor (TCS3200)";
+    case "hall-effect":
+    case "exp-hall-effect":
+      return "Hall Effect Experiment";
     case "sandbox":
     case "exp-sandbox":
       return "Physics Sandbox";
