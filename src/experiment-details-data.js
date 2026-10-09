@@ -242,13 +242,12 @@ accentColor: "#38bdf8",
     difficulty: "Undergraduate STEM Practical",
     duration: "45 Minutes",
     engine: "Waveguide Ray Tracing & Conical Divergence Solver",
-    accentColor: "#00f0ff"
+accentColor: "#00f0ff",
     referenceBooks: [
       { title: "Fiber Optics Engineering", source: "M. Azadeh", url: "https://www-hep.phys.sinica.edu.tw/RadWork_www/Publications/Reference_Books/Fiber_Optics_Engineering_M.Azadeh/978-1-4419-0304-4.pdf", description: "Technical reference book on fibre-optic engineering." },
       { title: "Total Internal Reflection", source: "OpenStax University Physics, Volume 3", url: "https://openstax.org/books/university-physics-volume-3/pages/1-4-total-internal-reflection", description: "Explains total internal reflection, the fundamental principle behind optical fibre light guidance." },
       { title: "University Physics, Volume 3", source: "OpenStax", url: "https://openstax.org/details/books/university-physics-volume-3", description: "Broader physics textbook covering optics and related principles." }
     ],
-,
     aim: `<p class="manual-aim-text">To determine the Numerical Aperture (NA) and maximum Acceptance Angle (θ<sub>a</sub>) of a step-index multimode optical fibre cable by measuring the divergence diameter of the output laser beam spot at varying distances on a calibrated optical bench.</p>`,
     theory: `
       <div class="theory-block">
@@ -700,13 +699,13 @@ accentColor: "#38bdf8",
     difficulty: "All Levels STEM Practical",
     duration: "45 Minutes",
     engine: "Matter.js Velocity Verlet Rigid-Body Engine",
-    accentColor: "#a855f7"
+    accentColor: "#a855f7",
     referenceBooks: [
       { title: "University Physics, Volume 1", source: "OpenStax", url: "https://openstax.org/books/university-physics-volume-1/pages/preface", description: "General university physics textbook covering mechanics and foundational physical principles." },
       { title: "Newton's Second Law", source: "OpenStax University Physics, Volume 1", url: "https://openstax.org/books/university-physics-volume-1/pages/5-3-newtons-second-law", description: "Explains the relationship between force, mass, and acceleration." },
       { title: "Introduction to Work and Kinetic Energy", source: "OpenStax University Physics, Volume 1", url: "https://openstax.org/books/university-physics-volume-1/pages/7-introduction", description: "Introduces work and kinetic energy, providing additional context for mechanics simulations." }
     ],
-,
+
     aim: `<p class="manual-aim-text">To investigate Newtonian rigid-body mechanics, conservation of linear momentum, coefficient of restitution (e), and the exchange between kinetic and gravitational potential energy in an interactive computational 2D physics environment.</p>`,
     theory: `
       <div class="theory-block">
@@ -907,13 +906,13 @@ accentColor: "#38bdf8",
     difficulty: "Undergraduate Wave Optics Laboratory",
     duration: "45 Minutes",
     engine: "Fourier Wave Optics & Fraunhofer Multi-Slit Interference Solver",
-    accentColor: "#a855f7"
+    accentColor: "#a855f7",
     referenceBooks: [
       { title: "Diffraction Gratings", source: "OpenStax University Physics, Volume 3", url: "https://openstax.org/books/university-physics-volume-3/pages/4-4-diffraction-gratings", description: "Explains diffraction gratings and the physical principles governing their behaviour." },
       { title: "Applications of Diffraction, Interference, and Coherence", source: "OpenStax Physics", url: "https://openstax.org/books/physics/pages/17-2-applications-of-diffraction-interference-and-coherence", description: "Covers applications of diffraction and interference phenomena." },
       { title: "Understanding Diffraction and Interference", source: "OpenStax Physics", url: "https://openstax.org/books/physics/pages/17-1-understanding-diffraction-and-interference", description: "Introduces diffraction and interference and explains their underlying principles." }
     ],
-,
+
     aim: `<p class="manual-aim-text">To study the diffraction of monochromatic light through a diffraction grating, observe the formation of principal maxima for different orders, verify the grating equation <strong>d sin θ = mλ</strong>, determine the wavelength of incident spectral lines, and analyze angular dispersion as a function of grating line density.</p>`,
     theory: `
       <div class="theory-block">
