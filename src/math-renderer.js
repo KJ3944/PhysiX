@@ -30,6 +30,14 @@ export function renderMathInDOM(root = document.body) {
 }
 
 /**
+ * Alias for renderMathInDOM — renders math inside a DOM element.
+ * @param {HTMLElement} root - DOM element to render math inside
+ */
+export function renderMathInElement(root) {
+  return renderMathInDOM(root);
+}
+
+/**
  * Replaces $$...$$ and $...$ with KaTeX HTML in a raw string.
  * @param {string} str - Raw string with LaTeX math delimiters
  * @returns {string} String with rendered KaTeX HTML
@@ -74,6 +82,15 @@ export function renderMathInString(str) {
   });
 
   return result;
+}
+
+/**
+ * Alias for renderMathInString — renders math in a text string.
+ * @param {string} str - Raw string with LaTeX math delimiters
+ * @returns {string} String with rendered KaTeX HTML
+ */
+export function renderMathInText(str) {
+  return renderMathInString(str);
 }
 
 /**
