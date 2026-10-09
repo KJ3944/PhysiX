@@ -23,15 +23,26 @@ export function renderLatex(latex, displayMode = false) {
   let cleaned = latex.trim();
   if (!cleaned) return "";
 
+  // Unescape HTML entities that might have been escaped by the browser
+  cleaned = cleaned
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&plusmn;/g, "\\pm")
+    .replace(/&deg;/g, "^\\circ");
+
   // Defensive sanitization: recover escaped backslashes if JS string literals converted them
   cleaned = cleaned
     .replace(/\x0crac/g, "\\frac")
     .replace(/\t(heta|imes|ext|an)/g, "\\t$1")
     .replace(/\n(abla|approx)/g, "\\n$1")
-    .replace(/\r(ho)/g, "\\r$1");
+    .replace(/\r(ho)/g, "\\r$1")
+    .replace(/\f(rac)/g, "\\f$1");
 
-  // Ensure plain-text fractions (like 1/2) inside LaTeX are formatted as \frac{num}{den}
-  cleaned = cleaned.replace(/(^|[\s(=\-+*])(\d+)\s*\/\s*(\d+)([\s).,;!?\-+]|$)/g, "$1\\frac{$2}{$3}$4");
+  // Normalize double backslashes before LaTeX commands in JS template literals
+  cleaned = cleaned.replace(/\\\\([a-zA-Z]+|[;,!])/g, "\\$1");
 
   try {
     return katex.renderToString(cleaned, {
@@ -63,9 +74,9 @@ export function renderPlainFractions(text) {
     .replace(/¼/g, () => renderLatex("\\frac{1}{4}", false))
     .replace(/¾/g, () => renderLatex("\\frac{3}{4}", false));
 
-  // Replace standalone numeric fractions like 1/2, 3/4, 5/2 when bounded by word or space,
-  // avoiding dates or URLs
-  res = res.replace(/(^|[\s(=\-+*])(\d+)\s*\/\s*(\d+)([\s).,;!?\-+]|$)/g, (match, prefix, num, den, suffix) => {
+  // Replace standalone numeric fractions like 1/2, 3/4 when bounded by word or space,
+  // avoiding dates (like 2026/02/14) or URLs
+  res = res.replace(/(^|[\s(=\-+*])(\d{1,2})\s*\/\s*(\d{1,2})([\s).,;!?\-+]|$)/g, (match, prefix, num, den, suffix) => {
     return `${prefix}${renderLatex(`\\frac{${num}}{${den}}`, false)}${suffix}`;
   });
 
@@ -104,12 +115,12 @@ export function renderMathInText(text) {
     return renderLatex(math, false);
   });
 
-  // 3. Inline math: $...$ (ensuring not double dollar and not empty)
-  processed = processed.replace(/(?<!\\)\$([^$\n]+?)(?<!\\)\$/g, (_, math) => {
+  // 3. Inline math: $...$ (ensuring not double dollar, non-empty, and single-line/inline)
+  processed = processed.replace(/(?<!\\)\$([^$\n\r]+?)(?<!\\)\$/g, (_, math) => {
     return renderLatex(math, false);
   });
 
-  // 4. Standalone plain-text fractions (e.g. 1/2) in text
+  // 4. Standalone unicode fractions in text
   processed = renderPlainFractions(processed);
 
   // 5. Restore code blocks
@@ -138,7 +149,7 @@ export function renderMathInElement(root) {
     el.innerHTML = renderLatex(raw, true);
   });
 
-  // 2. Render all formula cards (.manual-formula-card .f-eq, .formula-item code)
+  // 2. Render all formula cards (.manual-formula-card .f-eq, .formula-item code, .formula-item .f-eq)
   const formulaEqs = root.querySelectorAll(".manual-formula-card .f-eq, .formula-item code, .formula-item .f-eq");
   formulaEqs.forEach((el) => {
     if (el.querySelector(".katex")) return;
@@ -156,15 +167,17 @@ export function renderMathInElement(root) {
     el.innerHTML = renderLatex(raw, true);
   });
 
-  // 4. Render any inline $...$ or $$...$$ inside theory descriptions, steps, cards
-  const textContainers = root.querySelectorAll(
-    ".tutorial-card-desc, .theory-block p, .theory-block li, .formula-block p, .formula-block li, .theory-detail-content p, .theory-detail-content li, .theory-main-body p, .theory-main-body li, .theory-pane p, .theory-pane li, .f-desc, .f-name, .exp-detail-desc, .manual-aim-text, .manual-ordered-list li, .guide-section p, .guide-section li, .help-modal-body p, .help-modal-body li, .help-pane p, .help-pane li, .help-step-desc, .help-callout, .guide-card p"
+  // 4. Render any inline $...$, $$...$$, or \(...\) inside all text-bearing elements
+  const candidates = root.querySelectorAll(
+    "p, li, td, th, h1, h2, h3, h4, h5, .manual-aim-text, .help-callout, .help-step-desc, .f-name, .f-desc, .exp-detail-desc, .step-info p, .theory-block div, .guide-card p"
   );
-  textContainers.forEach((el) => {
+  candidates.forEach((el) => {
     if (el.querySelector(".katex")) return;
-    const originalHtml = el.innerHTML;
-    if (originalHtml.includes("$") || originalHtml.includes("\\(") || originalHtml.includes("\\[") || /½|⅓|⅔|¼|¾|\b\d+\s*\/\s*\d+\b/.test(originalHtml)) {
-      el.innerHTML = renderMathInText(originalHtml);
+    // Skip if element contains nested block structures (children will be processed individually)
+    if (el.querySelector("p, ul, ol, table, div.math-callout")) return;
+    const html = el.innerHTML;
+    if (html.includes("$") || html.includes("\\(") || html.includes("\\[") || /½|⅓|⅔|¼|¾/.test(html)) {
+      el.innerHTML = renderMathInText(html);
     }
   });
 }

@@ -6,6 +6,12 @@
  */
 
 import { renderMathInText } from "./math-renderer.js";
+import { db, doc, updateDoc } from "./firebase.js";
+
+let _authReadyPromise = null;
+export function setAuthReadyPromise(p) {
+  _authReadyPromise = p;
+}
 
 // Storage key helper for user-scoping and offline/guest support
 export function getTutorialStorageKey(userId) {
@@ -27,7 +33,19 @@ export function getCompletedTutorials(userId) {
 export function isExperimentTutorialCompleted(expId, userId) {
   const normalized = normalizeExpId(expId);
   const completed = getCompletedTutorials(userId);
-  return !!completed[normalized];
+  if (completed[normalized]) return true;
+
+  // Guest fallback / migration check: if user completed it on this device before signing in
+  if (userId && userId !== "guest") {
+    const guestCompleted = getCompletedTutorials("guest");
+    if (guestCompleted[normalized]) {
+      // Auto-migrate to authenticated account
+      markExperimentTutorialCompleted(normalized, userId);
+      return true;
+    }
+  }
+
+  return false;
 }
 
 export function markExperimentTutorialCompleted(expId, userId) {
@@ -36,9 +54,32 @@ export function markExperimentTutorialCompleted(expId, userId) {
     const completed = getCompletedTutorials(userId);
     completed[normalized] = true;
     localStorage.setItem(getTutorialStorageKey(userId), JSON.stringify(completed));
+
+    // If signed-in user, also persist to Firestore in cloud
+    if (userId && userId !== "guest" && db) {
+      updateDoc(doc(db, "users", userId), {
+        [`tutorialsCompleted.${normalized}`]: true
+      }).catch(err => {
+        console.warn("[Tutorial] Cloud sync notice (will retry on next sync):", err);
+      });
+    }
+
     console.log(`[Tutorial] Marked tutorial completed for experiment: ${normalized} (user: ${userId || "guest"})`);
   } catch (err) {
     console.warn("[Tutorial] Error saving completion state:", err);
+  }
+}
+
+export function syncTutorialsWithCloud(userId, cloudTutorials = {}) {
+  if (!userId || userId === "guest" || !cloudTutorials) return;
+  try {
+    const local = getCompletedTutorials(userId);
+    const guest = getCompletedTutorials("guest");
+    const merged = { ...guest, ...local, ...cloudTutorials };
+    localStorage.setItem(getTutorialStorageKey(userId), JSON.stringify(merged));
+    return merged;
+  } catch (err) {
+    console.warn("[Tutorial] Error syncing tutorials with cloud:", err);
   }
 }
 
@@ -69,9 +110,9 @@ export function getExperimentFriendlyName(expId) {
     case "projectile": return "Exp 1: 2D Projectile Motion";
     case "optical": return "Exp 2: Optical Fibre NA";
     case "colour-sensor": return "Exp 3: Study of Colour Sensor";
-    case "sandbox": return "Exp 4: Physics Sandbox";
-    case "diffraction": return "Exp 5: Diffraction Grating";
-    case "diode": return "Exp 6: Diode V-I Characteristics";
+    case "sandbox": return "Physics Sandbox (Playground)";
+    case "diffraction": return "Exp 4: Diffraction Grating";
+    case "diode": return "Exp 5: Diode V-I Characteristics";
     default: return "Interactive Physics Lab";
   }
 }
@@ -766,9 +807,25 @@ class TutorialManager {
 
   /**
    * Evaluates if tutorial should auto-launch on experiment open
+   * Accounts for asynchronous Firebase Auth initialization race conditions,
+   * active tutorial state, and per-user completion records.
    */
-  maybeTriggerFirstTimeTutorial(expId, delayMs = 380) {
+  async maybeTriggerFirstTimeTutorial(expId, delayMs = 380) {
     const normalized = normalizeExpId(expId);
+
+    // If a tour is already actively running, do not interrupt
+    if (this.isActive) return;
+
+    // Wait for auth to settle if an auth readiness promise is registered
+    if (_authReadyPromise) {
+      try {
+        await Promise.race([
+          _authReadyPromise,
+          new Promise(r => setTimeout(r, 650))
+        ]);
+      } catch (e) {}
+    }
+
     const userId = this.getActiveUserId();
 
     // If user has already completed or skipped this experiment's tutorial, do not show
@@ -778,8 +835,10 @@ class TutorialManager {
 
     // Wait for the DOM section of the experiment to unhide and render properly
     setTimeout(() => {
-      // Re-check in case user navigated away during timeout
-      if (isExperimentTutorialCompleted(normalized, userId)) return;
+      // Re-check after timeout in case state changed or user navigated away
+      if (this.isActive) return;
+      const currentUserId = this.getActiveUserId();
+      if (isExperimentTutorialCompleted(normalized, currentUserId)) return;
       this.startTutorial(normalized, false);
     }, delayMs);
   }
@@ -1029,7 +1088,7 @@ class TutorialManager {
       markExperimentTutorialCompleted(this.currentExpId, userId);
     }
     this.destroyTour();
-    this.showToast(`🎉 ${getExperimentFriendlyName(this.currentExpId)} Walkthrough Completed!`);
+    this.showToast(`${getExperimentFriendlyName(this.currentExpId)} Walkthrough Completed!`);
   }
 
   destroyTour() {

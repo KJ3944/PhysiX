@@ -1100,6 +1100,102 @@
   background: rgba(56, 189, 248, 0.4);
 }
 
+/* Digital Readout Badges inside Meter Housing */
+.meter-digital-readout-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(2, 6, 23, 0.92);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 6px;
+  padding: 3px 10px;
+  min-width: 140px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), inset 0 1px 2px rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+.meter-digital-readout-badge .readout-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+.meter-digital-readout-badge .readout-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 800;
+  color: #38bdf8;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+}
+
+#diode-ammeter-container .meter-digital-readout-badge {
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+#diode-ammeter-container .meter-digital-readout-badge .readout-val {
+  color: #fbbf24;
+  text-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+}
+
+/* Bias Mode Selector Group in Toolbar */
+.bias-mode-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(15, 23, 42, 0.85);
+  padding: 3px 6px;
+  border-radius: 7px;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.bias-group-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  color: #94a3b8;
+  margin-right: 4px;
+  letter-spacing: 0.5px;
+}
+
+.bias-mode-btn {
+  background: rgba(30, 41, 59, 0.7);
+  color: #94a3b8;
+  border: 1px solid transparent;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bias-mode-btn:hover {
+  color: #f8fafc;
+  background: rgba(51, 65, 85, 0.8);
+}
+
+.bias-mode-btn.active {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #ffffff;
+  border-color: #38bdf8;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+}
+
+#diode-btn-mode-rev.active {
+  background: linear-gradient(135deg, #9333ea, #7e22ce);
+  border-color: #c084fc;
+  box-shadow: 0 0 10px rgba(192, 132, 252, 0.35);
+}
+
 /* --------------------------------------------------------------------------
    15. LIGHT THEME OVERRIDES (SCOPED TO #exp-diode-section)
    -------------------------------------------------------------------------- */
@@ -1353,5 +1449,47 @@ body.light-mode #exp-diode-section .diode-dial-step-btn:hover {
 
 body.light-mode #exp-diode-section .diode-dial-step-btn:active {
   background: #e0f2fe;
+}
+
+body.light-mode #exp-diode-section .meter-digital-readout-badge {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+body.light-mode #exp-diode-section .meter-digital-readout-badge .readout-label {
+  color: #475569;
+}
+body.light-mode #exp-diode-section .meter-digital-readout-badge .readout-val {
+  color: #0284c7;
+  text-shadow: none;
+}
+body.light-mode #exp-diode-section #diode-ammeter-container .meter-digital-readout-badge .readout-val {
+  color: #b45309;
+  text-shadow: none;
+}
+body.light-mode #exp-diode-section .bias-mode-group {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+body.light-mode #exp-diode-section .bias-group-label {
+  color: #475569;
+}
+body.light-mode #exp-diode-section .bias-mode-btn {
+  background: #e2e8f0;
+  color: #475569;
+}
+body.light-mode #exp-diode-section .bias-mode-btn:hover {
+  background: #cbd5e1;
+  color: #0f172a;
+}
+body.light-mode #exp-diode-section .bias-mode-btn.active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+}
+body.light-mode #exp-diode-section #diode-btn-mode-rev.active {
+  background: #9333ea;
+  color: #ffffff;
+  border-color: #9333ea;
 }
 

@@ -25,7 +25,9 @@ import { createDiodeExperiment } from "./diode-vi.js";
 import {
   tutorialManager,
   isExperimentTutorialCompleted,
-  markExperimentTutorialCompleted
+  markExperimentTutorialCompleted,
+  syncTutorialsWithCloud,
+  setAuthReadyPromise
 } from "./tutorial-manager.js";
 import { initSplashScreen } from "./splash.js";
 import { initHomepage } from "./homepage/homepage.js";
@@ -55,6 +57,7 @@ import {
   onNetworkChange,
   setNetworkStatusOverride
 } from "./offline-manager.js";
+import { updateManager } from "./update-manager.js";
 import {
   syncUserToFirestore,
   recordExperimentInFirestore,
@@ -78,6 +81,15 @@ let activeAuthoritativeCompletedChallenges = [];
 const inFlightChallenges = new Set();
 const inFlightBadges = new Set();
 let userDocUnsubscribe = null;
+
+let resolveAuthReady;
+export const authReadyPromise = new Promise((res) => {
+  resolveAuthReady = res;
+});
+setAuthReadyPromise(authReadyPromise);
+setTimeout(() => {
+  if (resolveAuthReady) resolveAuthReady(auth.currentUser);
+}, 1200);
 
 export function getAuthoritativeUserXp(uid) {
   if (typeof activeAuthoritativeXp === "number") {
@@ -1276,6 +1288,12 @@ function getActiveUserId() {
   }
   return auth.currentUser.uid;
 }
+
+// Early binding for tutorialManager user scoping
+tutorialManager.init({
+  getActiveUserId,
+  showToast
+});
 
 async function checkBackendStatus() {
   try {
@@ -3610,8 +3628,9 @@ function initQuiz(expId) {
     if (chosenExp === "projectile") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 1";
     else if (chosenExp === "optical") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 2";
     else if (chosenExp === "colour-sensor") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 3";
-    else if (chosenExp === "sandbox") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 4";
-    else if (chosenExp === "diffraction") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 5";
+    else if (chosenExp === "sandbox") quizBadgeHeader.textContent = "MASTERY EVALUATION • PHYSICS SANDBOX";
+    else if (chosenExp === "diffraction") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 4";
+    else if (chosenExp === "diode") quizBadgeHeader.textContent = "MASTERY EVALUATION • EXP 5";
   }
 
   if (quizModalTitle) {
@@ -4841,7 +4860,7 @@ function switchExperiment(expId, updateUrl = true) {
       diffractionExperimentInstance.renderAll();
     }
 
-    showToast("Switched to Exp 5: Diffraction Grating");
+    showToast("Switched to Exp 4: Diffraction Grating");
   } else if (normalizedId === "sandbox") {
     expSandboxSection?.classList.remove("hidden");
     btnSwitchSandbox?.classList.add("active");
@@ -4872,7 +4891,7 @@ function switchExperiment(expId, updateUrl = true) {
       }
     }
 
-    showToast("Switched to Exp 4: Physics Sandbox");
+    showToast("Switched to Physics Sandbox");
   } else if (normalizedId === "colour-sensor") {
     expColourSection?.classList.remove("hidden");
     btnSwitchColour?.classList.add("active");
@@ -4995,7 +5014,7 @@ function switchExperiment(expId, updateUrl = true) {
       diodeExperimentInstance.renderAll();
     }
 
-    showToast("Switched to Exp 6: Diode V-I Characteristics");
+    showToast("Switched to Exp 5: Diode V-I Characteristics");
   } else {
     expProjSection?.classList.remove("hidden");
     btnSwitchProj?.classList.add("active");
@@ -5357,6 +5376,10 @@ async function completeVerifiedUserInitialization(user) {
           cloudXp = cUser.xp;
         }
 
+        if (cUser.tutorialsCompleted) {
+          syncTutorialsWithCloud(user.uid, cUser.tutorialsCompleted);
+        }
+
         // Sync authoritative cloud badges to user-scoped local storage
         const localBadges = getStoredBadges(user.uid);
         const mergedBadges = Array.from(new Set([...cloudBadges, ...localBadges]));
@@ -5471,6 +5494,10 @@ async function completeVerifiedUserInitialization(user) {
         renderChallenges();
       }
 
+      if (cloudUser.tutorialsCompleted) {
+        syncTutorialsWithCloud(user.uid, cloudUser.tutorialsCompleted);
+      }
+
       if (Array.isArray(cloudUser.completedChallenges)) {
         const hasDiff = cloudUser.completedChallenges.length !== activeAuthoritativeCompletedChallenges.length ||
           cloudUser.completedChallenges.some(id => !activeAuthoritativeCompletedChallenges.includes(id));
@@ -5511,6 +5538,9 @@ async function completeVerifiedUserInitialization(user) {
 
 // Listen to Firebase Auth state transitions
 onAuthStateChanged(auth, async (user) => {
+  if (resolveAuthReady) {
+    resolveAuthReady(user);
+  }
   if (user) {
     if (isEmailVerificationRequired(user)) {
       // Unverified email/password user: block access and do not initialize/sync Firestore data
@@ -5955,6 +5985,9 @@ initPwaSystem().then(() => {
   // Connect offline-manager's accurate network status to user-data-service
   setNetworkStatusOverride(() => canPerformCloudOperation());
 }).catch(err => console.warn("[PWA] Initialization error:", err));
+
+// Initialize Deployment Update Manager (Version detection & notification modal)
+updateManager.init();
 
 // Listen for network changes to handle transitions
 onNetworkChange((isOnline, quality) => {

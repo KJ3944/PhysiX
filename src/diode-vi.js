@@ -224,26 +224,38 @@ export function createDiodeExperiment(callbacks = {}) {
    * Solves the reverse-biased P-N junction diode operating point
    * Ir = Is * (1 - exp(-Vr / (eta * Vt))) + Vr / Rleak
    */
+  /**
+   * Solves the reverse-biased P-N junction diode operating point
+   * Models realistic reverse saturation leakage, generation current, and avalanche breakdown
+   * Matches experimental standard P-N junction reverse I-V curve:
+   * Vr in [0, 30] V, Ir in [0, 50+] μA with knee around 24-26 V
+   */
   function solveReverseDiode(supplyVoltage) {
     if (supplyVoltage <= 0.01) return { voltage: 0, current_uA: 0, current_mA: 0 };
 
+    const Vr = Math.min(Math.max(Number(supplyVoltage), 0), 30.0);
     const Vt = 0.026;
     const eta = 1.35;
-    const Is_uA = 0.025;      // 0.025 uA
-    const Rleak = 22e6;       // 22 Megaohms surface leakage resistance
 
-    const Vr = Math.min(supplyVoltage, 30.0);
-    const exponent = -Vr / (eta * Vt);
-    const saturationTerm = Is_uA * (1 - Math.exp(exponent));
-    const leakageTerm = (Vr / Rleak) * 1e6; // Convert A to uA
+    // 1. Reverse saturation current across junction (stabilizes rapidly above ~0.1V)
+    const Isat = 1.0 * (1 - Math.exp(-Vr / (eta * Vt)));
 
-    const total_uA = saturationTerm + leakageTerm;
+    // 2. Depletion layer thermal generation & surface leakage (linear slope ~0.26 μA/V)
+    const Ileak = 0.26 * Vr;
+
+    // 3. Avalanche breakdown multiplication
+    // Knee around 25.5 V, current rises steeply beyond 23-25 V matching textbook reference
+    const Vknee = 25.5;
+    const p = 5.5;
+    const Ibreakdown = 17.5 * Math.pow(Vr / Vknee, p);
+
+    const total_uA = Isat + Ileak + Ibreakdown;
     const clamped_uA = Math.min(Math.max(0, total_uA), 100.0);
 
     return {
       voltage: Vr,
-      current_uA: clamped_uA,
-      current_mA: clamped_uA * 0.001 // Requirement 21: 1 uA = 0.001 mA
+      current_uA: Number(clamped_uA.toFixed(2)),
+      current_mA: Number((clamped_uA * 0.001).toFixed(5)) // 1 μA = 0.001 mA
     };
   }
 
@@ -323,19 +335,43 @@ export function createDiodeExperiment(callbacks = {}) {
       }
     }
 
+    updateCircuitStatusBadge();
     updatePhysicsReadings();
+  }
+
+  function updateCircuitStatusBadge() {
+    const pill = document.getElementById("diode-circuit-status");
+    const txt = document.getElementById("diode-status-text");
+    if (pill) {
+      if (state.circuitValid) {
+        pill.className = "circuit-status-pill status-connected";
+      } else {
+        pill.className = "circuit-status-pill status-warning";
+      }
+    }
+    if (txt) {
+      txt.textContent = state.circuitStatusText;
+    }
   }
 
   // --------------------------------------------------------------------------
   // ELECTRICAL SIMULATION UPDATE & NEEDLE COMPUTATION
   // --------------------------------------------------------------------------
   function updatePhysicsReadings() {
+    const vmReadingEl = document.getElementById("diode-vm-reading");
+    const amReadingEl = document.getElementById("diode-am-reading");
+
     if (!state.powerOn || !state.circuitValid) {
       state.measuredVoltage = 0.0;
       state.measuredCurrent_mA = 0.0;
       state.measuredCurrent_uA = 0.0;
       state.targetVmAngle = -45;
       state.targetAmAngle = -45;
+
+      if (vmReadingEl) vmReadingEl.textContent = "0.00 V";
+      if (amReadingEl) {
+        amReadingEl.textContent = state.biasMode === "reverse" ? "0.00 μA" : "0.00 mA";
+      }
       return;
     }
 
@@ -354,10 +390,12 @@ export function createDiodeExperiment(callbacks = {}) {
       if (state.amRange === 10) {
         amFraction = Math.min(Math.max(result.current_mA / 10.0, 0), 1.05);
       } else {
-        // If user accidentally left it in 100 uA range in forward bias, it pegs to max
         amFraction = Math.min(Math.max(state.measuredCurrent_uA / 100.0, 0), 1.05);
       }
       state.targetAmAngle = -45 + amFraction * 90;
+
+      if (vmReadingEl) vmReadingEl.textContent = `${state.measuredVoltage.toFixed(2)} V`;
+      if (amReadingEl) amReadingEl.textContent = `${state.measuredCurrent_mA.toFixed(2)} mA`;
 
     } else if (state.biasMode === "reverse") {
       const result = solveReverseDiode(state.reverseVoltageKnob);
@@ -375,6 +413,11 @@ export function createDiodeExperiment(callbacks = {}) {
         amFraction = Math.min(Math.max(result.current_mA / 10.0, 0), 1.05);
       }
       state.targetAmAngle = -45 + amFraction * 90;
+
+      if (vmReadingEl) vmReadingEl.textContent = `${state.measuredVoltage.toFixed(1)} V`;
+      if (amReadingEl) {
+        amReadingEl.textContent = `${state.measuredCurrent_uA.toFixed(2)} μA`;
+      }
     }
   }
 
@@ -476,6 +519,24 @@ export function createDiodeExperiment(callbacks = {}) {
     ctx.fillStyle = "#64748b";
     ctx.fillText("MO 65", cx - 24, cy - 14);
     ctx.fillText("⭐ 2.5", cx + 24, cy - 14);
+
+    // 3b. Digital LCD Window on Dial Face
+    const vmBoxW = 76;
+    const vmBoxH = 18;
+    ctx.fillStyle = "rgba(15, 23, 42, 0.88)";
+    ctx.beginPath();
+    ctx.roundRect(cx - vmBoxW / 2, cy - 26, vmBoxW, vmBoxH, 3);
+    ctx.fill();
+    ctx.strokeStyle = state.vmRange === 1.5 ? "rgba(56, 189, 248, 0.5)" : "rgba(192, 132, 252, 0.5)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.font = "bold 10px 'JetBrains Mono', monospace";
+    ctx.fillStyle = state.powerOn && state.circuitValid ? "#38bdf8" : "#64748b";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const dispVm = state.measuredVoltage.toFixed(state.vmRange === 1.5 ? 2 : 1);
+    ctx.fillText(`${dispVm} V`, cx, cy - 17);
 
     // 4. Analog Needle with Damped Rotation
     const needleRad = (state.vmNeedleAngle * Math.PI) / 180 - Math.PI / 2;
@@ -604,6 +665,26 @@ export function createDiodeExperiment(callbacks = {}) {
     ctx.fillStyle = "#64748b";
     ctx.fillText("MO 65", cx - 24, cy - 14);
     ctx.fillText("⭐ 2.5", cx + 24, cy - 14);
+
+    // 3b. Digital LCD Window on Dial Face
+    const amBoxW = 84;
+    const amBoxH = 18;
+    ctx.fillStyle = "rgba(15, 23, 42, 0.88)";
+    ctx.beginPath();
+    ctx.roundRect(cx - amBoxW / 2, cy - 26, amBoxW, amBoxH, 3);
+    ctx.fill();
+    ctx.strokeStyle = state.amRange === 10 ? "rgba(245, 158, 11, 0.5)" : "rgba(192, 132, 252, 0.5)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.font = "bold 9.5px 'JetBrains Mono', monospace";
+    ctx.fillStyle = state.powerOn && state.circuitValid ? "#fbbf24" : "#64748b";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const dispAm = state.amRange === 10
+      ? `${state.measuredCurrent_mA.toFixed(2)} mA`
+      : `${state.measuredCurrent_uA.toFixed(1)} μA`;
+    ctx.fillText(dispAm, cx, cy - 17);
 
     // 4. Analog Needle
     const needleRad = (state.amNeedleAngle * Math.PI) / 180 - Math.PI / 2;
@@ -771,7 +852,7 @@ export function createDiodeExperiment(callbacks = {}) {
   }
 
   // Quick-Connect Presets
-  function autoConnectForward() {
+  function autoConnectForward(notify = true) {
     state.wires = [
       // 1. Forward DC (+) -> Diode P (RED)
       { id: "w_fwd_1", from: "fwd_out_pos1", to: "fwd_diode_p", color: "red" },
@@ -785,18 +866,17 @@ export function createDiodeExperiment(callbacks = {}) {
       { id: "w_fwd_5", from: "vm_neg", to: "fwd_out_neg2", color: "black" }
     ];
 
-    // Set Forward Bias defaults as required by Prompt Section 14
     setVoltmeterRange(1.5);
     setAmmeterRange(10);
 
     renderWiresSvg();
     evaluateCircuit();
-    if (typeof showToast === "function") {
+    if (notify && typeof showToast === "function") {
       showToast("Forward Bias Circuit Wired Successfully!");
     }
   }
 
-  function autoConnectReverse() {
+  function autoConnectReverse(notify = true) {
     state.wires = [
       // 1. Reverse DC (+) -> Reverse Diode N (RED)
       { id: "w_rev_1", from: "rev_out_pos1", to: "rev_diode_n", color: "red" },
@@ -810,13 +890,12 @@ export function createDiodeExperiment(callbacks = {}) {
       { id: "w_rev_5", from: "vm_neg", to: "rev_out_neg2", color: "black" }
     ];
 
-    // Set Reverse Bias defaults as required by Prompt Section 15
     setVoltmeterRange(30);
     setAmmeterRange(100);
 
     renderWiresSvg();
     evaluateCircuit();
-    if (typeof showToast === "function") {
+    if (notify && typeof showToast === "function") {
       showToast("Reverse Bias Circuit Wired Successfully!");
     }
   }
@@ -824,11 +903,115 @@ export function createDiodeExperiment(callbacks = {}) {
   function clearAllWires() {
     state.wires = [];
     state.selectedTerminal = null;
+    state.circuitValid = false;
+    state.circuitStatusText = "Open Circuit — Connect Banana Cables";
+    state.circuitStatusType = "warning";
     document.querySelectorAll(".banana-terminal").forEach(t => t.classList.remove("terminal-selected"));
     renderWiresSvg();
     evaluateCircuit();
     if (typeof showToast === "function") {
       showToast("All wires cleared");
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // AUTHORITATIVE BIAS MODE & VOLTAGE CONTROLLER FUNCTIONS
+  // --------------------------------------------------------------------------
+  function setBiasMode(mode) {
+    state.biasMode = mode;
+    state.activeObsTab = mode;
+    state.activeGraphTab = mode;
+
+    const btnModeFwd = document.getElementById("diode-btn-mode-fwd");
+    const btnModeRev = document.getElementById("diode-btn-mode-rev");
+    const tabObsFwd = document.getElementById("diode-tab-obs-fwd");
+    const tabObsRev = document.getElementById("diode-tab-obs-rev");
+    const tabGraphFwd = document.getElementById("diode-tab-graph-fwd");
+    const tabGraphRev = document.getElementById("diode-tab-graph-rev");
+    const graphContainerFwd = document.getElementById("diode-fwd-graph-container");
+    const graphContainerRev = document.getElementById("diode-rev-graph-container");
+    const lcStripFwd = document.getElementById("diode-lc-strip-fwd");
+    const lcStripRev = document.getElementById("diode-lc-strip-rev");
+    const thVoltage = document.getElementById("th-diode-voltage");
+    const thCurrent = document.getElementById("th-diode-current");
+
+    if (mode === "forward") {
+      btnModeFwd?.classList.add("active");
+      btnModeRev?.classList.remove("active");
+      tabObsFwd?.classList.add("active");
+      tabObsRev?.classList.remove("active");
+      tabGraphFwd?.classList.add("active");
+      tabGraphRev?.classList.remove("active");
+      graphContainerFwd?.classList.remove("hidden");
+      graphContainerRev?.classList.add("hidden");
+      lcStripFwd?.classList.remove("hidden");
+      lcStripRev?.classList.add("hidden");
+      if (thVoltage) thVoltage.textContent = "Forward Voltage Vf (Volt)";
+      if (thCurrent) thCurrent.textContent = "Forward Current If (mA)";
+
+      autoConnectForward(false);
+    } else {
+      btnModeRev?.classList.add("active");
+      btnModeFwd?.classList.remove("active");
+      tabObsRev?.classList.add("active");
+      tabObsFwd?.classList.remove("active");
+      tabGraphRev?.classList.add("active");
+      tabGraphFwd?.classList.remove("active");
+      graphContainerRev?.classList.remove("hidden");
+      graphContainerFwd?.classList.add("hidden");
+      lcStripRev?.classList.remove("hidden");
+      lcStripFwd?.classList.add("hidden");
+      if (thVoltage) thVoltage.textContent = "Reverse Voltage Vr (Volt)";
+      if (thCurrent) thCurrent.textContent = "Reverse Current Ir (mA)";
+
+      autoConnectReverse(false);
+    }
+
+    updatePhysicsReadings();
+    renderObservationTable();
+    drawForwardGraph();
+    drawReverseGraph();
+  }
+
+  function setForwardVoltage(val) {
+    const clamped = Math.min(Math.max(Number(val), 0.0), 1.5);
+    state.forwardVoltageKnob = Number(clamped.toFixed(2));
+
+    const fwdKnob = document.getElementById("diode-fwd-knob");
+    if (fwdKnob) {
+      const rotDeg = (state.forwardVoltageKnob / 1.5) * 270;
+      fwdKnob.style.transform = `rotate(${rotDeg}deg)`;
+    }
+    const fwdVal = document.getElementById("diode-fwd-knob-val");
+    if (fwdVal) {
+      fwdVal.textContent = `${state.forwardVoltageKnob.toFixed(2)} V`;
+    }
+
+    if (state.biasMode !== "forward") {
+      setBiasMode("forward");
+    } else {
+      updatePhysicsReadings();
+    }
+  }
+
+  function setReverseVoltage(val) {
+    const clamped = Math.min(Math.max(Number(val), 0.0), 30.0);
+    state.reverseVoltageKnob = Number(clamped.toFixed(1));
+
+    const revKnob = document.getElementById("diode-rev-knob");
+    if (revKnob) {
+      const rotDeg = (state.reverseVoltageKnob / 30.0) * 270;
+      revKnob.style.transform = `rotate(${rotDeg}deg)`;
+    }
+    const revVal = document.getElementById("diode-rev-knob-val");
+    if (revVal) {
+      revVal.textContent = `${state.reverseVoltageKnob.toFixed(1)} V`;
+    }
+
+    if (state.biasMode !== "reverse") {
+      setBiasMode("reverse");
+    } else {
+      updatePhysicsReadings();
     }
   }
 
@@ -919,23 +1102,30 @@ export function createDiodeExperiment(callbacks = {}) {
   // --------------------------------------------------------------------------
   function recordCurrentObservation() {
     if (!state.powerOn) {
-      if (typeof showToast === "function") showToast("Cannot record: Power is OFF");
+      if (typeof showToast === "function") showToast("Apparatus is powered OFF. Switch Power ON to record.");
       return;
     }
     if (!state.circuitValid) {
-      if (typeof showToast === "function") showToast("Cannot record: Circuit not connected");
+      if (typeof showToast === "function") showToast("Circuit incomplete. Connect wires before recording.");
       return;
     }
 
     if (state.biasMode === "forward") {
+      const vfVal = Number(state.measuredVoltage.toFixed(2));
+      const ifVal = Number(state.measuredCurrent_mA.toFixed(2));
+
+      if (isNaN(vfVal) || isNaN(ifVal)) return;
+
       const sNo = state.forwardObservations.length + 1;
       const newObs = {
-        id: `fwd_obs_${Date.now()}`,
+        id: `fwd_obs_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
         sNo,
-        vf: Number(state.measuredVoltage.toFixed(3)),
-        if_mA: Number(state.measuredCurrent_mA.toFixed(3))
+        vf: vfVal,
+        if_mA: ifVal
       };
       state.forwardObservations.push(newObs);
+      state.activeObsTab = "forward";
+      state.activeGraphTab = "forward";
       renderObservationTable();
       drawForwardGraph();
       triggerChallenge("recordFwd");
@@ -945,19 +1135,26 @@ export function createDiodeExperiment(callbacks = {}) {
       }
 
       if (typeof showToast === "function") {
-        showToast(`Forward reading #${sNo} recorded: Vf = ${newObs.vf} V, If = ${newObs.if_mA} mA`);
+        showToast(`Forward reading #${sNo} recorded: Vf = ${vfVal.toFixed(2)} V, If = ${ifVal.toFixed(2)} mA`);
       }
     } else if (state.biasMode === "reverse") {
+      const vrVal = Number(state.measuredVoltage.toFixed(1));
+      const irUaVal = Number(state.measuredCurrent_uA.toFixed(2));
+      const irMaVal = Number((irUaVal * 0.001).toFixed(5));
+
+      if (isNaN(vrVal) || isNaN(irMaVal)) return;
+
       const sNo = state.reverseObservations.length + 1;
       const newObs = {
-        id: `rev_obs_${Date.now()}`,
+        id: `rev_obs_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
         sNo,
-        vr: Number(state.measuredVoltage.toFixed(2)),
-        ir_uA: Number(state.measuredCurrent_uA.toFixed(2)),
-        // Converted strictly to mA as required by Prompt Section 21 (1 uA = 0.001 mA)
-        ir_mA: Number(state.measuredCurrent_mA.toFixed(6))
+        vr: vrVal,
+        ir_uA: irUaVal,
+        ir_mA: irMaVal
       };
       state.reverseObservations.push(newObs);
+      state.activeObsTab = "reverse";
+      state.activeGraphTab = "reverse";
       renderObservationTable();
       drawReverseGraph();
       triggerChallenge("recordRev");
@@ -967,7 +1164,7 @@ export function createDiodeExperiment(callbacks = {}) {
       }
 
       if (typeof showToast === "function") {
-        showToast(`Reverse reading #${sNo} recorded: Vr = ${newObs.vr} V, Ir = ${newObs.ir_mA} mA (${newObs.ir_uA} μA)`);
+        showToast(`Reverse reading #${sNo} recorded: Vr = ${vrVal.toFixed(1)} V, Ir = ${irMaVal.toFixed(4)} mA (${irUaVal.toFixed(1)} μA)`);
       }
     }
   }
@@ -1156,62 +1353,70 @@ export function createDiodeExperiment(callbacks = {}) {
     ctx.textAlign = "left";
     ctx.fillText("V-I CHARACTERISTICS • 1ST QUADRANT (FORWARD BIAS)", padL, 18);
 
-    // Plot Theoretical Reference Curve (Translucent guide)
+    // Plot Actual Recorded Observations (or empty state)
+    if (state.forwardObservations.length === 0) {
+      ctx.font = "bold 13px 'Space Grotesk', sans-serif";
+      ctx.fillStyle = "#64748b";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("No Forward Observations Logged", padL + plotW / 2, padT + plotH / 2 - 8);
+      ctx.font = "11px sans-serif";
+      ctx.fillStyle = "#475569";
+      ctx.fillText("Adjust voltage with > and click 'Record Observation' to plot curve points.", padL + plotW / 2, padT + plotH / 2 + 14);
+      return;
+    }
+
+    // Sort observations by voltage for smooth line drawing
+    const sorted = [...state.forwardObservations].sort((a, b) => a.vf - b.vf);
+
+    // Connected observation spline
     ctx.beginPath();
-    let started = false;
-    for (let v = 0; v <= maxV; v += 0.02) {
-      const pt = solveForwardDiode(v);
-      const px = padL + (pt.voltage / maxV) * plotW;
-      const py = padT + plotH - (pt.current_mA / maxI) * plotH;
-      if (!started) { ctx.moveTo(px, py); started = true; }
-      else { ctx.lineTo(px, py); }
-    }
-    ctx.strokeStyle = "rgba(245, 158, 11, 0.35)";
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([4, 4]);
+    sorted.forEach((pt, idx) => {
+      const px = padL + (pt.vf / maxV) * plotW;
+      const py = padT + plotH - (pt.if_mA / maxI) * plotH;
+      if (idx === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    });
+    ctx.strokeStyle = "#00f0ff";
+    ctx.lineWidth = 2.5;
+    ctx.shadowColor = "#00f0ff";
+    ctx.shadowBlur = 8;
     ctx.stroke();
-    ctx.setLineDash([]);
+    ctx.shadowBlur = 0;
 
-    // Plot Actual Recorded Observations
-    if (state.forwardObservations.length > 0) {
-      // Sort observations by voltage for smooth line drawing
-      const sorted = [...state.forwardObservations].sort((a, b) => a.vf - b.vf);
+    // Dots and point labels
+    sorted.forEach(pt => {
+      const px = padL + (pt.vf / maxV) * plotW;
+      const py = padT + plotH - (pt.if_mA / maxI) * plotH;
 
-      // Connected observation spline
       ctx.beginPath();
-      sorted.forEach((pt, idx) => {
-        const px = padL + (pt.vf / maxV) * plotW;
-        const py = padT + plotH - (pt.if_mA / maxI) * plotH;
-        if (idx === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      });
-      ctx.strokeStyle = "#00f0ff";
-      ctx.lineWidth = 2.5;
-      ctx.shadowColor = "#00f0ff";
-      ctx.shadowBlur = 8;
+      ctx.arc(px, py, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#0284c7";
       ctx.stroke();
-      ctx.shadowBlur = 0;
 
-      // Dots
-      sorted.forEach(pt => {
-        const px = padL + (pt.vf / maxV) * plotW;
-        const py = padT + plotH - (pt.if_mA / maxI) * plotH;
-
-        ctx.beginPath();
-        ctx.arc(px, py, 4.5, 0, Math.PI * 2);
-        ctx.fillStyle = "#ffffff";
-        ctx.fill();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "#0284c7";
-        ctx.stroke();
-      });
-    }
+      ctx.font = "bold 8.5px 'JetBrains Mono', monospace";
+      ctx.fillStyle = "#38bdf8";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      ctx.fillText(`(${pt.vf.toFixed(2)}, ${pt.if_mA.toFixed(2)})`, px, py - 6);
+    });
   }
 
   /**
    * 3rd Quadrant Graph: Reverse Bias Characteristics (-Vr vs -Ir)
    * Scale: X-axis 1 cm = 2 V (negative X, 0 to -30 V)
    *        Y-axis 1 cm = 10 μA (negative Y, 0 to -100 μA)
+   */
+  /**
+   * 3rd Quadrant Graph: Reverse Bias Characteristics
+   * Matches the standard laboratory / textbook curve (Image 2):
+   * - Origin at Top-Right (0, 0)
+   * - Reverse bias voltage (VR) in V extends to the LEFT (0 to 30 V) with left arrow
+   * - Reverse current (IR) in μA extends DOWNWARDS (0 to 40 μA) with down arrow
+   * - Realistic graph paper grid and dynamically plotted observations
    */
   function drawReverseGraph() {
     const canvas = document.getElementById("diode-rev-graph-canvas");
@@ -1221,29 +1426,36 @@ export function createDiodeExperiment(callbacks = {}) {
     const h = canvas.height;
     ctx.clearRect(0, 0, w, h);
 
-    const padL = 40;
-    const padR = 50;
-    const padT = 35;
-    const padB = 40;
+    const padL = 50;
+    const padR = 60;
+    const padT = 45;
+    const padB = 45;
 
     const plotW = w - padL - padR;
     const plotH = h - padT - padB;
 
     const maxVr = 30.0;
-    const maxIr = 100.0; // μA
+    // Dynamic max current: at least 40 μA, expanding if user records higher breakdown currents
+    let maxIr = 40.0;
+    state.reverseObservations.forEach(obs => {
+      const uA = (typeof obs.ir_uA === "number" && !isNaN(obs.ir_uA)) ? obs.ir_uA : (obs.ir_mA * 1000);
+      if (uA > maxIr) maxIr = Math.ceil(uA / 10) * 10;
+    });
 
+    // Dark slate laboratory canvas background
     ctx.fillStyle = "#030712";
     ctx.fillRect(0, 0, w, h);
 
-    // In 3rd quadrant: Origin is at Top-Right!
+    // Origin is at Top-Right
     const originX = padL + plotW;
     const originY = padT;
 
-    // Grid lines (negative direction)
+    // 1. Graph Paper Grid (Fine cyan grid matching standard engineering graph paper)
     ctx.lineWidth = 0.5;
-    ctx.strokeStyle = "rgba(168, 85, 247, 0.12)";
+    ctx.strokeStyle = "rgba(6, 182, 212, 0.12)";
 
-    for (let v = 5; v <= maxVr; v += 5) {
+    // Minor vertical grid lines (every 2.5 V)
+    for (let v = 2.5; v <= maxVr; v += 2.5) {
       const gx = originX - (v / maxVr) * plotW;
       ctx.beginPath();
       ctx.moveTo(gx, originY);
@@ -1251,7 +1463,8 @@ export function createDiodeExperiment(callbacks = {}) {
       ctx.stroke();
     }
 
-    for (let i = 20; i <= maxIr; i += 20) {
+    // Minor horizontal grid lines (every 5 μA)
+    for (let i = 5; i <= maxIr; i += 5) {
       const gy = originY + (i / maxIr) * plotH;
       ctx.beginPath();
       ctx.moveTo(padL, gy);
@@ -1259,119 +1472,169 @@ export function createDiodeExperiment(callbacks = {}) {
       ctx.stroke();
     }
 
-    // Axes in 3rd Quadrant:
-    // Negative X goes LEFT from originX
-    // Negative Y goes DOWN from originY
-    ctx.lineWidth = 1.8;
-    ctx.strokeStyle = "#a855f7";
+    // Major grid lines
+    ctx.lineWidth = 0.8;
+    ctx.strokeStyle = "rgba(6, 182, 212, 0.25)";
+    const majorVSteps = [5, 10, 15, 20, 25, 30];
+    majorVSteps.forEach(v => {
+      const gx = originX - (v / maxVr) * plotW;
+      ctx.beginPath();
+      ctx.moveTo(gx, originY);
+      ctx.lineTo(gx, originY + plotH);
+      ctx.stroke();
+    });
 
-    // Horizontal Axis (Reverse Voltage, negative left)
+    const majorISteps = [10, 20, 30, 40];
+    majorISteps.forEach(i => {
+      if (i <= maxIr) {
+        const gy = originY + (i / maxIr) * plotH;
+        ctx.beginPath();
+        ctx.moveTo(padL, gy);
+        ctx.lineTo(originX, gy);
+        ctx.stroke();
+      }
+    });
+
+    // 2. Main Axes with Directional Arrows
+    ctx.lineWidth = 2.0;
+    ctx.strokeStyle = "#00f0ff";
+
+    // Top Horizontal Axis: Origin (Right) -> Left
     ctx.beginPath();
-    ctx.moveTo(originX, originY);
-    ctx.lineTo(padL, originY);
+    ctx.moveTo(originX + 2, originY);
+    ctx.lineTo(padL - 10, originY);
     ctx.stroke();
 
-    // Vertical Axis (Reverse Current, negative downwards)
+    // Left Arrow Head (<-)
     ctx.beginPath();
-    ctx.moveTo(originX, originY);
-    ctx.lineTo(originX, originY + plotH);
+    ctx.moveTo(padL - 10, originY);
+    ctx.lineTo(padL - 3, originY - 4);
+    ctx.lineTo(padL - 3, originY + 4);
+    ctx.closePath();
+    ctx.fillStyle = "#00f0ff";
+    ctx.fill();
+
+    // Right Vertical Axis: Origin (Top) -> Downwards
+    ctx.beginPath();
+    ctx.moveTo(originX, originY - 2);
+    ctx.lineTo(originX, originY + plotH + 10);
     ctx.stroke();
 
-    // Axis Labels & Ticks
-    ctx.font = "bold 9px 'JetBrains Mono', monospace";
+    // Down Arrow Head (v)
+    ctx.beginPath();
+    ctx.moveTo(originX, originY + plotH + 10);
+    ctx.lineTo(originX - 4, originY + plotH + 3);
+    ctx.lineTo(originX + 4, originY + plotH + 3);
+    ctx.closePath();
+    ctx.fillStyle = "#00f0ff";
+    ctx.fill();
+
+    // 3. Ticks and Labels for Reverse Voltage Axis (Top, Left-facing)
+    ctx.font = "bold 9.5px 'JetBrains Mono', monospace";
     ctx.fillStyle = "#94a3b8";
     ctx.textAlign = "center";
     ctx.textBaseline = "bottom";
 
-    // X Ticks (0, -5, -10, -15, -20, -25, -30 V)
-    for (let v = 0; v <= maxVr; v += 5) {
+    const vTicks = [0, 5, 7, 10, 15, 20, 25, 30];
+    vTicks.forEach(v => {
       const gx = originX - (v / maxVr) * plotW;
-      ctx.fillText(v === 0 ? "0" : `-${v}`, gx, originY - 4);
+      ctx.fillText(String(v), gx, originY - 6);
       ctx.beginPath();
-      ctx.moveTo(gx, originY - 3);
+      ctx.moveTo(gx, originY - 5);
       ctx.lineTo(gx, originY);
-      ctx.strokeStyle = "#a855f7";
+      ctx.strokeStyle = "#00f0ff";
+      ctx.lineWidth = 1.2;
       ctx.stroke();
-    }
+    });
 
-    // Y Ticks (0, -20, -40, -60, -80, -100 μA)
+    // 4. Ticks and Labels for Reverse Current Axis (Right, Downwards)
     ctx.textAlign = "left";
     ctx.textBaseline = "middle";
-    for (let i = 0; i <= maxIr; i += 20) {
-      const gy = originY + (i / maxIr) * plotH;
-      ctx.fillText(i === 0 ? "0" : `-${i}`, originX + 6, gy);
-      ctx.beginPath();
-      ctx.moveTo(originX, gy);
-      ctx.lineTo(originX + 4, gy);
-      ctx.strokeStyle = "#a855f7";
-      ctx.stroke();
-    }
+    const iTicks = [0, 1, 2, 5, 10, 15, 20, 25, 30, 35, 40];
+    iTicks.forEach(i => {
+      if (i <= maxIr) {
+        const gy = originY + (i / maxIr) * plotH;
+        ctx.fillText(String(i), originX + 7, gy);
+        ctx.beginPath();
+        ctx.moveTo(originX, gy);
+        ctx.lineTo(originX + 5, gy);
+        ctx.strokeStyle = "#00f0ff";
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+      }
+    });
 
-    // Axis Titles
-    ctx.font = "bold 11px 'Space Grotesk', sans-serif";
-    ctx.fillStyle = "#f8fafc";
+    // 5. Axis Titles Matching Textbook Spec
+    ctx.font = "bold 12px 'Space Grotesk', sans-serif";
+    ctx.fillStyle = "#00f0ff";
     ctx.textAlign = "center";
-    ctx.fillText("← Reverse Voltage Vr (Volt) [Scale: 1 cm = 2 V]", padL + plotW / 2, h - 12);
+    ctx.fillText("Reverse bias voltage (VR) in V", originX - plotW / 2, originY - 26);
 
     ctx.save();
-    ctx.translate(w - 14, padT + plotH / 2);
+    ctx.translate(w - 12, originY + plotH / 2);
     ctx.rotate(Math.PI / 2);
-    ctx.fillText("Reverse Current Ir (μA) → [Scale: 1 cm = 10 μA]", 0, 0);
+    ctx.fillText("Reverse Current in μA", 0, 0);
     ctx.restore();
 
-    // Header Tag
-    ctx.font = "bold 10.5px 'Space Grotesk', sans-serif";
-    ctx.fillStyle = "#c084fc";
-    ctx.textAlign = "left";
-    ctx.fillText("V-I CHARACTERISTICS • 3RD QUADRANT (REVERSE BIAS)", padL, 18);
+    // 6. Graph Heading / Subtitle at bottom
+    ctx.font = "bold 11px 'Space Grotesk', sans-serif";
+    ctx.fillStyle = "#cbd5e1";
+    ctx.textAlign = "center";
+    ctx.fillText("I-V Characteristic Curve of a P-N Junction in Reverse Bias", originX - plotW / 2, h - 12);
 
-    // Theoretical Guide line
-    ctx.beginPath();
-    let started = false;
-    for (let v = 0; v <= maxVr; v += 0.5) {
-      const pt = solveReverseDiode(v);
-      const px = originX - (pt.voltage / maxVr) * plotW;
-      const py = originY + (pt.current_uA / maxIr) * plotH;
-      if (!started) { ctx.moveTo(px, py); started = true; }
-      else { ctx.lineTo(px, py); }
+    // 7. Plot Observations
+    if (state.reverseObservations.length === 0) {
+      ctx.font = "bold 12.5px 'Space Grotesk', sans-serif";
+      ctx.fillStyle = "#64748b";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("No Reverse Observations Logged", originX - plotW / 2, originY + plotH / 2 - 8);
+      ctx.font = "11px sans-serif";
+      ctx.fillStyle = "#475569";
+      ctx.fillText("Adjust reverse voltage knob and click 'Record Observation' to plot points.", originX - plotW / 2, originY + plotH / 2 + 14);
+      return;
     }
-    ctx.strokeStyle = "rgba(192, 132, 252, 0.35)";
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([4, 4]);
-    ctx.stroke();
-    ctx.setLineDash([]);
 
-    // Actual Recorded Points
-    if (state.reverseObservations.length > 0) {
-      const sorted = [...state.reverseObservations].sort((a, b) => a.vr - b.vr);
+    const sorted = [...state.reverseObservations].sort((a, b) => a.vr - b.vr);
+
+    // Dynamic curve starting from origin (0, 0)
+    ctx.beginPath();
+    ctx.moveTo(originX, originY);
+
+    sorted.forEach(pt => {
+      const uA = (typeof pt.ir_uA === "number" && !isNaN(pt.ir_uA)) ? pt.ir_uA : (pt.ir_mA * 1000);
+      const px = originX - (pt.vr / maxVr) * plotW;
+      const py = originY + (uA / maxIr) * plotH;
+      ctx.lineTo(px, py);
+    });
+
+    ctx.strokeStyle = "#3b82f6";
+    ctx.lineWidth = 3.0;
+    ctx.shadowColor = "rgba(59, 130, 246, 0.7)";
+    ctx.shadowBlur = 10;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Dots and point coordinates
+    sorted.forEach(pt => {
+      const uA = (typeof pt.ir_uA === "number" && !isNaN(pt.ir_uA)) ? pt.ir_uA : (pt.ir_mA * 1000);
+      const px = originX - (pt.vr / maxVr) * plotW;
+      const py = originY + (uA / maxIr) * plotH;
 
       ctx.beginPath();
-      sorted.forEach((pt, idx) => {
-        const px = originX - (pt.vr / maxVr) * plotW;
-        const py = originY + (pt.ir_uA / maxIr) * plotH;
-        if (idx === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      });
-      ctx.strokeStyle = "#e879f9";
-      ctx.lineWidth = 2.5;
-      ctx.shadowColor = "#e879f9";
-      ctx.shadowBlur = 8;
+      ctx.arc(px, py, 5.0, 0, Math.PI * 2);
+      ctx.fillStyle = "#ec4899"; // Pink marker like textbook point dots
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#ffffff";
       ctx.stroke();
-      ctx.shadowBlur = 0;
 
-      sorted.forEach(pt => {
-        const px = originX - (pt.vr / maxVr) * plotW;
-        const py = originY + (pt.ir_uA / maxIr) * plotH;
-
-        ctx.beginPath();
-        ctx.arc(px, py, 4.5, 0, Math.PI * 2);
-        ctx.fillStyle = "#ffffff";
-        ctx.fill();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "#a855f7";
-        ctx.stroke();
-      });
-    }
+      ctx.font = "bold 9px 'JetBrains Mono', monospace";
+      ctx.fillStyle = "#f8fafc";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "top";
+      ctx.fillText(` (${pt.vr.toFixed(0)}, ${uA.toFixed(0)})`, px + 6, py + 2);
+    });
   }
 
   // --------------------------------------------------------------------------
@@ -1551,24 +1814,9 @@ export function createDiodeExperiment(callbacks = {}) {
   // --------------------------------------------------------------------------
   function resetExperiment() {
     setPowerToggle(false);
-    state.forwardVoltageKnob = 0.0;
-    state.reverseVoltageKnob = 0.0;
-    state.measuredVoltage = 0.0;
-    state.measuredCurrent_mA = 0.0;
-    state.measuredCurrent_uA = 0.0;
-    state.targetVmAngle = -45;
-    state.targetAmAngle = -45;
-
-    const fwdKnob = document.getElementById("diode-fwd-knob");
-    const revKnob = document.getElementById("diode-rev-knob");
-    const fwdVal = document.getElementById("diode-fwd-knob-val");
-    const revVal = document.getElementById("diode-rev-knob-val");
-
-    if (fwdKnob) fwdKnob.style.transform = "rotate(0deg)";
-    if (revKnob) revKnob.style.transform = "rotate(0deg)";
-    if (fwdVal) fwdVal.textContent = "0.00 V";
-    if (revVal) revVal.textContent = "0.0 V";
-
+    setForwardVoltage(0.0);
+    setReverseVoltage(0.0);
+    setBiasMode("forward");
     clearAllWires();
     state.forwardObservations = [];
     state.reverseObservations = [];
@@ -1594,14 +1842,26 @@ export function createDiodeExperiment(callbacks = {}) {
     });
 
     // Preset Wire Buttons
-    document.getElementById("diode-btn-auto-fwd")?.addEventListener("click", autoConnectForward);
-    document.getElementById("diode-btn-auto-rev")?.addEventListener("click", autoConnectReverse);
+    document.getElementById("diode-btn-auto-fwd")?.addEventListener("click", () => {
+      setBiasMode("forward");
+      if (typeof showToast === "function") showToast("Forward Bias Circuit Wired Successfully!");
+    });
+    document.getElementById("diode-btn-auto-rev")?.addEventListener("click", () => {
+      setBiasMode("reverse");
+      if (typeof showToast === "function") showToast("Reverse Bias Circuit Wired Successfully!");
+    });
     document.getElementById("diode-btn-clear-wires")?.addEventListener("click", clearAllWires);
 
-    // Power Toggle
-    document.getElementById("diode-power-toggle")?.addEventListener("click", () => {
-      setPowerToggle(!state.powerOn);
-    });
+    // Dedicated Bias Mode Selector Buttons in Toolbar
+    document.getElementById("diode-btn-mode-fwd")?.addEventListener("click", () => setBiasMode("forward"));
+    document.getElementById("diode-btn-mode-rev")?.addEventListener("click", () => setBiasMode("reverse"));
+
+    // Power Toggle & Labels
+    const togglePower = () => setPowerToggle(!state.powerOn);
+    document.getElementById("diode-power-toggle")?.addEventListener("click", togglePower);
+    document.getElementById("lbl-power-off")?.addEventListener("click", () => setPowerToggle(false));
+    document.getElementById("lbl-power-on")?.addEventListener("click", () => setPowerToggle(true));
+    document.getElementById("diode-power-lamp")?.addEventListener("click", togglePower);
 
     // Voltmeter Range Selector
     document.getElementById("diode-vm-range-toggle")?.addEventListener("click", () => {
@@ -1619,7 +1879,6 @@ export function createDiodeExperiment(callbacks = {}) {
 
     // Rotary Knob: Forward Bias DC Supply (0.0 to 1.5 V)
     const fwdKnob = document.getElementById("diode-fwd-knob");
-    const fwdVal = document.getElementById("diode-fwd-knob-val");
     if (fwdKnob) {
       let isDragging = false;
       let startY = 0;
@@ -1639,12 +1898,7 @@ export function createDiodeExperiment(callbacks = {}) {
         if (!isDragging) return;
         const currentY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
         const delta = (startY - currentY) * 0.008;
-        const newVal = Math.min(Math.max(startVal + delta, 0.0), 1.5);
-        state.forwardVoltageKnob = Number(newVal.toFixed(3));
-        const rotDeg = (state.forwardVoltageKnob / 1.5) * 270;
-        fwdKnob.style.transform = `rotate(${rotDeg}deg)`;
-        if (fwdVal) fwdVal.textContent = `${state.forwardVoltageKnob.toFixed(2)} V`;
-        updatePhysicsReadings();
+        setForwardVoltage(startVal + delta);
       };
 
       const onMouseUp = () => {
@@ -1660,40 +1914,25 @@ export function createDiodeExperiment(callbacks = {}) {
       fwdKnob.addEventListener("wheel", (e) => {
         e.preventDefault();
         const delta = e.deltaY < 0 ? 0.05 : -0.05;
-        state.forwardVoltageKnob = Math.min(Math.max(state.forwardVoltageKnob + delta, 0.0), 1.5);
-        const rotDeg = (state.forwardVoltageKnob / 1.5) * 270;
-        fwdKnob.style.transform = `rotate(${rotDeg}deg)`;
-        if (fwdVal) fwdVal.textContent = `${state.forwardVoltageKnob.toFixed(2)} V`;
-        updatePhysicsReadings();
+        setForwardVoltage(state.forwardVoltageKnob + delta);
       });
 
       // Step Buttons: < (Decrease) and > (Increase) for Forward Voltage
       const fwdBtnDec = document.getElementById("diode-fwd-btn-dec");
       const fwdBtnInc = document.getElementById("diode-fwd-btn-inc");
       const FWD_STEP = 0.05;
-      if (fwdBtnDec) {
-        fwdBtnDec.addEventListener("click", () => {
-          state.forwardVoltageKnob = Math.min(Math.max(state.forwardVoltageKnob - FWD_STEP, 0.0), 1.5);
-          const rotDeg = (state.forwardVoltageKnob / 1.5) * 270;
-          fwdKnob.style.transform = `rotate(${rotDeg}deg)`;
-          if (fwdVal) fwdVal.textContent = `${state.forwardVoltageKnob.toFixed(2)} V`;
-          updatePhysicsReadings();
-        });
-      }
-      if (fwdBtnInc) {
-        fwdBtnInc.addEventListener("click", () => {
-          state.forwardVoltageKnob = Math.min(Math.max(state.forwardVoltageKnob + FWD_STEP, 0.0), 1.5);
-          const rotDeg = (state.forwardVoltageKnob / 1.5) * 270;
-          fwdKnob.style.transform = `rotate(${rotDeg}deg)`;
-          if (fwdVal) fwdVal.textContent = `${state.forwardVoltageKnob.toFixed(2)} V`;
-          updatePhysicsReadings();
-        });
-      }
+      fwdBtnDec?.addEventListener("click", (e) => {
+        e.preventDefault();
+        setForwardVoltage(Number((state.forwardVoltageKnob - FWD_STEP).toFixed(2)));
+      });
+      fwdBtnInc?.addEventListener("click", (e) => {
+        e.preventDefault();
+        setForwardVoltage(Number((state.forwardVoltageKnob + FWD_STEP).toFixed(2)));
+      });
     }
 
     // Rotary Knob: Reverse Bias DC Supply (0.0 to 30.0 V)
     const revKnob = document.getElementById("diode-rev-knob");
-    const revVal = document.getElementById("diode-rev-knob-val");
     if (revKnob) {
       let isDragging = false;
       let startY = 0;
@@ -1713,12 +1952,7 @@ export function createDiodeExperiment(callbacks = {}) {
         if (!isDragging) return;
         const currentY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
         const delta = (startY - currentY) * 0.15;
-        const newVal = Math.min(Math.max(startVal + delta, 0.0), 30.0);
-        state.reverseVoltageKnob = Number(newVal.toFixed(2));
-        const rotDeg = (state.reverseVoltageKnob / 30.0) * 270;
-        revKnob.style.transform = `rotate(${rotDeg}deg)`;
-        if (revVal) revVal.textContent = `${state.reverseVoltageKnob.toFixed(1)} V`;
-        updatePhysicsReadings();
+        setReverseVoltage(startVal + delta);
       };
 
       const onMouseUp = () => {
@@ -1734,81 +1968,33 @@ export function createDiodeExperiment(callbacks = {}) {
       revKnob.addEventListener("wheel", (e) => {
         e.preventDefault();
         const delta = e.deltaY < 0 ? 1.0 : -1.0;
-        state.reverseVoltageKnob = Math.min(Math.max(state.reverseVoltageKnob + delta, 0.0), 30.0);
-        const rotDeg = (state.reverseVoltageKnob / 30.0) * 270;
-        revKnob.style.transform = `rotate(${rotDeg}deg)`;
-        if (revVal) revVal.textContent = `${state.reverseVoltageKnob.toFixed(1)} V`;
-        updatePhysicsReadings();
+        setReverseVoltage(state.reverseVoltageKnob + delta);
       });
 
       // Step Buttons: < (Decrease) and > (Increase) for Reverse Voltage
       const revBtnDec = document.getElementById("diode-rev-btn-dec");
       const revBtnInc = document.getElementById("diode-rev-btn-inc");
       const REV_STEP = 1.0;
-      if (revBtnDec) {
-        revBtnDec.addEventListener("click", () => {
-          state.reverseVoltageKnob = Math.min(Math.max(state.reverseVoltageKnob - REV_STEP, 0.0), 30.0);
-          const rotDeg = (state.reverseVoltageKnob / 30.0) * 270;
-          revKnob.style.transform = `rotate(${rotDeg}deg)`;
-          if (revVal) revVal.textContent = `${state.reverseVoltageKnob.toFixed(1)} V`;
-          updatePhysicsReadings();
-        });
-      }
-      if (revBtnInc) {
-        revBtnInc.addEventListener("click", () => {
-          state.reverseVoltageKnob = Math.min(Math.max(state.reverseVoltageKnob + REV_STEP, 0.0), 30.0);
-          const rotDeg = (state.reverseVoltageKnob / 30.0) * 270;
-          revKnob.style.transform = `rotate(${rotDeg}deg)`;
-          if (revVal) revVal.textContent = `${state.reverseVoltageKnob.toFixed(1)} V`;
-          updatePhysicsReadings();
-        });
-      }
+      revBtnDec?.addEventListener("click", (e) => {
+        e.preventDefault();
+        setReverseVoltage(Number((state.reverseVoltageKnob - REV_STEP).toFixed(1)));
+      });
+      revBtnInc?.addEventListener("click", (e) => {
+        e.preventDefault();
+        setReverseVoltage(Number((state.reverseVoltageKnob + REV_STEP).toFixed(1)));
+      });
     }
 
-    // Observation Table Tabs & Buttons
-    document.getElementById("diode-tab-obs-fwd")?.addEventListener("click", () => {
-      state.activeObsTab = "forward";
-      document.getElementById("diode-tab-obs-fwd")?.classList.add("active");
-      document.getElementById("diode-tab-obs-rev")?.classList.remove("active");
-      document.getElementById("diode-lc-strip-fwd")?.classList.remove("hidden");
-      document.getElementById("diode-lc-strip-rev")?.classList.add("hidden");
-      document.getElementById("th-diode-voltage").textContent = "Forward Voltage Vf (Volt)";
-      document.getElementById("th-diode-current").textContent = "Forward Current If (mA)";
-      renderObservationTable();
-    });
-
-    document.getElementById("diode-tab-obs-rev")?.addEventListener("click", () => {
-      state.activeObsTab = "reverse";
-      document.getElementById("diode-tab-obs-rev")?.classList.add("active");
-      document.getElementById("diode-tab-obs-fwd")?.classList.remove("active");
-      document.getElementById("diode-lc-strip-rev")?.classList.remove("hidden");
-      document.getElementById("diode-lc-strip-fwd")?.classList.add("hidden");
-      document.getElementById("th-diode-voltage").textContent = "Reverse Voltage Vr (Volt)";
-      document.getElementById("th-diode-current").textContent = "Reverse Current Ir (mA)";
-      renderObservationTable();
-    });
+    // Observation Table Tabs & Buttons (Switching tabs synchronizes authoritative bias mode)
+    document.getElementById("diode-tab-obs-fwd")?.addEventListener("click", () => setBiasMode("forward"));
+    document.getElementById("diode-tab-obs-rev")?.addEventListener("click", () => setBiasMode("reverse"));
 
     document.getElementById("diode-btn-record")?.addEventListener("click", recordCurrentObservation);
     document.getElementById("diode-btn-clear-obs")?.addEventListener("click", clearObservations);
 
-    // Graph Tabs
-    document.getElementById("diode-tab-graph-fwd")?.addEventListener("click", () => {
-      state.activeGraphTab = "forward";
-      document.getElementById("diode-tab-graph-fwd")?.classList.add("active");
-      document.getElementById("diode-tab-graph-rev")?.classList.remove("active");
-      document.getElementById("diode-fwd-graph-container")?.classList.remove("hidden");
-      document.getElementById("diode-rev-graph-container")?.classList.add("hidden");
-      drawForwardGraph();
-    });
-
-    document.getElementById("diode-tab-graph-rev")?.addEventListener("click", () => {
-      state.activeGraphTab = "reverse";
-      document.getElementById("diode-tab-graph-rev")?.classList.add("active");
-      document.getElementById("diode-tab-graph-fwd")?.classList.remove("active");
-      document.getElementById("diode-rev-graph-container")?.classList.remove("hidden");
-      document.getElementById("diode-fwd-graph-container")?.classList.add("hidden");
-      drawReverseGraph();
-    });
+    // Graph Tabs (Switching tabs synchronizes authoritative bias mode)
+    document.getElementById("diode-tab-graph-fwd")?.addEventListener("click", () => setBiasMode("forward"));
+    document.getElementById("diode-tab-graph-rev")?.addEventListener("click", () => setBiasMode("reverse"));
 
     // Reset & Export Buttons
     document.getElementById("diode-btn-reset-exp")?.addEventListener("click", resetExperiment);
@@ -1828,6 +2014,7 @@ export function createDiodeExperiment(callbacks = {}) {
   return {
     init() {
       bindDomEvents();
+      setBiasMode("forward");
       renderChallengesDom();
       renderObservationTable();
       drawForwardGraph();
@@ -1837,17 +2024,18 @@ export function createDiodeExperiment(callbacks = {}) {
       if (!animFrameId) {
         stepMeterNeedles();
       }
-
-      // Default initial wiring: Auto Connect Forward Bias for immediate intuitive interactivity!
-      autoConnectForward();
     },
 
     renderAll() {
+      if (!animFrameId) {
+        stepMeterNeedles();
+      }
       renderWiresSvg();
       drawForwardGraph();
       drawReverseGraph();
       renderObservationTable();
       renderChallengesDom();
+      updatePhysicsReadings();
     },
 
     hydrateChallenges(completedList) {
@@ -1862,16 +2050,24 @@ export function createDiodeExperiment(callbacks = {}) {
       return {
         powerOn: state.powerOn,
         biasMode: state.biasMode,
+        mode: state.biasMode,
         vmRange: state.vmRange,
+        vRange: state.vmRange,
         amRange: state.amRange,
+        iRange: state.amRange,
         forwardVoltageKnob: state.forwardVoltageKnob,
+        vf: state.forwardVoltageKnob,
         reverseVoltageKnob: state.reverseVoltageKnob,
+        vr: state.reverseVoltageKnob,
         measuredVoltage: state.measuredVoltage,
         measuredCurrent_mA: state.measuredCurrent_mA,
+        ifMa: state.measuredCurrent_mA,
         measuredCurrent_uA: state.measuredCurrent_uA,
+        irUa: state.measuredCurrent_uA,
         circuitValid: state.circuitValid,
         forwardCount: state.forwardObservations.length,
-        reverseCount: state.reverseObservations.length
+        reverseCount: state.reverseObservations.length,
+        observationsCount: state.forwardObservations.length + state.reverseObservations.length
       };
     },
 

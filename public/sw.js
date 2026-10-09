@@ -59,9 +59,10 @@ self.addEventListener('install', (event) => {
           }
         })
       );
-    }).then(() => self.skipWaiting())
+    })
   );
 });
+
 
 // Activate event - claim clients and delete outdated caches
 self.addEventListener('activate', (event) => {
@@ -328,6 +329,12 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // 3.5. Application version check - strictly network only, never cached
+  if (url.pathname === '/version.json') {
+    event.respondWith(fetch(request, { cache: 'no-store' }));
+    return;
+  }
+
   // 4. API calls to Express backend - network only
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(networkOnly(request));
@@ -347,7 +354,7 @@ self.addEventListener('fetch', (event) => {
 
 // Message event for skip waiting or explicit cache requests
 self.addEventListener('message', (event) => {
-  if (event.data === 'SKIP_WAITING') {
+  if (event.data === 'SKIP_WAITING' || (event.data && event.data.type === 'SKIP_WAITING')) {
     self.skipWaiting();
   } else if (event.data && event.data.type === 'CACHE_URLS' && Array.isArray(event.data.urls)) {
     event.waitUntil(
@@ -363,4 +370,4 @@ self.addEventListener('message', (event) => {
       })
     );
   }
-});
+});

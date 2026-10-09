@@ -1,0 +1,187 @@
+/* ==========================================================================
+   PhysiX • New Deployment & Version Update Notification Modal
+   Inspired by Chordician's PWA & Web deployment update experience.
+   100% Zero Emojis compliant.
+   ========================================================================== */
+
+.physix-update-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: rgba(3, 7, 18, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.physix-update-modal-backdrop.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.physix-update-modal-backdrop.hidden {
+  display: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.physix-update-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  background: linear-gradient(145deg, #0b1329 0%, #080d1a 100%);
+  border: 1.5px solid rgba(56, 189, 248, 0.35);
+  border-radius: 20px;
+  padding: 28px 28px 24px 28px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(56, 189, 248, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  transform: translateY(12px) scale(0.97);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.physix-update-modal-backdrop.visible .physix-update-dialog {
+  transform: translateY(0) scale(1);
+}
+
+.physix-update-glow-orb {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+  filter: blur(20px);
+}
+
+.physix-update-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.physix-update-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+  flex-shrink: 0;
+}
+
+.physix-update-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.physix-update-kicker {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #38bdf8;
+  text-transform: uppercase;
+}
+
+.physix-update-title {
+  margin: 0;
+  color: #ffffff;
+  font-family: 'Space Grotesk', Outfit, sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.physix-update-message {
+  color: #94a3b8;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+}
+
+.physix-update-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.physix-update-btn {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.physix-update-btn-later {
+  background: transparent;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: #94a3b8;
+}
+
+.physix-update-btn-later:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #f1f5f9;
+  border-color: rgba(148, 163, 184, 0.5);
+}
+
+.physix-update-btn-refresh {
+  background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+  border: 1px solid #38bdf8;
+  color: #041226;
+  box-shadow: 0 4px 18px rgba(56, 189, 248, 0.35);
+}
+
+.physix-update-btn-refresh:hover {
+  background: linear-gradient(135deg, #0ea5e9 0%, #7dd3fc 100%);
+  box-shadow: 0 6px 24px rgba(56, 189, 248, 0.55);
+  transform: translateY(-1px);
+}
+
+/* Light Mode Adaptations */
+body.light-mode .physix-update-dialog,
+[data-theme="light"] .physix-update-dialog {
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border-color: #0284c7;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25), 0 0 25px rgba(2, 132, 199, 0.15);
+}
+
+body.light-mode .physix-update-title,
+[data-theme="light"] .physix-update-title {
+  color: #0f172a;
+}
+
+body.light-mode .physix-update-message,
+[data-theme="light"] .physix-update-message {
+  color: #475569;
+}
+
+body.light-mode .physix-update-btn-later,
+[data-theme="light"] .physix-update-btn-later {
+  border-color: #cbd5e1;
+  color: #64748b;
+}
+
+body.light-mode .physix-update-btn-later:hover,
+[data-theme="light"] .physix-update-btn-later:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
