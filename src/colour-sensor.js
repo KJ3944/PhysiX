@@ -10,6 +10,13 @@
 import { api } from "./api.js";
 import { generateLabReportPdf } from "./pdf-export.js";
 
+// Preloaded TCS3200 colour sensor chip module image for Experiment 3
+let tcs3200ChipImage = null;
+if (typeof Image !== "undefined") {
+  tcs3200ChipImage = new Image();
+  tcs3200ChipImage.src = "/tcs3200-chip.png";
+}
+
 export function createColourSensorExperiment(callbacks = {}) {
   const { onXpAwarded, onExperimentRecorded, showToast, getActiveUserId, loadUserProfile, getStoredUserProfile, unlockBadge, isUserAuthenticated, openLoginModal, onChallengeCompleted } = callbacks;
 
@@ -725,15 +732,15 @@ export function createColourSensorExperiment(callbacks = {}) {
 
     // Flexible Braided Multi-Conductor Ribbon Cable
     // Loops gracefully out of the I/O socket across to the TCS3200 sensor module
-    const sensX = 355;
-    const sensY = 70;
-    const sensW = 82;
-    const sensH = 145;
+    const sensW = 108;
+    const sensH = Math.round(sensW * (576 / 768)); // 81
+    const sensX = 437 - sensW; // 329
+    const sensY = Math.round(152.5 - sensH / 2); // 112
 
     const cableStartX = ioX + 44;
     const cableStartY = ioY + 28;
     const cableEndX = sensX + 4;
-    const cableEndY = sensY + sensH - 22;
+    const cableEndY = sensY + sensH / 2;
 
     ctx.save();
     // Render 6 braided wire conductors with alternating tones
@@ -758,212 +765,136 @@ export function createColourSensorExperiment(callbacks = {}) {
     // ==========================================
     clickRegions.sensorArray = { x: sensX, y: sensY, w: sensW, h: sensH };
 
-    // Sensor PCB Plate (Deep Royal Blue FR4 with Satin Sheen)
-    const gradPcb = ctx.createLinearGradient(sensX, sensY, sensX + sensW, sensY + sensH);
-    gradPcb.addColorStop(0, "#0c234b");
-    gradPcb.addColorStop(0.5, "#081b3a");
-    gradPcb.addColorStop(1, "#051126");
-    ctx.fillStyle = gradPcb;
-    ctx.beginPath();
-    ctx.roundRect(sensX, sensY, sensW, sensH, 6);
-    ctx.fill();
-    ctx.strokeStyle = "#1d4ed8";
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
+    // Metal Optical Rail Mounting Pedestal under Sensor
+    const postW = 32;
+    const postX = sensX + sensW / 2 - postW / 2;
+    const postY = sensY + sensH;
+    const postH = Math.max(0, benchY + 15 - postY);
 
-    // Gold Traces and Silkscreen Lines on PCB
-    ctx.strokeStyle = "rgba(234, 179, 8, 0.4)";
-    ctx.lineWidth = 0.8;
-    ctx.beginPath();
-    ctx.moveTo(sensX + 10, sensY + 38);
-    ctx.lineTo(sensX + 22, sensY + 38);
-    ctx.lineTo(sensX + 22, sensY + 65);
-    ctx.moveTo(sensX + sensW - 10, sensY + 38);
-    ctx.lineTo(sensX + sensW - 22, sensY + 38);
-    ctx.lineTo(sensX + sensW - 22, sensY + 65);
-    ctx.stroke();
-
-    // 4 Brass Standoff Mounting Pillars in Corners (Matching Reference Image)
-    const standoffs = [
-      [sensX + 9, sensY + 9],
-      [sensX + sensW - 9, sensY + 9],
-      [sensX + 9, sensY + sensH - 9],
-      [sensX + sensW - 9, sensY + sensH - 9]
-    ];
-    standoffs.forEach(([sx, sy]) => {
-      // Brass Washer Outer Ring
-      ctx.beginPath();
-      ctx.arc(sx, sy, 5.5, 0, Math.PI * 2);
-      ctx.fillStyle = "#eab308";
-      ctx.fill();
-      ctx.strokeStyle = "#a16207";
+    if (postH > 0) {
+      const gradPost = ctx.createLinearGradient(postX, postY, postX + postW, postY);
+      gradPost.addColorStop(0, "#334155");
+      gradPost.addColorStop(0.3, "#64748b");
+      gradPost.addColorStop(0.7, "#94a3b8");
+      gradPost.addColorStop(1, "#1e293b");
+      ctx.fillStyle = gradPost;
+      ctx.fillRect(postX, postY, postW, postH);
+      ctx.strokeStyle = "#0f172a";
       ctx.lineWidth = 1;
-      ctx.stroke();
+      ctx.strokeRect(postX, postY, postW, postH);
 
-      // Inner Screw Hex Socket
+      // Knurled thumb screw on mount
+      ctx.fillStyle = "#cbd5e1";
       ctx.beginPath();
-      ctx.arc(sx, sy, 2.5, 0, Math.PI * 2);
-      ctx.fillStyle = "#0a0f1d";
+      ctx.arc(postX + postW / 2, postY + 14, 5, 0, Math.PI * 2);
       ctx.fill();
-    });
+      ctx.strokeStyle = "#475569";
+      ctx.stroke();
+    }
 
-    // 4 White SMD Spotlight LEDs (Illumination Array)
-    const ledPositions = [
+    const hasChipImage = tcs3200ChipImage && tcs3200ChipImage.complete && tcs3200ChipImage.naturalWidth > 0;
+
+    // LED Positions on the Board
+    const ledPositions = hasChipImage ? [
+      [sensX + sensW * 0.26, sensY + sensH * 0.18],
+      [sensX + sensW * 0.74, sensY + sensH * 0.18],
+      [sensX + sensW * 0.26, sensY + sensH * 0.82],
+      [sensX + sensW * 0.74, sensY + sensH * 0.82]
+    ] : [
       [sensX + 16, sensY + 26],
       [sensX + sensW - 16, sensY + 26],
       [sensX + 16, sensY + sensH - 26],
       [sensX + sensW - 16, sensY + sensH - 26]
     ];
 
-    ledPositions.forEach(([lx, ly]) => {
-      // SMD Package Housing
-      ctx.fillStyle = "#1e293b";
-      ctx.fillRect(lx - 5, ly - 5, 10, 10);
-      ctx.strokeStyle = "#475569";
-      ctx.lineWidth = 0.8;
-      ctx.strokeRect(lx - 5, ly - 5, 10, 10);
+    if (hasChipImage) {
+      // Photorealistic TCS3200 Breakout Module & Chip from User Image
+      ctx.save();
+      ctx.shadowColor = "rgba(0, 0, 0, 0.75)";
+      ctx.shadowBlur = 12;
+      ctx.shadowOffsetY = 4;
+      ctx.drawImage(tcs3200ChipImage, sensX, sensY, sensW, sensH);
+      ctx.restore();
 
-      // Gold Solder Terminals
-      ctx.fillStyle = "#eab308";
-      ctx.fillRect(lx - 6, ly - 2, 2, 4);
-      ctx.fillRect(lx + 4, ly - 2, 2, 4);
-
-      // White LED Encapsulation Dome
-      ctx.beginPath();
-      ctx.arc(lx, ly, 3.8, 0, Math.PI * 2);
-      ctx.fillStyle = isLedOn ? "#ffffff" : "#cbd5e1";
-      ctx.fill();
-
+      // If White LEDs active, render radiant illumination bloom over the 4 LED domes
       if (isLedOn) {
-        // High Intensity Radiant Bloom
-        ctx.shadowColor = "#ffffff";
-        ctx.shadowBlur = 12;
-        ctx.fillStyle = "#ffffff";
-        ctx.fill();
+        ctx.save();
+        ledPositions.forEach(([lx, ly]) => {
+          ctx.beginPath();
+          ctx.arc(lx, ly, 4.5, 0, Math.PI * 2);
+          ctx.fillStyle = "#ffffff";
+          ctx.shadowColor = "#ffffff";
+          ctx.shadowBlur = 16;
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(lx, ly, 9, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
+          ctx.shadowBlur = 24;
+          ctx.fill();
+        });
+        ctx.restore();
+      }
+
+      // If Power is ON, highlight active photodiode channel in center chip U1
+      if (state.powerSupplyOn) {
+        const icCx = sensX + sensW / 2;
+        const icCy = sensY + sensH / 2;
+        const filterColor = state.filterChannel === "red" ? "#ef4444"
+          : state.filterChannel === "green" ? "#10b981"
+          : state.filterChannel === "blue" ? "#38bdf8"
+          : "rgba(255, 255, 255, 0.9)";
+
+        ctx.save();
+        ctx.strokeStyle = filterColor;
+        ctx.lineWidth = 1.2;
+        ctx.shadowColor = filterColor;
+        ctx.shadowBlur = 8;
+        ctx.strokeRect(icCx - 5, icCy - 5, 10, 10);
+
+        ctx.fillStyle = filterColor;
+        ctx.globalAlpha = 0.35;
+        ctx.fillRect(icCx - 4, icCy - 4, 8, 8);
+        ctx.restore();
+      }
+    } else {
+      // Fallback: Sensor PCB Plate & IC
+      const gradPcb = ctx.createLinearGradient(sensX, sensY, sensX + sensW, sensY + sensH);
+      gradPcb.addColorStop(0, "#0c234b");
+      gradPcb.addColorStop(0.5, "#081b3a");
+      gradPcb.addColorStop(1, "#051126");
+      ctx.fillStyle = gradPcb;
+      ctx.beginPath();
+      ctx.roundRect(sensX, sensY, sensW, sensH, 6);
+      ctx.fill();
+      ctx.strokeStyle = "#1d4ed8";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ledPositions.forEach(([lx, ly]) => {
+        ctx.fillStyle = "#1e293b";
+        ctx.fillRect(lx - 5, ly - 5, 10, 10);
         ctx.beginPath();
-        ctx.arc(lx, ly, 7, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+        ctx.arc(lx, ly, 3.8, 0, Math.PI * 2);
+        ctx.fillStyle = isLedOn ? "#ffffff" : "#cbd5e1";
         ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-    });
+      });
 
-    // ------------------------------------------
-    // THE REALISTIC TCS3200 IC CHIP (CENTER)
-    // ------------------------------------------
-    const icSize = 42;
-    const icX = sensX + sensW / 2 - icSize / 2;
-    const icY = sensY + sensH / 2 - icSize / 2;
+      const icSize = 36;
+      const icX = sensX + sensW / 2 - icSize / 2;
+      const icY = sensY + sensH / 2 - icSize / 2;
+      ctx.fillStyle = "#111827";
+      ctx.beginPath();
+      ctx.roundRect(icX, icY, icSize, icSize, 3);
+      ctx.fill();
+      ctx.strokeStyle = "#4b5563";
+      ctx.stroke();
 
-    // Solder Lead Pins (8 Pins: 4 Left, 4 Right)
-    for (let p = 0; p < 4; p++) {
-      const py = icY + 6 + p * 8.5;
-      ctx.fillStyle = "#94a3b8";
-      // Left pin
-      ctx.fillRect(icX - 4, py, 4, 3);
-      // Right pin
-      ctx.fillRect(icX + icSize, py, 4, 3);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "800 8.5px 'JetBrains Mono', monospace";
+      ctx.textAlign = "center";
+      ctx.fillText("TCS3200", sensX + sensW / 2, sensY + sensH - 6);
     }
-
-    // Black Epoxy Molded IC Package Body
-    const gradIc = ctx.createLinearGradient(icX, icY, icX + icSize, icY + icSize);
-    gradIc.addColorStop(0, "#1f2937");
-    gradIc.addColorStop(0.5, "#111827");
-    gradIc.addColorStop(1, "#030712");
-    ctx.fillStyle = gradIc;
-    ctx.beginPath();
-    ctx.roundRect(icX, icY, icSize, icSize, 3);
-    ctx.fill();
-    ctx.strokeStyle = "#4b5563";
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    // Pin 1 Index Notch Dot
-    ctx.beginPath();
-    ctx.arc(icX + 5, icY + 5, 1.5, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
-    ctx.fill();
-
-    // Recessed Gold Leadframe Cavity
-    const cavX = icX + 6;
-    const cavY = icY + 6;
-    const cavSize = icSize - 12;
-    ctx.fillStyle = "#78350f";
-    ctx.fillRect(cavX, cavY, cavSize, cavSize);
-    ctx.strokeStyle = "#d97706";
-    ctx.lineWidth = 0.8;
-    ctx.strokeRect(cavX, cavY, cavSize, cavSize);
-
-    // Gold Bond Wires at corners
-    ctx.strokeStyle = "#fde047";
-    ctx.lineWidth = 0.6;
-    ctx.beginPath();
-    ctx.moveTo(cavX - 2, cavY - 2); ctx.lineTo(cavX + 3, cavY + 3);
-    ctx.moveTo(cavX + cavSize + 2, cavY - 2); ctx.lineTo(cavX + cavSize - 3, cavY + 3);
-    ctx.moveTo(cavX - 2, cavY + cavSize + 2); ctx.lineTo(cavX + 3, cavY + cavSize - 3);
-    ctx.moveTo(cavX + cavSize + 2, cavY + cavSize + 2); ctx.lineTo(cavX + cavSize - 3, cavY + cavSize - 3);
-    ctx.stroke();
-
-    // 8x8 Silicon Photodiode Array Matrix (64 Micro-Filters)
-    const arrayStart = cavX + 3;
-    const cellSize = 2.4;
-    const cellGap = 0.9;
-    const gridDim = 8;
-
-    for (let r = 0; r < gridDim; r++) {
-      for (let c = 0; c < gridDim; c++) {
-        const mx = arrayStart + c * (cellSize + cellGap);
-        const my = arrayStart + r * (cellSize + cellGap);
-
-        // Standard TCS3200 8x8 Photodiode Filter Distribution
-        // 16 Red, 16 Green, 16 Blue, 16 Clear
-        let filterType = "clear";
-        const codeVal = (r % 2) * 2 + (c % 2);
-        if (codeVal === 0) filterType = "red";
-        else if (codeVal === 1) filterType = "blue";
-        else if (codeVal === 2) filterType = "clear";
-        else filterType = "green";
-
-        let cellColor = "#334155";
-        let isGlow = false;
-        if (filterType === "red") {
-          cellColor = state.filterChannel === "red" ? "#ef4444" : "#7f1d1d";
-          isGlow = state.filterChannel === "red" && state.powerSupplyOn;
-        } else if (filterType === "green") {
-          cellColor = state.filterChannel === "green" ? "#10b981" : "#064e3b";
-          isGlow = state.filterChannel === "green" && state.powerSupplyOn;
-        } else if (filterType === "blue") {
-          cellColor = state.filterChannel === "blue" ? "#38bdf8" : "#1e3a8a";
-          isGlow = state.filterChannel === "blue" && state.powerSupplyOn;
-        } else {
-          cellColor = state.filterChannel === "clear" ? "#f8fafc" : "#64748b";
-          isGlow = state.filterChannel === "clear" && state.powerSupplyOn;
-        }
-
-        ctx.fillStyle = cellColor;
-        ctx.fillRect(mx, my, cellSize, cellSize);
-
-        if (isGlow) {
-          ctx.strokeStyle = "#ffffff";
-          ctx.lineWidth = 0.4;
-          ctx.strokeRect(mx, my, cellSize, cellSize);
-        }
-      }
-    }
-
-    // Translucent Optical Glass Window Sheen over Sensor
-    const gradGlass = ctx.createLinearGradient(cavX, cavY, cavX + cavSize, cavY + cavSize);
-    gradGlass.addColorStop(0, "rgba(255, 255, 255, 0.3)");
-    gradGlass.addColorStop(0.4, "rgba(255, 255, 255, 0.05)");
-    gradGlass.addColorStop(1, "rgba(56, 189, 248, 0.15)");
-    ctx.fillStyle = gradGlass;
-    ctx.fillRect(cavX, cavY, cavSize, cavSize);
-
-    // Silkscreen Chip Label on PCB below IC
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "800 8.5px 'JetBrains Mono', monospace";
-    ctx.textAlign = "center";
-    ctx.fillText("TCS3200", sensX + sensW / 2, sensY + sensH - 8);
 
     // ==========================================
     // 3. TARGET SPECIMEN STAGE ON VERNIER RAIL (CENTER-RIGHT)

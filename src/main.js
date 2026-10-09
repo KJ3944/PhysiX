@@ -23,11 +23,14 @@ import { createColourSensorExperiment } from "./colour-sensor.js";
 import { createHallEffectExperiment } from "./hall-effect.js";
 import { createPhysicsSandboxExperiment } from "./sandbox/sandbox-experiment.js";
 import { createDiffractionGratingExperiment } from "./diffraction-grating.js";
+import { createDiodeExperiment } from "./diode-vi.js";
 import {
   tutorialManager,
   normalizeExpId,
   isExperimentTutorialCompleted,
-  markExperimentTutorialCompleted
+  markExperimentTutorialCompleted,
+  syncTutorialsWithCloud,
+  setAuthReadyPromise
 } from "./tutorial-manager.js";
 import { initSplashScreen } from "./splash.js";
 import { initHomepage } from "./homepage/homepage.js";
@@ -35,6 +38,7 @@ import { initPhysixLogoAnimation } from "./logo-animation.js";
 import { generateLabReportPdf } from "./pdf-export.js";
 import { initContentProtection } from "./content-protection.js";
 import { EXPERIMENT_DETAILS } from "./experiment-details-data.js";
+import { renderMathInText, renderMathInElement } from "./math-renderer.js";
 import {
   initCelebrations,
   showLevelUpCelebration,
@@ -56,6 +60,7 @@ import {
   onNetworkChange,
   setNetworkStatusOverride
 } from "./offline-manager.js";
+import { updateManager } from "./update-manager.js";
 import {
   syncUserToFirestore,
   recordExperimentInFirestore,
@@ -79,6 +84,15 @@ let activeAuthoritativeCompletedChallenges = [];
 const inFlightChallenges = new Set();
 const inFlightBadges = new Set();
 let userDocUnsubscribe = null;
+
+let resolveAuthReady;
+export const authReadyPromise = new Promise((res) => {
+  resolveAuthReady = res;
+});
+setAuthReadyPromise(authReadyPromise);
+setTimeout(() => {
+  if (resolveAuthReady) resolveAuthReady(auth.currentUser);
+}, 1200);
 
 export function getAuthoritativeUserXp(uid) {
   if (typeof activeAuthoritativeXp === "number") {
@@ -340,6 +354,7 @@ let colourSensorExperimentInstance = null;
 let hallEffectExperimentInstance = null;
 let physicsSandboxExperimentInstance = null;
 let diffractionExperimentInstance = null;
+let diodeExperimentInstance = null;
 
 // Help & Interactive User Guide DOM Elements
 const helpModal = document.getElementById("help-modal");
@@ -920,7 +935,7 @@ function drawCoordinateGrid(ctx) {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    ctx.fillStyle = isLight ? "#64748b" : "#506080";
+    ctx.fillStyle = isLight ? "#334155" : "#506080";
     ctx.textAlign = "right";
     ctx.fillText(`${h}m`, ORIGIN_X - 10, y + 4);
   }
@@ -1277,6 +1292,12 @@ function getActiveUserId() {
   }
   return auth.currentUser.uid;
 }
+
+// Early binding for tutorialManager user scoping
+tutorialManager.init({
+  getActiveUserId,
+  showToast
+});
 
 async function checkBackendStatus() {
   try {
@@ -1668,6 +1689,22 @@ function syncChallengeToLocalState(challengeId, persistToStorage = true) {
       diffractionExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
     }
   }
+
+  // Exp 6: Diode V-I Characteristics
+  if (challengeId.startsWith("diode.")) {
+    const diodeKey = challengeId.replace("diode.", "");
+    if (persistToStorage && canPerformCloudOperation()) {
+      try {
+        const savedDiode = JSON.parse(localStorage.getItem("physix_diode_challenges") || "{}");
+        if (!savedDiode[diodeKey]) savedDiode[diodeKey] = {};
+        savedDiode[diodeKey].completed = true;
+        localStorage.setItem("physix_diode_challenges", JSON.stringify(savedDiode));
+      } catch (e) {}
+    }
+    if (diodeExperimentInstance && typeof diodeExperimentInstance.hydrateChallenges === "function") {
+      diodeExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+    }
+  }
 }
 
 export async function completeChallengeAuthoritatively({ challengeId, xp, badgeId, badgeTitle, title }) {
@@ -1896,6 +1933,23 @@ function hydrateAllExperimentChallenges(completedChallengeIds) {
 
   if (diffractionExperimentInstance && typeof diffractionExperimentInstance.hydrateChallenges === "function") {
     diffractionExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+  }
+
+  // 6. Exp 6: Diode V-I Characteristics
+  try {
+    const savedDiode = JSON.parse(localStorage.getItem("physix_diode_challenges") || "{}");
+    const diodeKeys = ["setRangesFwd", "connectFwd", "recordFwd", "setRangesRev", "connectRev", "recordRev", "generateFwdCurve", "generateRevCurve"];
+    diodeKeys.forEach(k => {
+      if (set.has(`diode.${k}`)) {
+        if (!savedDiode[k]) savedDiode[k] = {};
+        savedDiode[k].completed = true;
+      }
+    });
+    localStorage.setItem("physix_diode_challenges", JSON.stringify(savedDiode));
+  } catch (e) {}
+
+  if (diodeExperimentInstance && typeof diodeExperimentInstance.hydrateChallenges === "function") {
+    diodeExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
   }
 }
 
@@ -3713,7 +3767,7 @@ function renderQuizQuestion(index) {
     card.innerHTML = `
       <div style="display:flex; align-items:center; gap:12px;">
         <span class="quiz-option-marker">${letters[optIdx]}</span>
-        <span>${opt}</span>
+        <span>${renderMathInText(opt)}</span>
       </div>
       <span style="font-size:18px;">${opt === chosenOption ? "●" : "○"}</span>
     `;
@@ -4169,6 +4223,7 @@ function switchHelpTab(tabIndex) {
       if (idx === tabIndex - 1) {
         pane.classList.remove("hidden");
         pane.classList.add("active");
+        renderMathInElement(pane);
       } else {
         pane.classList.add("hidden");
         pane.classList.remove("active");
@@ -4200,6 +4255,7 @@ btnOpenHelp?.addEventListener("click", () => {
     switchHelpTab(1);
   }
   helpModal?.classList.remove("hidden");
+  if (helpModal) renderMathInElement(helpModal);
 });
 
 btnCloseHelp?.addEventListener("click", () => {
@@ -4278,6 +4334,24 @@ function getLiveSimulationContext() {
       maxOrder: dgState.maxObservableOrder || 3,
       isMysteryMode: !!dgState.isMysteryMode,
       observationsCount: Array.isArray(dgState.observations) ? dgState.observations.length : 0
+    };
+  }
+
+  if ((activeExperimentId === "diode" || activeExperimentId === "diode-vi") && diodeExperimentInstance) {
+    const dState = diodeExperimentInstance.getState();
+    return {
+      experiment: "Diode V-I Characteristics",
+      activeLab: "Voltage-Current Characteristics of Forward and Reverse Biased P-N Junction Diode",
+      mode: dState.mode,
+      powerOn: dState.powerOn,
+      circuitValid: dState.circuitValid,
+      forwardVoltage: dState.vf,
+      reverseVoltage: dState.vr,
+      forwardCurrentMa: dState.ifMa,
+      reverseCurrentUa: dState.irUa,
+      voltmeterRange: dState.vRange,
+      ammeterRange: dState.iRange,
+      observationsCount: dState.observationsCount
     };
   }
 
@@ -4643,12 +4717,14 @@ const expColourSection = document.getElementById("exp-colour-sensor-section");
 const expHallSection = document.getElementById("exp-hall-effect-section");
 const expSandboxSection = document.getElementById("exp-sandbox-section");
 const expDiffractionSection = document.getElementById("exp-diffraction-section");
+const expDiodeSection = document.getElementById("exp-diode-section");
 const btnSwitchProj = document.getElementById("btn-switch-exp-projectile");
 const btnSwitchOpt = document.getElementById("btn-switch-exp-optical");
 const btnSwitchColour = document.getElementById("btn-switch-exp-colour");
 const btnSwitchHall = document.getElementById("btn-switch-exp-hall");
 const btnSwitchSandbox = document.getElementById("btn-switch-exp-sandbox");
 const btnSwitchDiffraction = document.getElementById("btn-switch-exp-diffraction");
+const btnSwitchDiode = document.getElementById("btn-switch-exp-diode");
 
 async function trackExperimentEngagement(expId) {
   if (!canPerformCloudOperation()) return;
@@ -4693,7 +4769,8 @@ async function trackExperimentEngagement(expId) {
 
 function switchExperiment(expId, updateUrl = true) {
   let normalizedId = expId;
-  if (expId === "diffraction-grating") normalizedId = "diffraction";
+  if (expId === "diode" || expId === "diode-vi" || expId === "pn-junction") normalizedId = "diode";
+  else if (expId === "diffraction-grating") normalizedId = "diffraction";
   else if (expId === "optical-fibre") normalizedId = "optical";
   else if (expId === "physics-sandbox") normalizedId = "sandbox";
 
@@ -4706,6 +4783,7 @@ function switchExperiment(expId, updateUrl = true) {
   expHallSection?.classList.add("hidden");
   expSandboxSection?.classList.add("hidden");
   expDiffractionSection?.classList.add("hidden");
+  expDiodeSection?.classList.add("hidden");
 
   btnSwitchProj?.classList.remove("active");
   btnSwitchOpt?.classList.remove("active");
@@ -4713,10 +4791,13 @@ function switchExperiment(expId, updateUrl = true) {
   btnSwitchHall?.classList.remove("active");
   btnSwitchSandbox?.classList.remove("active");
   btnSwitchDiffraction?.classList.remove("active");
+  btnSwitchDiode?.classList.remove("active");
 
-  const routeSlug = normalizedId === "diffraction"
-    ? "diffraction-grating"
-    : (normalizedId === "optical" ? "optical-fibre" : normalizedId);
+  const routeSlug = normalizedId === "diode"
+    ? "diode-vi"
+    : (normalizedId === "diffraction"
+      ? "diffraction-grating"
+      : (normalizedId === "optical" ? "optical-fibre" : normalizedId));
 
   if (updateUrl && !document.body.classList.contains("on-homepage")) {
     const targetUrl = `/simulations/${routeSlug}`;
@@ -4765,7 +4846,7 @@ function switchExperiment(expId, updateUrl = true) {
       diffractionExperimentInstance.renderAll();
     }
 
-    showToast("Switched to Exp 5: Diffraction Grating");
+    showToast("Switched to Exp 4: Diffraction Grating");
   } else if (normalizedId === "sandbox") {
     expSandboxSection?.classList.remove("hidden");
     btnSwitchSandbox?.classList.add("active");
@@ -4920,6 +5001,47 @@ function switchExperiment(expId, updateUrl = true) {
     }
 
     showToast("Switched to Exp 2: Numerical Aperture of Optical Fibre");
+  } else if (normalizedId === "diode") {
+    expDiodeSection?.classList.remove("hidden");
+    btnSwitchDiode?.classList.add("active");
+
+    if (!diodeExperimentInstance) {
+      diodeExperimentInstance = createDiodeExperiment({
+        onXpAwarded: (amount, reason) => addStudentXp(amount, reason),
+        onExperimentRecorded: (id, data) => {
+          if (auth.currentUser && canPerformCloudOperation()) {
+            recordExperimentInFirestore(auth.currentUser.uid, id, data).then(res => {
+              if (res && typeof res.totalXP === "number") {
+                setAuthoritativeUserXp(auth.currentUser.uid, res.totalXP);
+                loadUserProfile();
+              }
+              if (res && res.experimentsPerformed >= 5) {
+                unlockBadge("badge-lab-veteran", "Laboratory Veteran (Explored Labs 5+ Times)");
+              }
+            }).catch(() => {});
+          }
+        },
+        showToast,
+        getActiveUserId,
+        loadUserProfile,
+        getStoredUserProfile,
+        unlockBadge: (badgeId, badgeName) => unlockBadge(badgeId, badgeName),
+        isUserAuthenticated,
+        openLoginModal,
+        onChallengeCompleted: (data) => completeChallengeAuthoritatively(data)
+      });
+      diodeExperimentInstance.init();
+      if (activeAuthoritativeCompletedChallenges.length > 0 && typeof diodeExperimentInstance.hydrateChallenges === "function") {
+        diodeExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+      }
+    } else {
+      if (activeAuthoritativeCompletedChallenges.length > 0 && typeof diodeExperimentInstance.hydrateChallenges === "function") {
+        diodeExperimentInstance.hydrateChallenges(activeAuthoritativeCompletedChallenges);
+      }
+      diodeExperimentInstance.renderAll();
+    }
+
+    showToast("Switched to Exp 5: Diode V-I Characteristics");
   } else {
     expProjSection?.classList.remove("hidden");
     btnSwitchProj?.classList.add("active");
@@ -4939,6 +5061,7 @@ btnSwitchColour?.addEventListener("click", () => switchExperiment("colour-sensor
 btnSwitchHall?.addEventListener("click", () => switchExperiment("hall-effect"));
 btnSwitchSandbox?.addEventListener("click", () => switchExperiment("sandbox"));
 btnSwitchDiffraction?.addEventListener("click", () => switchExperiment("diffraction"));
+btnSwitchDiode?.addEventListener("click", () => switchExperiment("diode"));
 
 // ==========================================
 // LAB & EXPERIMENT CARDS INTERACTION & WHITE LIGHT EFFECT
@@ -5069,6 +5192,11 @@ function applyTheme(theme) {
     colourSensorExperimentInstance.renderAll();
   }
 
+  // Update Physics Sandbox (Exp 4) simulation canvases & graphs
+  if (physicsSandboxExperimentInstance) {
+    physicsSandboxExperimentInstance.renderAll();
+  }
+
   // Update Diffraction Grating (Exp 5) simulation canvases
   if (diffractionExperimentInstance) {
     diffractionExperimentInstance.renderAll();
@@ -5119,16 +5247,19 @@ function updateAuthStateRestrictions() {
   const challengesCardExp3 = document.querySelector("#exp-colour-sensor-section .challenges-card");
   const challengesCardExp4 = document.querySelector("#exp-hall-effect-section .challenges-card");
   const challengesCardExp5 = document.querySelector("#exp-diffraction-section .challenges-card");
+  const challengesCardExp6 = document.querySelector("#exp-diode-section .challenges-card");
   if (isAuth) {
     challengesCardExp2?.classList.remove("challenges-locked");
     challengesCardExp3?.classList.remove("challenges-locked");
     challengesCardExp4?.classList.remove("challenges-locked");
     challengesCardExp5?.classList.remove("challenges-locked");
+    challengesCardExp6?.classList.remove("challenges-locked");
   } else {
     challengesCardExp2?.classList.add("challenges-locked");
     challengesCardExp3?.classList.add("challenges-locked");
     challengesCardExp4?.classList.add("challenges-locked");
     challengesCardExp5?.classList.add("challenges-locked");
+    challengesCardExp6?.classList.add("challenges-locked");
   }
 
   if (opticalExperimentInstance) {
@@ -5159,6 +5290,12 @@ function updateAuthStateRestrictions() {
     diffractionExperimentInstance.renderAll();
     if (diffractionExperimentInstance.renderChallengesDom) {
       diffractionExperimentInstance.renderChallengesDom();
+    }
+  }
+  if (diodeExperimentInstance) {
+    diodeExperimentInstance.renderAll();
+    if (diodeExperimentInstance.renderChallengesDom) {
+      diodeExperimentInstance.renderChallengesDom();
     }
   }
 
@@ -5245,6 +5382,10 @@ async function completeVerifiedUserInitialization(user) {
           cloudXp = cUser.totalXP;
         } else if (typeof cUser.xp === "number") {
           cloudXp = cUser.xp;
+        }
+
+        if (cUser.tutorialsCompleted) {
+          syncTutorialsWithCloud(user.uid, cUser.tutorialsCompleted);
         }
 
         // Sync authoritative cloud badges to user-scoped local storage
@@ -5366,6 +5507,10 @@ async function completeVerifiedUserInitialization(user) {
         renderChallenges();
       }
 
+      if (cloudUser.tutorialsCompleted) {
+        syncTutorialsWithCloud(user.uid, cloudUser.tutorialsCompleted);
+      }
+
       if (Array.isArray(cloudUser.completedChallenges)) {
         const hasDiff = cloudUser.completedChallenges.length !== activeAuthoritativeCompletedChallenges.length ||
           cloudUser.completedChallenges.some(id => !activeAuthoritativeCompletedChallenges.includes(id));
@@ -5406,6 +5551,9 @@ async function completeVerifiedUserInitialization(user) {
 
 // Listen to Firebase Auth state transitions
 onAuthStateChanged(auth, async (user) => {
+  if (resolveAuthReady) {
+    resolveAuthReady(user);
+  }
   if (user) {
     if (isEmailVerificationRequired(user)) {
       // Unverified email/password user: block access and do not initialize/sync Firestore data
@@ -5428,8 +5576,20 @@ onAuthStateChanged(auth, async (user) => {
     hydrateAllExperimentChallenges([]);
     hideVerificationOverlay();
     updateAuthStateRestrictions();
+    await processUserDailyStreak(null);
     loadUserProfile();
     renderChallenges();
+  }
+});
+
+// Refresh daily streak when returning to tab (e.g. across midnight boundary)
+document.addEventListener("visibilitychange", async () => {
+  if (document.visibilityState === "visible") {
+    try {
+      const currentUser = auth?.currentUser || null;
+      await processUserDailyStreak(currentUser);
+      loadUserProfile();
+    } catch (e) {}
   }
 });
 
@@ -5483,6 +5643,8 @@ export function openExperimentDetailsPage(expId) {
   if (obsContent) obsContent.innerHTML = data.observations || "";
   if (resultContent) resultContent.innerHTML = data.result || "";
   renderMathInDOM(detailPage);
+
+  renderMathInElement(detailPage);
 
   // Hide other pages & modals
   document.body.classList.remove("on-homepage");
@@ -5671,7 +5833,8 @@ export function handleRoute(path = window.location.pathname, hash = window.locat
     document.body.classList.remove("on-standalone-page");
     physixHome?.classList.add("hidden");
     let mappedId = expId;
-    if (expId === "diffraction-grating" || expId === "diffraction") mappedId = "diffraction";
+    if (expId === "diode" || expId === "diode-vi" || expId === "pn-junction") mappedId = "diode";
+    else if (expId === "diffraction-grating" || expId === "diffraction") mappedId = "diffraction";
     else if (expId === "optical-fibre" || expId === "optical") mappedId = "optical";
     else if (expId === "colour-sensor") mappedId = "colour-sensor";
     else if (expId === "sandbox" || expId === "physics-sandbox") mappedId = "sandbox";
@@ -5702,7 +5865,8 @@ export function handleRoute(path = window.location.pathname, hash = window.locat
     document.body.classList.remove("on-standalone-page");
     physixHome?.classList.add("hidden");
     let mapped = cleanHash.replace("#", "");
-    if (mapped === "diffraction-grating") mapped = "diffraction";
+    if (mapped === "diode-vi" || mapped === "pn-junction") mapped = "diode";
+    else if (mapped === "diffraction-grating") mapped = "diffraction";
     switchExperiment(mapped, false);
   } else {
     // Default to Homepage
@@ -5835,6 +5999,9 @@ initPwaSystem().then(() => {
   // Connect offline-manager's accurate network status to user-data-service
   setNetworkStatusOverride(() => canPerformCloudOperation());
 }).catch(err => console.warn("[PWA] Initialization error:", err));
+
+// Initialize Deployment Update Manager (Version detection & notification modal)
+updateManager.init();
 
 // Listen for network changes to handle transitions
 onNetworkChange((isOnline, quality) => {

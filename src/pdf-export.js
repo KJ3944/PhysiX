@@ -141,9 +141,13 @@ export function generateLabReportPdf(config = {}) {
       studentName = "Student Physicist",
       studentEmail = "guest@physix.lab",
       studentRole = "Student Researcher",
+      aim = null,
+      apparatus = null,
       summaryMetrics = [],
       columns = [],
       rows = [],
+      tables = null,
+      graphs = null,
       filename = "PhysiX_Observation_Report.pdf",
       orientation = "portrait"
     } = config;
@@ -256,7 +260,28 @@ export function generateLabReportPdf(config = {}) {
     doc.setTextColor(15, 23, 42);
     doc.text(`${dateStr} • ${timeStr}`, margin + colWidth * 2 + 4, currentY + 13);
 
-    currentY += cardHeight + 8;
+    currentY += cardHeight + 6;
+
+    // Optional Aim & Apparatus Block
+    if (aim || apparatus) {
+      doc.setFillColor(241, 245, 249);
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.2);
+      
+      const contentLines = [];
+      if (aim) contentLines.push(`AIM: ${aim}`);
+      if (apparatus) contentLines.push(`APPARATUS: ${apparatus}`);
+      
+      const splitText = doc.splitTextToSize(contentLines.join("\n"), pageWidth - margin * 2 - 8);
+      const aimBoxHeight = Math.max(12, splitText.length * 3.8 + 5);
+      
+      doc.roundedRect(margin, currentY, pageWidth - margin * 2, aimBoxHeight, 2, 2, "FD");
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.setTextColor(51, 65, 85);
+      doc.text(splitText, margin + 4, currentY + 4.5);
+      currentY += aimBoxHeight + 6;
+    }
 
     // ==========================================
     // 4. SUMMARY METRIC KPI TILES (IF PROVIDED)
@@ -294,49 +319,122 @@ export function generateLabReportPdf(config = {}) {
     }
 
     // ==========================================
-    // 5. STRUCTURED OBSERVATION TABLE (AUTOTABLE)
+    // 5. STRUCTURED OBSERVATION TABLES (AUTOTABLE)
     // ==========================================
-    const tableOptions = {
-      startY: currentY,
-      margin: { left: margin, right: margin, bottom: 22 },
-      head: [columns],
-      body: rows,
-      theme: "grid",
-      headStyles: {
-        fillColor: [15, 23, 42], // slate-900
-        textColor: [255, 255, 255],
-        font: "helvetica",
-        fontStyle: "bold",
-        fontSize: 8,
-        cellPadding: 2.8,
-        halign: "center",
-        valign: "middle",
-        lineColor: [51, 65, 85],
-        lineWidth: 0.2
-      },
-      bodyStyles: {
-        font: "helvetica",
-        fontSize: 7.5,
-        textColor: [30, 41, 59],
-        cellPadding: 2.5,
-        halign: "center",
-        valign: "middle",
-        lineColor: [226, 232, 240],
-        lineWidth: 0.15
-      },
-      alternateRowStyles: {
-        fillColor: [248, 250, 252] // slate-50
-      },
-      styles: {
-        overflow: "linebreak",
-        cellWidth: "auto"
+    const renderTable = (tblCols, tblRows, title = "") => {
+      if (title) {
+        if (currentY + 14 > pageHeight - 24) {
+          doc.addPage();
+          currentY = 24;
+        }
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        doc.setTextColor(15, 23, 42);
+        doc.text(title, margin, currentY);
+        currentY += 4.5;
       }
+
+      const tableOptions = {
+        startY: currentY,
+        margin: { left: margin, right: margin, bottom: 22 },
+        head: [tblCols],
+        body: tblRows,
+        theme: "grid",
+        headStyles: {
+          fillColor: [15, 23, 42], // slate-900
+          textColor: [255, 255, 255],
+          font: "helvetica",
+          fontStyle: "bold",
+          fontSize: 8,
+          cellPadding: 2.5,
+          halign: "center",
+          valign: "middle",
+          lineColor: [51, 65, 85],
+          lineWidth: 0.2
+        },
+        bodyStyles: {
+          font: "helvetica",
+          fontSize: 7.5,
+          textColor: [30, 41, 59],
+          cellPadding: 2.2,
+          halign: "center",
+          valign: "middle",
+          lineColor: [226, 232, 240],
+          lineWidth: 0.15
+        },
+        alternateRowStyles: {
+          fillColor: [248, 250, 252] // slate-50
+        },
+        styles: {
+          overflow: "linebreak",
+          cellWidth: "auto"
+        }
+      };
+
+      if (typeof autoTable === "function") {
+        autoTable(doc, tableOptions);
+      } else if (doc.autoTable) {
+        doc.autoTable(tableOptions);
+      }
+
+      currentY = (doc.lastAutoTable ? doc.lastAutoTable.finalY : currentY) + 7;
     };
 
-    if (typeof autoTable === "function") {
-      autoTable(doc, tableOptions);
-    } else if (doc.autoTable) {
-      doc.autoTable(tableOptions);
+    if (Array.isArray(tables) && tables.length > 0) {
+      tables.forEach(tbl => {
+        renderTable(tbl.columns || [], tbl.rows || [], tbl.title || "");
+      });
+    } else if (columns && columns.length > 0) {
+      renderTable(columns, rows);
+    }
+
+    // ==========================================
+    // 5B. SCIENTIFIC GRAPHS (IF PROVIDED)
+    // ==========================================
+    if (Array.isArray(graphs) && graphs.length > 0) {
+      graphs.forEach(g => {
+        const imgW = g.width || (pageWidth - margin * 2);
+        const imgH = g.height || 62;
+        const requiredSpace = imgH + 18;
+
+        if (currentY + requiredSpace > pageHeight - 22) {
+          doc.addPage();
+          currentY = 24;
+        }
+
+        if (g.title) {
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(9.5);
+          doc.setTextColor(15, 23, 42);
+          doc.text(g.title, margin, currentY);
+          currentY += 4;
+        }
+
+        if (g.imageData) {
+          try {
+            // Draw background card for graph
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(226, 232, 240);
+            doc.setLineWidth(0.3);
+            doc.roundedRect(margin, currentY, imgW, imgH, 2, 2, "FD");
+
+            doc.addImage(g.imageData, "PNG", margin + 1, currentY + 1, imgW - 2, imgH - 2);
+            currentY += imgH + 2;
+
+            if (g.caption) {
+              doc.setFont("helvetica", "italic");
+              doc.setFontSize(7);
+              doc.setTextColor(100, 116, 139);
+              doc.text(g.caption, margin + 2, currentY + 3.5);
+              currentY += 6;
+            } else {
+              currentY += 3;
+            }
+          } catch (imgErr) {
+            console.warn("[PDF Export] Could not embed graph image:", imgErr);
+          }
+        }
+      });
     }
 
     // ==========================================

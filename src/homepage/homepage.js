@@ -362,30 +362,43 @@ export function initHomepage(options = {}) {
         const dx = p.x - mouse.x;
         const dy = p.y - mouse.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const radius = p.layer === 2 ? 190 : 130;
+        // Subtle, restrained influence radius — gentle enough to feel atmospheric
+        const radius = p.layer === 2 ? 80 : 55;
 
         if (dist < radius && dist > 1) {
-          // Repulsion vector
+          // Gentle repulsion — low magnitude so particles drift, not flee
           const normDx = dx / dist;
           const normDy = dy / dist;
-          const repelMag = Math.pow(1 - dist / radius, 2) * (p.layer === 2 ? 140 : 60) * cursorIntensity;
+          const repelMag = Math.pow(1 - dist / radius, 2) * (p.layer === 2 ? 12 : 6) * cursorIntensity;
 
-          // Subtle vortex curl (perpendicular component)
-          const curlX = -normDy * repelMag * 0.35;
-          const curlY = normDx * repelMag * 0.35;
+          // Very subtle vortex curl for natural independence
+          const curlX = -normDy * repelMag * 0.2;
+          const curlY = normDx * repelMag * 0.2;
 
           p.vx += (normDx * repelMag + curlX) * dt;
           p.vy += (normDy * repelMag + curlY) * dt;
         }
       }
 
+      // Gentle independent micro-drift so particles never fully synchronize
+      p.vx += (Math.random() - 0.5) * 0.02 * dt;
+      p.vy += (Math.random() - 0.5) * 0.02 * dt;
+
       // Restoring Spring Force back toward equilibrium
-      const springK = p.layer === 2 ? 3.8 : 2.5;
-      const damp = 0.91;
+      const springK = p.layer === 2 ? 2.2 : 1.6;
+      const damp = 0.88;
       p.vx += (eqX - p.x) * springK * dt;
       p.vy += (eqY - p.y) * springK * dt;
       p.vx *= damp;
       p.vy *= damp;
+
+      // Soft velocity cap to prevent runaway clustering
+      const maxVel = p.layer === 2 ? 0.9 : 0.5;
+      const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+      if (speed > maxVel) {
+        p.vx = (p.vx / speed) * maxVel;
+        p.vy = (p.vy / speed) * maxVel;
+      }
 
       p.x += p.vx;
       p.y += p.vy;

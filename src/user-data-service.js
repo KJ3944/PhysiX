@@ -702,6 +702,10 @@ export function getExperimentNameById(id) {
     case "exp-diffraction":
     case "exp-diffraction-grating":
       return "Diffraction Grating";
+    case "diode":
+    case "diode-vi":
+    case "exp-diode":
+      return "Diode V-I Characteristics";
     default:
       return id;
   }

@@ -1033,16 +1033,24 @@ export function createPhysicsSandboxExperiment(callbacks = {}) {
 
     ctx.clearRect(0, 0, w, h);
 
-    // 1. Deep Space Canvas Background with Atmospheric Vignette
+    const isLight = document.documentElement.getAttribute("data-theme") === "light";
+
+    // 1. Canvas Background with Atmospheric Vignette
     const bgGrad = ctx.createRadialGradient(w / 2, h * 0.4, 40, w / 2, h * 0.5, w * 0.7);
-    bgGrad.addColorStop(0, "#08122c");
-    bgGrad.addColorStop(0.55, "#040816");
-    bgGrad.addColorStop(1, "#020309");
+    if (isLight) {
+      bgGrad.addColorStop(0, "#ffffff");
+      bgGrad.addColorStop(0.55, "#f0f9ff");
+      bgGrad.addColorStop(1, "#e0f2fe");
+    } else {
+      bgGrad.addColorStop(0, "#08122c");
+      bgGrad.addColorStop(0.55, "#040816");
+      bgGrad.addColorStop(1, "#020309");
+    }
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, w, h);
 
     // 2. Coordinate Grid & Measurement Markings (1m and 5m lines)
-    ctx.strokeStyle = "rgba(56, 189, 248, 0.08)";
+    ctx.strokeStyle = isLight ? "rgba(14, 165, 233, 0.16)" : "rgba(56, 189, 248, 0.08)";
     ctx.lineWidth = 1;
     ctx.setLineDash([2, 4]);
 
@@ -1064,7 +1072,7 @@ export function createPhysicsSandboxExperiment(callbacks = {}) {
     ctx.setLineDash([]);
 
     // Major 5m Axis Markers
-    ctx.fillStyle = "rgba(125, 211, 252, 0.4)";
+    ctx.fillStyle = isLight ? "rgba(2, 132, 199, 0.75)" : "rgba(125, 211, 252, 0.4)";
     ctx.font = "10px 'JetBrains Mono', monospace";
     ctx.textAlign = "left";
     for (let m = 0; m <= state.worldWidthMeters; m += 2) {
@@ -1327,9 +1335,11 @@ export function createPhysicsSandboxExperiment(callbacks = {}) {
    * Canvas Top HUD Badges
    */
   function renderCanvasHUD(w, h) {
+    const isLight = document.documentElement.getAttribute("data-theme") === "light";
+
     // Mode badge at top left
-    ctx.fillStyle = "rgba(4, 8, 22, 0.85)";
-    ctx.strokeStyle = "rgba(56, 189, 248, 0.35)";
+    ctx.fillStyle = isLight ? "rgba(255, 255, 255, 0.92)" : "rgba(4, 8, 22, 0.85)";
+    ctx.strokeStyle = isLight ? "rgba(14, 165, 233, 0.45)" : "rgba(56, 189, 248, 0.35)";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.roundRect(14, 14, 250, 26, 8);
@@ -1341,7 +1351,7 @@ export function createPhysicsSandboxExperiment(callbacks = {}) {
     ctx.arc(26, 27, 4, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = "#f8fafc";
+    ctx.fillStyle = isLight ? "#0f172a" : "#f8fafc";
     ctx.font = "bold 10px 'Orbitron', monospace";
     ctx.textAlign = "left";
     ctx.fillText(
@@ -1352,7 +1362,7 @@ export function createPhysicsSandboxExperiment(callbacks = {}) {
 
     // Coordinate Reference Legend at bottom right
     ctx.textAlign = "right";
-    ctx.fillStyle = "rgba(148, 163, 184, 0.7)";
+    ctx.fillStyle = isLight ? "rgba(71, 85, 105, 0.9)" : "rgba(148, 163, 184, 0.7)";
     ctx.font = "10px 'JetBrains Mono', monospace";
     ctx.fillText("Coordinate Origin: Ground Level (y = 0m)", w - 16, h - 12);
   }
@@ -1881,6 +1891,7 @@ export function createPhysicsSandboxExperiment(callbacks = {}) {
     renderAll: () => {
       handleResize();
       renderCanvas();
+      if (graphs) graphs.render();
       updateUI();
       renderChallengesDom();
     },

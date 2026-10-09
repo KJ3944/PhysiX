@@ -162,33 +162,26 @@ async function registerServiceWorker() {
     console.log("[PWA] Service Worker registered:", registration.scope);
     registration.update().catch(() => {});
 
-    // Handle updates
+    // Handle updates via updateManager rather than abrupt automatic reload
     registration.addEventListener("updatefound", () => {
       const newWorker = registration.installing;
       if (!newWorker) return;
 
       newWorker.addEventListener("statechange", () => {
-        if (newWorker.state === "installed") {
-          newWorker.postMessage("SKIP_WAITING");
-          if (navigator.serviceWorker.controller) {
-            console.log("[PWA] New version activated");
+        if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+          console.log("[PWA] New version installed and waiting for user refresh.");
+          if (typeof window !== "undefined" && window.__PHYSIX_NOTIFY_UPDATE__) {
+            window.__PHYSIX_NOTIFY_UPDATE__("Service Worker ready");
           }
         }
       });
     });
 
-    // Listen for controller change (new SW took control)
-    let refreshing = false;
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if (refreshing) return;
-      refreshing = true;
-      window.location.reload();
-    });
-
     // Check for updates periodically
     setInterval(() => {
       registration.update().catch(() => {});
-    }, 60 * 60 * 1000); // Every hour
+    }, 15 * 60 * 1000); // Every 15 minutes
+
 
     // Cache current page scripts and styles once SW is active
     if (navigator.onLine) {

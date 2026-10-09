@@ -22,10 +22,10 @@ export const EXPERIMENT_DETAILS = {
         <p>A projectile is any object projected into space with an initial velocity and subsequently subject solely to the force of gravity and (optionally) air resistance. According to Galilean invariance and Newtonian mechanics, two-dimensional projectile motion can be resolved into two mutually independent, orthogonal component motions:</p>
         <ul class="manual-list">
           <li><strong>Horizontal Motion (x-axis):</strong> In the absence of aerodynamic drag, no horizontal force acts on the projectile (F<sub>x</sub> = 0). Thus, horizontal acceleration a<sub>x</sub> = 0, and the horizontal velocity remains strictly uniform throughout flight:
-            <div class="math-callout">v<sub>x</sub>(t) = v₀ · cos(θ) = constant</div>
+            <div class="math-callout">v_x(t) = v_0 \cos(\theta) = \text{constant}</div>
           </li>
           <li><strong>Vertical Motion (y-axis):</strong> The projectile experiences a continuous, downward gravitational acceleration (a<sub>y</sub> = −g). The vertical velocity decreases uniformly until reaching zero at the peak apex, reversing direction as it descends:
-            <div class="math-callout">v<sub>y</sub>(t) = v₀ · sin(θ) − g · t</div>
+            <div class="math-callout">v_y(t) = v_0 \sin(\theta) - gt</div>
           </li>
         </ul>
       </div>
@@ -33,17 +33,17 @@ export const EXPERIMENT_DETAILS = {
       <div class="theory-block">
         <h3>2. Derivation of Parabolic Trajectory Equation</h3>
         <p>Let the projectile be launched from an initial coordinate (d₀, h₀) with speed v₀ at angle θ to the horizontal plane. The parametric displacement equations as a function of elapsed time t are:</p>
-        <div class="math-callout">x(t) = d₀ + (v₀ · cos θ) · t &nbsp;⟹&nbsp; t = (x − d₀) / (v₀ · cos θ)</div>
-        <div class="math-callout">y(t) = h₀ + (v₀ · sin θ) · t − ½ g · t²</div>
+        <div class="math-callout">x(t) = d_0 + (v_0 \cos\theta)t \implies t = \frac{x - d_0}{v_0 \cos\theta}</div>
+        <div class="math-callout">y(t) = h_0 + (v_0 \sin\theta)t - \frac{1}{2}gt^2</div>
         <p>Substituting t into the vertical displacement equation yields the Cartesian trajectory equation:</p>
-        <div class="math-callout formula-highlight">y(x) = h₀ + (x − d₀) · tan(θ) − [g · (x − d₀)²] / [2 · v₀² · cos²(θ)]</div>
+        <div class="math-callout formula-highlight">y(x) = h_0 + (x - d_0)\tan(\theta) - \frac{g(x - d_0)^2}{2v_0^2 \cos^2(\theta)}</div>
         <p>Because this equation is quadratic in x with a negative second-degree coefficient (−g / [2v₀² cos²θ]), the geometric path traced by the projectile is an exact downward-opening <strong>parabola</strong>.</p>
       </div>
 
       <div class="theory-block">
         <h3>3. Condition for Maximum Range</h3>
         <p>For a level terrain launch (h₀ = 0), setting y = 0 yields the horizontal range R = (v₀² · sin 2θ) / g. Differentiating R with respect to θ and setting dR/dθ = 0 gives:</p>
-        <div class="math-callout">d/dθ [sin(2θ)] = 2 cos(2θ) = 0 &nbsp;⟹&nbsp; 2θ = 90° &nbsp;⟹&nbsp; θ = 45°</div>
+        <div class="math-callout">\frac{d}{d\theta} [\sin(2\theta)] = 2 \cos(2\theta) = 0 \implies 2\theta = 90^\circ \implies \theta = 45^\circ</div>
         <p>When launching from an elevated cliff or platform (h₀ &gt; 0), the optimal angle for maximum range decreases below 45° according to θ<sub>opt</sub> = arcsin( 1 / √(2 + 2gh₀ / v₀²) ).</p>
       </div>
     `,
@@ -112,7 +112,7 @@ export const EXPERIMENT_DETAILS = {
             <span class="f-title">Total Time of Flight (T)</span>
             <span class="f-unit">Seconds [s]</span>
           </div>
-          <div class="f-eq">T = [v₀ · sin(θ) + √(v₀² · sin²θ + 2gh₀)] / g</div>
+          <div class="f-eq">T = \frac{v_0 \sin(\theta) + \sqrt{v_0^2 \sin^2\theta + 2gh_0}}{g}</div>
           <p class="f-desc">When launch height h₀ = 0, simplifies to T = (2 · v₀ · sin θ) / g. Represents the duration from cannon departure to ground contact.</p>
         </div>
 
@@ -121,7 +121,7 @@ export const EXPERIMENT_DETAILS = {
             <span class="f-title">Maximum Apex Height (H<sub>max</sub>)</span>
             <span class="f-unit">Meters [m]</span>
           </div>
-          <div class="f-eq">H<sub>max</sub> = h₀ + (v₀² · sin²θ) / (2g)</div>
+          <div class="f-eq">H_{\text{max}} = h_0 + \frac{v_0^2 \sin^2\theta}{2g}</div>
           <p class="f-desc">The maximum vertical altitude achieved when vertical velocity v<sub>y</sub> = 0. Independent of horizontal velocity component.</p>
         </div>
 
@@ -130,7 +130,7 @@ export const EXPERIMENT_DETAILS = {
             <span class="f-title">Horizontal Range (R)</span>
             <span class="f-unit">Meters [m]</span>
           </div>
-          <div class="f-eq">R = d₀ + (v₀ · cos θ) · T</div>
+          <div class="f-eq">R = d_0 + (v_0 \cos\theta) \cdot T</div>
           <p class="f-desc">For level ground (h₀ = 0), R = (v₀² · sin 2θ) / g. Yields the total horizontal displacement traversed.</p>
         </div>
 
@@ -139,7 +139,7 @@ export const EXPERIMENT_DETAILS = {
             <span class="f-title">Impact Touchdown Velocity (v<sub>f</sub>)</span>
             <span class="f-unit">Meters / Second [m/s]</span>
           </div>
-          <div class="f-eq">v<sub>f</sub> = √(v₀² + 2gh₀)</div>
+          <div class="f-eq">v_f = \sqrt{v_0^2 + 2gh_0}</div>
           <p class="f-desc">Derived from conservation of mechanical energy (E<sub>i</sub> = E<sub>f</sub>). Demonstrates that impact speed is independent of launch angle when air resistance is neglected.</p>
         </div>
       </div>
@@ -251,19 +251,19 @@ export const EXPERIMENT_DETAILS = {
       <div class="theory-block">
         <h3>2. Acceptance Angle & Numerical Aperture Derivation</h3>
         <p>Applying Snell's Law at the input air-core interface for a ray entering at the maximum acceptance angle θ<sub>a</sub>:</p>
-        <div class="math-callout">n₀ · sin(θ<sub>a</sub>) = n₁ · sin(r) = n₁ · sin(90° − φ<sub>c</sub>) = n₁ · cos(φ<sub>c</sub>) = n₁ · √(1 − sin²φ<sub>c</sub>)</div>
+        <div class="math-callout">n_0 \sin(\theta_a) = n_1 \sin(r) = n_1 \sin(90^\circ - \phi_c) = n_1 \cos(\phi_c) = n_1 \sqrt{1 - \sin^2\phi_c}</div>
         <p>Substituting sin(φ<sub>c</sub>) = n₂ / n₁:</p>
-        <div class="math-callout formula-highlight">n₀ · sin(θ<sub>a</sub>) = n₁ · √(1 − n₂² / n₁²) = √(n₁² − n₂²)</div>
+        <div class="math-callout formula-highlight">n_0 \sin(\theta_a) = n_1 \sqrt{1 - \frac{n_2^2}{n_1^2}} = \sqrt{n_1^2 - n_2^2}</div>
         <p>For an external medium of air (n₀ = 1.0), the light-gathering capacity of the fibre is defined as the <strong>Numerical Aperture (NA)</strong>:</p>
-        <div class="math-callout formula-highlight">NA = sin(θ<sub>a</sub>) = √(n₁² − n₂²)</div>
+        <div class="math-callout formula-highlight">NA = \sin(\theta_a) = \sqrt{n_1^2 - n_2^2}</div>
       </div>
 
       <div class="theory-block">
         <h3>3. Spot Divergence Measurement Principle</h3>
         <p>Because the optical path is reversible, light emerging from the fiber output tip diverges into a solid cone whose semi-angle is equal to the acceptance angle θ<sub>a</sub>. When projected onto a perpendicular target screen at distance L, the spot diameter W relates trigonometrically to L and θ<sub>a</sub>:</p>
-        <div class="math-callout">tan(θ<sub>a</sub>) = (W / 2) / L = W / (2L)</div>
+        <div class="math-callout">\tan(\theta_a) = \frac{W/2}{L} = \frac{W}{2L}</div>
         <p>Expressing sin(θ<sub>a</sub>) in terms of tan(θ<sub>a</sub>):</p>
-        <div class="math-callout formula-highlight">NA = sin(θ<sub>a</sub>) = [W / 2L] / √[1 + (W / 2L)²] = W / √(4L² + W²)</div>
+        <div class="math-callout formula-highlight">NA = \sin(\theta_a) = \frac{W/2L}{\sqrt{1 + (W/2L)^2}} = \frac{W}{\sqrt{4L^2 + W^2}}</div>
       </div>
     `,
     howToPerform: `
@@ -330,7 +330,7 @@ export const EXPERIMENT_DETAILS = {
             <span class="f-title">Experimental NA Formula</span>
             <span class="f-unit">Dimensionless</span>
           </div>
-          <div class="f-eq">NA = W / √(4L² + W²)</div>
+          <div class="f-eq">NA = \frac{W}{\sqrt{4L^2 + W^2}}</div>
           <p class="f-desc">Where W is the light spot diameter (mm) and L is the distance from the fibre tip to the target screen (mm).</p>
         </div>
 
@@ -339,7 +339,7 @@ export const EXPERIMENT_DETAILS = {
             <span class="f-title">Acceptance Angle (θ<sub>a</sub>)</span>
             <span class="f-unit">Degrees [°]</span>
           </div>
-          <div class="f-eq">θ<sub>a</sub> = arcsin(NA) = arctan(W / 2L)</div>
+          <div class="f-eq">\theta_a = \arcsin(NA) = \arctan\left(\frac{W}{2L}\right)</div>
           <p class="f-desc">The half-angle of the cone within which light rays are accepted and guided through total internal reflection.</p>
         </div>
 
@@ -348,7 +348,7 @@ export const EXPERIMENT_DETAILS = {
             <span class="f-title">Theoretical Refractive NA</span>
             <span class="f-unit">Dimensionless</span>
           </div>
-          <div class="f-eq">NA = √(n₁² − n₂²) = n₁ · √(2Δ)</div>
+          <div class="f-eq">NA = \sqrt{n_1^2 - n_2^2} = n_1 \sqrt{2\Delta}</div>
           <p class="f-desc">Where n₁ is core index, n₂ is cladding index, and Δ = (n₁ − n₂) / n₁ is the fractional index difference.</p>
         </div>
 
@@ -357,7 +357,7 @@ export const EXPERIMENT_DETAILS = {
             <span class="f-title">Solid Acceptance Angle (Ω)</span>
             <span class="f-unit">Steradians [sr]</span>
           </div>
-          <div class="f-eq">Ω = π · sin²(θ<sub>a</sub>) = π · (NA)²</div>
+          <div class="f-eq">\Omega = \pi \sin^2(\theta_a) = \pi (NA)^2</div>
           <p class="f-desc">Quantifies the total solid angle of the light-gathering acceptance cone in three-dimensional space.</p>
         </div>
       </div>
@@ -471,9 +471,9 @@ export const EXPERIMENT_DETAILS = {
       <div class="theory-block">
         <h3>2. Light-to-Frequency Conversion Principle</h3>
         <p>When photons with energy hν strike the photodiode depletion region, electron-hole pairs are generated via the internal photoelectric effect. The resulting photocurrent I<sub>ph</sub> is directly proportional to incident optical irradiance P<sub>opt</sub> and wavelength λ:</p>
-        <div class="math-callout">I<sub>ph</sub> = R(λ) · P<sub>opt</sub> = (η · q · λ / [h · c]) · P<sub>opt</sub></div>
+        <div class="math-callout">I_{\text{ph}} = R(\lambda) \cdot P_{\text{opt}} = \left(\frac{\eta q \lambda}{h c}\right) P_{\text{opt}}</div>
         <p>The internal current-to-frequency oscillator converts this photocurrent into a 50% duty-cycle square wave whose frequency f<sub>out</sub> is linearly proportional to the detected optical irradiance:</p>
-        <div class="math-callout formula-highlight">f<sub>out</sub> = k · I<sub>ph</sub> ∝ P<sub>opt</sub></div>
+        <div class="math-callout formula-highlight">f_{\text{out}} = k \cdot I_{\text{ph}} \propto P_{\text{opt}}</div>
       </div>
 
       <div class="theory-block">
@@ -490,9 +490,9 @@ export const EXPERIMENT_DETAILS = {
       <div class="theory-block">
         <h3>4. Color Coordinate Normalization & Inverse-Square Law</h3>
         <p>By measuring the frequency across the three primary channels (f<sub>R</sub>, f<sub>G</sub>, f<sub>B</sub>), normalized chromaticity coordinates are computed:</p>
-        <div class="math-callout formula-highlight">r = f<sub>R</sub> / (f<sub>R</sub> + f<sub>G</sub> + f<sub>B</sub>), &nbsp; g = f<sub>G</sub> / (f<sub>R</sub> + f<sub>G</sub> + f<sub>B</sub>), &nbsp; b = f<sub>B</sub> / (f<sub>R</sub> + f<sub>G</sub> + f<sub>B</sub>)</div>
+        <div class="math-callout formula-highlight">r = \frac{f_R}{f_R + f_G + f_B}, \quad g = \frac{f_G}{f_R + f_G + f_B}, \quad b = \frac{f_B}{f_R + f_G + f_B}</div>
         <p>Furthermore, reflected radiant intensity E decreases quadratically with distance d according to the Inverse-Square Law:</p>
-        <div class="math-callout">E(d) ∝ 1 / d² &nbsp;⟹&nbsp; f<sub>out</sub>(d) ∝ 1 / d²</div>
+        <div class="math-callout">E(d) \propto \frac{1}{d^2} \implies f_{\text{out}}(d) \propto \frac{1}{d^2}</div>
       </div>
     `,
     howToPerform: `
@@ -560,7 +560,7 @@ export const EXPERIMENT_DETAILS = {
             <span class="f-title">Optoelectronic Current (I<sub>ph</sub>)</span>
             <span class="f-unit">Microamperes [μA]</span>
           </div>
-          <div class="f-eq">I<sub>ph</sub> = (η · q · λ / [h · c]) · P<sub>opt</sub></div>
+          <div class="f-eq">I_{\text{ph}} = \left(\frac{\eta q \lambda}{h c}\right) P_{\text{opt}}</div>
           <p class="f-desc">Where η is quantum efficiency, q is electronic charge, h is Planck's constant, and P<sub>opt</sub> is incident optical power.</p>
         </div>
 
@@ -569,7 +569,7 @@ export const EXPERIMENT_DETAILS = {
             <span class="f-title">Frequency Output (f<sub>out</sub>)</span>
             <span class="f-unit">Kilohertz [kHz]</span>
           </div>
-          <div class="f-eq">f<sub>out</sub> = k<sub>s</sub> · (I<sub>ph</sub> / C<sub>int</sub>)</div>
+          <div class="f-eq">f_{\text{out}} = k_s \left(\frac{I_{\text{ph}}}{C_{\text{int}}}\right)</div>
           <p class="f-desc">Direct linear current-to-frequency relationship modulated by frequency scaling factor k<sub>s</sub> (2%, 20%, 100%).</p>
         </div>
 
@@ -578,7 +578,7 @@ export const EXPERIMENT_DETAILS = {
             <span class="f-title">Normalized Chromaticity Coordinate (r, g, b)</span>
             <span class="f-unit">Dimensionless [0 - 1]</span>
           </div>
-          <div class="f-eq">r = f<sub>R</sub> / (f<sub>R</sub> + f<sub>G</sub> + f<sub>B</sub>), &nbsp; g = f<sub>G</sub> / (f<sub>R</sub> + f<sub>G</sub> + f<sub>B</sub>)</div>
+          <div class="f-eq">r = \frac{f_R}{f_R + f_G + f_B}, \quad g = \frac{f_G}{f_R + f_G + f_B}</div>
           <p class="f-desc">Normalizes color component ratios, eliminating dependence on ambient illumination variations.</p>
         </div>
 
@@ -587,7 +587,7 @@ export const EXPERIMENT_DETAILS = {
             <span class="f-title">Inverse-Square Law (E)</span>
             <span class="f-unit">Watts / Meter² [W/m²]</span>
           </div>
-          <div class="f-eq">E(d) = I₀ / d² &nbsp;⟹&nbsp; f<sub>out</sub>(d) ∝ 1 / d²</div>
+          <div class="f-eq">E(d) = \frac{I_0}{d^2} \implies f_{\text{out}}(d) \propto \frac{1}{d^2}</div>
           <p class="f-desc">Quantifies the decay of detected optical irradiance as distance from the reflective target increases.</p>
         </div>
       </div>
@@ -702,7 +702,7 @@ export const EXPERIMENT_DETAILS = {
       <div class="theory-block">
         <h3>3. Coefficient of Restitution (e) & Collision Kinematics</h3>
         <p>The elasticity of a collision along the line of impact is characterized by the <strong>Coefficient of Restitution (e)</strong>, defined as the ratio of relative separation speed to relative approach speed:</p>
-        <div class="math-callout formula-highlight">e = −(v₂<sub>n</sub> − v₁<sub>n</sub>) / (u₂<sub>n</sub> − u₁<sub>n</sub>)</div>
+        <div class="math-callout formula-highlight">e = \frac{v_{1n} - v_{2n}}{u_{2n} - u_{1n}}</div>
         <ul class="manual-list">
           <li><strong>e = 1.0 (Perfectly Elastic):</strong> Total mechanical kinetic energy is conserved (∑ KE<sub>i</sub> = ∑ KE<sub>f</sub>).</li>
           <li><strong>0 &lt; e &lt; 1.0 (Inelastic):</strong> Kinetic energy is partially dissipated into thermal and vibrational modes.</li>
@@ -713,7 +713,7 @@ export const EXPERIMENT_DETAILS = {
       <div class="theory-block">
         <h3>4. Mechanical Energy Conservation</h3>
         <p>In a conservative gravitational field with zero non-conservative dissipative forces:</p>
-        <div class="math-callout formula-highlight">E<sub>total</sub> = KE + PE = ½ m v² + m g y = constant</div>
+        <div class="math-callout formula-highlight">E_{\text{total}} = KE + PE = \frac{1}{2} m v^2 + m g y = \text{constant}</div>
       </div>
     `,
     howToPerform: `
@@ -781,7 +781,7 @@ export const EXPERIMENT_DETAILS = {
             <span class="f-title">Linear Momentum (p)</span>
             <span class="f-unit">Kilogram Meter / Second [kg·m/s]</span>
           </div>
-          <div class="f-eq">p = m · v</div>
+          <div class="f-eq">p = m \cdot v</div>
           <p class="f-desc">Vector quantity representing the quantity of motion in an object.</p>
         </div>
 
@@ -790,7 +790,7 @@ export const EXPERIMENT_DETAILS = {
             <span class="f-title">Restitution (e)</span>
             <span class="f-unit">Dimensionless [0 - 1]</span>
           </div>
-          <div class="f-eq">e = −(v₂ − v₁) / (u₂ − u₁) = √(h<sub>rebound</sub> / h<sub>drop</sub>)</div>
+          <div class="f-eq">e = \frac{v_1 - v_2}{u_2 - u_1} = \sqrt{\frac{h_{\text{rebound}}}{h_{\text{drop}}}}</div>
           <p class="f-desc">Quantifies energy elasticity in normal impacts between colliding bodies.</p>
         </div>
 
@@ -799,7 +799,7 @@ export const EXPERIMENT_DETAILS = {
             <span class="f-title">Kinetic Energy (KE)</span>
             <span class="f-unit">Joules [J]</span>
           </div>
-          <div class="f-eq">KE = ½ m v² + ½ I ω²</div>
+          <div class="f-eq">KE = \frac{1}{2} m v^2 + \frac{1}{2} I \omega^2</div>
           <p class="f-desc">Includes translational kinetic energy and rotational kinetic energy.</p>
         </div>
 
@@ -808,7 +808,7 @@ export const EXPERIMENT_DETAILS = {
             <span class="f-title">Collision Impulse (J)</span>
             <span class="f-unit">Newton Seconds [N·s]</span>
           </div>
-          <div class="f-eq">J = ∫ F dt = Δp = m(v − u)</div>
+          <div class="f-eq">J = \int F dt = \Delta p = m(v - u)</div>
           <p class="f-desc">The instantaneous force-time integral acting during contact impact.</p>
         </div>
       </div>
@@ -891,14 +891,14 @@ export const EXPERIMENT_DETAILS = {
         <h3>1. Principle of Multi-Slit Fraunhofer Diffraction</h3>
         <p>A diffraction grating consists of a periodic array of a large number of equally spaced, identical parallel slits or rulings (N lines per unit length) separated by an opaque width. When a monochromatic collimated plane wave of wavelength λ is normally incident upon the grating, each transparent ruling acts as a secondary coherent wave source in accordance with the Huygens-Fresnel principle.</p>
         <p>The secondary wavelets emerging from adjacent slits travel path lengths that differ by an optical path difference (OPD) given by:</p>
-        <div class="math-callout">Δ = d · sin(θ)</div>
+        <div class="math-callout">\\Delta = d \\cdot \\sin(\\theta)</div>
         <p>Where <strong>d</strong> is the grating spacing (distance between corresponding points of adjacent slits) and <strong>θ</strong> is the diffraction angle relative to the incident optical axis.</p>
       </div>
 
       <div class="theory-block">
         <h3>2. The Principal Maxima Condition (Grating Equation)</h3>
         <p>Constructive interference of wavelets from all N rulings occurs whenever the optical path difference between adjacent slits is an integral multiple of the wavelength (mλ). This establishes the fundamental <strong>Grating Equation</strong>:</p>
-        <div class="math-callout formula-highlight">d · sin(θ) = m · λ &nbsp;&nbsp;⟹&nbsp;&nbsp; sin(θ) = (m · λ) / d</div>
+        <div class="math-callout formula-highlight">d \\cdot \\sin(\\theta) = m \\cdot \\lambda \\implies \\sin(\\theta) = \\frac{m \\cdot \\lambda}{d}</div>
         <p>Where:</p>
         <ul class="manual-list">
           <li><strong>d = 1 / N:</strong> Grating spacing (e.g. for N = 600 lines/mm, d = 1 / (600 × 10³) m = 1.667 μm).</li>
@@ -912,14 +912,14 @@ export const EXPERIMENT_DETAILS = {
       <div class="theory-block">
         <h3>3. Cutoff & Maximum Observable Order</h3>
         <p>Because the sine of any real physical angle cannot exceed unity (|sin θ| ≤ 1), the maximum permissible diffraction order m<sub>max</sub> is strictly bounded by:</p>
-        <div class="math-callout">|m| · λ / d ≤ 1 &nbsp;&nbsp;⟹&nbsp;&nbsp; m<sub>max</sub> = ⌊ d / λ ⌋</div>
+        <div class="math-callout">\\frac{|m| \\cdot \\lambda}{d} \\le 1 \\implies m_{\\text{max}} = \\left\\lfloor \\frac{d}{\\lambda} \\right\\rfloor</div>
         <p>Orders exceeding m<sub>max</sub> are non-propagating evanescent states and cannot be observed on a physical screen.</p>
       </div>
 
       <div class="theory-block">
         <h3>4. Angular Dispersion & Resolving Power</h3>
         <p>The rate of change of diffraction angle with respect to wavelength is defined as the <strong>angular dispersion (D)</strong>:</p>
-        <div class="math-callout">D = dθ / dλ = m / [d · cos(θ)]</div>
+        <div class="math-callout">D = \\frac{d\\theta}{d\\lambda} = \\frac{m}{d \\cdot \\cos(\\theta)}</div>
         <p>This demonstrates that angular dispersion increases with higher diffraction order (m) and higher line density N (smaller slit spacing d).</p>
       </div>
     `,
@@ -966,6 +966,45 @@ export const EXPERIMENT_DETAILS = {
             <h4>Commit Data & Verify Grating Equation</h4>
             <p>Click <strong>Record Observation</strong> to log the trial. Verify that the calculated wavelength λ_calc = (d · sin θ) / m matches the nominal laser wavelength within experimental accuracy.</p>
           </div>
+        </div>
+      </div>
+    `,
+    formulas: `
+      <div class="formula-card-grid">
+        <div class="manual-formula-card">
+          <div class="f-header">
+            <span class="f-title">Grating Equation (Principal Maxima)</span>
+            <span class="f-unit">Nanometers [nm]</span>
+          </div>
+          <div class="f-eq">d \\sin\\theta = m \\lambda \\implies \\lambda = \\frac{d \\sin\\theta}{m}</div>
+          <p class="f-desc">Defines condition for constructive multi-slit interference where m is the diffraction order.</p>
+        </div>
+
+        <div class="manual-formula-card">
+          <div class="f-header">
+            <span class="f-title">Grating Slit Spacing (d)</span>
+            <span class="f-unit">Micrometers [μm]</span>
+          </div>
+          <div class="f-eq">d = \\frac{1}{N \\times 10^3} \\text{ m} = \\frac{10^6}{N} \\text{ nm}</div>
+          <p class="f-desc">Microscopic pitch between adjacent ruling slits for line density N (lines/mm).</p>
+        </div>
+
+        <div class="manual-formula-card">
+          <div class="f-header">
+            <span class="f-title">Angular Dispersion (D)</span>
+            <span class="f-unit">Radians / Micrometer [rad/μm]</span>
+          </div>
+          <div class="f-eq">D = \\frac{d\\theta}{d\\lambda} = \\frac{m}{d \\cos\\theta}</div>
+          <p class="f-desc">Quantifies angular separation between adjacent spectral lines per unit wavelength increment.</p>
+        </div>
+
+        <div class="manual-formula-card">
+          <div class="f-header">
+            <span class="f-title">Screen Fringe Displacement (y)</span>
+            <span class="f-unit">Centimeters [cm]</span>
+          </div>
+          <div class="f-eq">y = L \\tan\\theta</div>
+          <p class="f-desc">Linear distance from central zeroth-order maximum on observation screen at distance L.</p>
         </div>
       </div>
     `,
@@ -1084,14 +1123,14 @@ export const EXPERIMENT_DETAILS = {
         <h3>1. Principle of Multi-Slit Fraunhofer Diffraction</h3>
         <p>A diffraction grating consists of a periodic array of a large number of equally spaced, identical parallel slits or rulings (N lines per unit length) separated by an opaque width. When a monochromatic collimated plane wave of wavelength λ is normally incident upon the grating, each transparent ruling acts as a secondary coherent wave source in accordance with the Huygens-Fresnel principle.</p>
         <p>The secondary wavelets emerging from adjacent slits travel path lengths that differ by an optical path difference (OPD) given by:</p>
-        <div class="math-callout">Δ = d · sin(θ)</div>
+        <div class="math-callout">\Delta = d \cdot \sin(\theta)</div>
         <p>Where <strong>d</strong> is the grating spacing (distance between corresponding points of adjacent slits) and <strong>θ</strong> is the diffraction angle relative to the incident optical axis.</p>
       </div>
 
       <div class="theory-block">
         <h3>2. The Principal Maxima Condition (Grating Equation)</h3>
         <p>Constructive interference of wavelets from all N rulings occurs whenever the optical path difference between adjacent slits is an integral multiple of the wavelength (mλ). This establishes the fundamental <strong>Grating Equation</strong>:</p>
-        <div class="math-callout formula-highlight">d · sin(θ) = m · λ &nbsp;&nbsp;⟹&nbsp;&nbsp; sin(θ) = (m · λ) / d</div>
+        <div class="math-callout formula-highlight">d \cdot \sin(\theta) = m \cdot \lambda \implies \sin(\theta) = \frac{m \cdot \lambda}{d}</div>
         <p>Where:</p>
         <ul class="manual-list">
           <li><strong>d = 1 / N:</strong> Grating spacing (e.g. for N = 600 lines/mm, d = 1 / (600 × 10³) m = 1.667 μm).</li>
@@ -1105,14 +1144,14 @@ export const EXPERIMENT_DETAILS = {
       <div class="theory-block">
         <h3>3. Cutoff & Maximum Observable Order</h3>
         <p>Because the sine of any real physical angle cannot exceed unity (|sin θ| ≤ 1), the maximum permissible diffraction order m<sub>max</sub> is strictly bounded by:</p>
-        <div class="math-callout">|m| · λ / d ≤ 1 &nbsp;&nbsp;⟹&nbsp;&nbsp; m<sub>max</sub> = ⌊ d / λ ⌋</div>
+        <div class="math-callout">\frac{|m|\lambda}{d} \le 1 \implies m_{\text{max}} = \left\lfloor \frac{d}{\lambda} \right\rfloor</div>
         <p>Orders exceeding m<sub>max</sub> are non-propagating evanescent states and cannot be observed on a physical screen.</p>
       </div>
 
       <div class="theory-block">
         <h3>4. Angular Dispersion & Resolving Power</h3>
         <p>The rate of change of diffraction angle with respect to wavelength is defined as the <strong>angular dispersion (D)</strong>:</p>
-        <div class="math-callout">D = dθ / dλ = m / [d · cos(θ)]</div>
+        <div class="math-callout">D = \frac{d\theta}{d\lambda} = \frac{m}{d \cdot \cos(\theta)}</div>
         <p>This demonstrates that angular dispersion increases with higher diffraction order (m) and higher line density N (smaller slit spacing d).</p>
       </div>
     `,
@@ -1159,6 +1198,45 @@ export const EXPERIMENT_DETAILS = {
             <h4>Commit Data & Verify Grating Equation</h4>
             <p>Click <strong>Record Observation</strong> to log the trial. Verify that the calculated wavelength λ_calc = (d · sin θ) / m matches the nominal laser wavelength within experimental accuracy.</p>
           </div>
+        </div>
+      </div>
+    `,
+    formulas: `
+      <div class="formula-card-grid">
+        <div class="manual-formula-card">
+          <div class="f-header">
+            <span class="f-title">Grating Equation (Principal Maxima)</span>
+            <span class="f-unit">Nanometers [nm]</span>
+          </div>
+          <div class="f-eq">d \\sin\\theta = m \\lambda \\implies \\lambda = \\frac{d \\sin\\theta}{m}</div>
+          <p class="f-desc">Defines condition for constructive multi-slit interference where m is the diffraction order.</p>
+        </div>
+
+        <div class="manual-formula-card">
+          <div class="f-header">
+            <span class="f-title">Grating Slit Spacing (d)</span>
+            <span class="f-unit">Micrometers [μm]</span>
+          </div>
+          <div class="f-eq">d = \\frac{1}{N \\times 10^3} \\text{ m} = \\frac{10^6}{N} \\text{ nm}</div>
+          <p class="f-desc">Microscopic pitch between adjacent ruling slits for line density N (lines/mm).</p>
+        </div>
+
+        <div class="manual-formula-card">
+          <div class="f-header">
+            <span class="f-title">Angular Dispersion (D)</span>
+            <span class="f-unit">Radians / Micrometer [rad/μm]</span>
+          </div>
+          <div class="f-eq">D = \\frac{d\\theta}{d\\lambda} = \\frac{m}{d \\cos\\theta}</div>
+          <p class="f-desc">Quantifies angular separation between adjacent spectral lines per unit wavelength increment.</p>
+        </div>
+
+        <div class="manual-formula-card">
+          <div class="f-header">
+            <span class="f-title">Screen Fringe Displacement (y)</span>
+            <span class="f-unit">Centimeters [cm]</span>
+          </div>
+          <div class="f-eq">y = L \\tan\\theta</div>
+          <p class="f-desc">Linear distance from central zeroth-order maximum on observation screen at distance L.</p>
         </div>
       </div>
     `,
@@ -1515,3 +1593,5 @@ export const EXPERIMENT_DETAILS = {
     `
   }
 };
+
+EXPERIMENT_DETAILS["diode-vi"] = EXPERIMENT_DETAILS["diode"];

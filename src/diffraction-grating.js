@@ -271,25 +271,39 @@ export function createDiffractionGratingExperiment(callbacks = {}) {
 
     ctx.clearRect(0, 0, w, h);
 
+    const isLight = document.documentElement.getAttribute("data-theme") === "light";
+
     // 1. Technical Laboratory Tabletop & Atmosphere
     const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
-    bgGrad.addColorStop(0, "#060913");
-    bgGrad.addColorStop(0.65, "#0b101d");
-    bgGrad.addColorStop(1, "#03060a");
+    if (isLight) {
+      bgGrad.addColorStop(0, "#f0f9ff");
+      bgGrad.addColorStop(0.65, "#e0f2fe");
+      bgGrad.addColorStop(1, "#bae6fd");
+    } else {
+      bgGrad.addColorStop(0, "#060913");
+      bgGrad.addColorStop(0.65, "#0b101d");
+      bgGrad.addColorStop(1, "#03060a");
+    }
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, w, h);
 
     // Laboratory Table Surface (Optical Breadboard Surface at bottom)
     const tableTopY = 275;
     const tableGrad = ctx.createLinearGradient(0, tableTopY, 0, h);
-    tableGrad.addColorStop(0, "#111827");
-    tableGrad.addColorStop(0.3, "#0f172a");
-    tableGrad.addColorStop(1, "#020617");
+    if (isLight) {
+      tableGrad.addColorStop(0, "#cbd5e1");
+      tableGrad.addColorStop(0.3, "#94a3b8");
+      tableGrad.addColorStop(1, "#64748b");
+    } else {
+      tableGrad.addColorStop(0, "#111827");
+      tableGrad.addColorStop(0.3, "#0f172a");
+      tableGrad.addColorStop(1, "#020617");
+    }
     ctx.fillStyle = tableGrad;
     ctx.fillRect(0, tableTopY, w, h - tableTopY);
 
     // Tabletop highlight line
-    ctx.strokeStyle = "rgba(56, 189, 248, 0.2)";
+    ctx.strokeStyle = isLight ? "rgba(14, 165, 233, 0.4)" : "rgba(56, 189, 248, 0.2)";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, tableTopY);
@@ -297,8 +311,8 @@ export function createDiffractionGratingExperiment(callbacks = {}) {
     ctx.stroke();
 
     // Technical M6 Threaded Optical Breadboard Grid Holes (Every 36px)
-    ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.06)";
+    ctx.fillStyle = isLight ? "rgba(255, 255, 255, 0.55)" : "rgba(0, 0, 0, 0.6)";
+    ctx.strokeStyle = isLight ? "rgba(71, 85, 105, 0.3)" : "rgba(255, 255, 255, 0.06)";
     ctx.lineWidth = 0.8;
     for (let bx = 30; bx < w - 20; bx += 36) {
       for (let by = tableTopY + 16; by < h - 10; by += 24) {
@@ -310,7 +324,7 @@ export function createDiffractionGratingExperiment(callbacks = {}) {
     }
 
     // Technical Coordinate Background Grid Lines in air
-    ctx.strokeStyle = "rgba(56, 189, 248, 0.035)";
+    ctx.strokeStyle = isLight ? "rgba(14, 165, 233, 0.12)" : "rgba(56, 189, 248, 0.035)";
     ctx.lineWidth = 1;
     for (let x = 0; x < w; x += 40) {
       ctx.beginPath();
@@ -969,16 +983,24 @@ export function createDiffractionGratingExperiment(callbacks = {}) {
 
     ctx.clearRect(0, 0, w, h);
 
-    // 1. Dark Screen Canvas Background
+    const isLight = document.documentElement.getAttribute("data-theme") === "light";
+
+    // 1. Screen Canvas Background (White-blue frosted or Dark Obsidian)
     const scrGrad = ctx.createLinearGradient(0, 0, w, 0);
-    scrGrad.addColorStop(0, "#030712");
-    scrGrad.addColorStop(0.5, "#0b0f1a");
-    scrGrad.addColorStop(1, "#030712");
+    if (isLight) {
+      scrGrad.addColorStop(0, "#f8fafc");
+      scrGrad.addColorStop(0.5, "#ffffff");
+      scrGrad.addColorStop(1, "#f8fafc");
+    } else {
+      scrGrad.addColorStop(0, "#030712");
+      scrGrad.addColorStop(0.5, "#0b0f1a");
+      scrGrad.addColorStop(1, "#030712");
+    }
     ctx.fillStyle = scrGrad;
     ctx.fillRect(0, 0, w, h);
 
     // Frame border
-    ctx.strokeStyle = "rgba(56, 189, 248, 0.25)";
+    ctx.strokeStyle = isLight ? "rgba(14, 165, 233, 0.45)" : "rgba(56, 189, 248, 0.25)";
     ctx.lineWidth = 1.5;
     ctx.strokeRect(1, 1, w - 2, h - 2);
 
@@ -988,7 +1010,7 @@ export function createDiffractionGratingExperiment(callbacks = {}) {
     const apertureHeight = 110;
 
     // 2. Optical Center Crosshair / Datum
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+    ctx.strokeStyle = isLight ? "rgba(100, 116, 139, 0.3)" : "rgba(255, 255, 255, 0.12)";
     ctx.lineWidth = 1;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
@@ -998,14 +1020,14 @@ export function createDiffractionGratingExperiment(callbacks = {}) {
     ctx.setLineDash([]);
 
     // 3. Millimeter Coordinate Scale along bottom of screen aperture
-    ctx.strokeStyle = "rgba(148, 163, 184, 0.35)";
+    ctx.strokeStyle = isLight ? "rgba(14, 165, 233, 0.5)" : "rgba(148, 163, 184, 0.35)";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(20, apertureTopY + apertureHeight);
     ctx.lineTo(w - 20, apertureTopY + apertureHeight);
     ctx.stroke();
 
-    ctx.fillStyle = "rgba(148, 163, 184, 0.6)";
+    ctx.fillStyle = isLight ? "#0369a1" : "rgba(148, 163, 184, 0.6)";
     ctx.font = "8px monospace";
     ctx.textAlign = "center";
 
