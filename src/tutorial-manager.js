@@ -1,3 +1,4 @@
+import { renderMathInDOM } from "./math-renderer.js";
 /**
  * PhysiX Interactive Guided Tutorial / Onboarding System
  * Provides complete, per-experiment first-time onboarding walkthroughs
@@ -57,6 +58,7 @@ export function normalizeExpId(expId) {
   if (expId === "optical-fibre" || expId === "optical") return "optical";
   if (expId === "physics-sandbox" || expId === "sandbox") return "sandbox";
   if (expId === "colour-sensor" || expId === "color-sensor") return "colour-sensor";
+  if (expId === "hall-effect" || expId === "hall") return "hall-effect";
   return "projectile";
 }
 
@@ -66,8 +68,9 @@ export function getExperimentFriendlyName(expId) {
     case "projectile": return "Exp 1: 2D Projectile Motion";
     case "optical": return "Exp 2: Optical Fibre NA";
     case "colour-sensor": return "Exp 3: Study of Colour Sensor";
-    case "sandbox": return "Exp 4: Physics Sandbox";
+    case "hall-effect": return "Exp 4: Hall Effect Experiment";
     case "diffraction": return "Exp 5: Diffraction Grating";
+    case "sandbox": return "Exp 6: Physics Sandbox";
     default: return "Interactive Physics Lab";
   }
 }
@@ -360,7 +363,93 @@ export const TUTORIAL_DEFINITIONS = {
   ],
 
   // -----------------------------------------------------------------------
-  // EXPERIMENT 4: PHYSICS SANDBOX
+  // EXPERIMENT 4: HALL EFFECT EXPERIMENT
+  // -----------------------------------------------------------------------
+  "hall-effect": [
+    {
+      id: "hall-welcome",
+      selector: "#exp-hall-effect-section .cs-procedure-ribbon",
+      title: "Welcome to Hall Effect Laboratory",
+      category: "LABORATORY PURPOSE & OVERVIEW",
+      description: "Investigate electromagnetic Lorentz force magnetotransport in semiconductors and metals. When current $I$ flows through a specimen under perpendicular magnetic field $B$, charge carriers deflect transversely, establishing the Hall electric field and voltage $V_H = \\frac{R_H I B}{t}$.",
+      placement: "bottom"
+    },
+    {
+      id: "hall-bench",
+      selector: "#hall-bench-canvas",
+      title: "Electromagnetic Bench Viewport",
+      category: "APPARATUS & COIL POLES",
+      description: "Visualizes the dual electromagnet pole pieces (North & South) producing uniform flux density $B$, and the central sample mount holding the precision wafer probe connected to constant current leads.",
+      placement: "bottom"
+    },
+    {
+      id: "hall-specimens",
+      selector: "#exp-hall-effect-section .hall-specimens-bar",
+      title: "Specimen Selection Bay",
+      category: "MATERIAL SELECTION",
+      description: "Switch between calibrated semiconductor and metal probes: n-type Germanium (electrons dominate), p-type Germanium (holes dominate), n-type Indium Arsenide (high mobility), and Copper Foil reference.",
+      placement: "top"
+    },
+    {
+      id: "hall-console",
+      selector: "#exp-hall-effect-section .hall-controller-plate",
+      title: "Concave Industrial Controller Panel",
+      category: "POWER & POLARITY CONTROLS",
+      description: "Operate heavy-duty tactile controls: Red button toggles Electromagnet Power Supply; Black button toggles Specimen Constant Current Supply; Blue reverses Magnetic Field Polarity (+B / -B); Green reverses Current Direction (+I / -I).",
+      placement: "top"
+    },
+    {
+      id: "hall-current",
+      selector: "#hall-slider-current",
+      title: "Specimen Current (I_S) Adjustment",
+      category: "CURRENT REGULATION",
+      description: "Adjust longitudinal sample current from 0.0 to 50.0 mA using the slider or quick presets (5mA, 10mA, 20mA, 30mA, 40mA). Higher current increases transverse carrier drift velocity and boosts $V_H$.",
+      placement: "left"
+    },
+    {
+      id: "hall-field",
+      selector: "#hall-slider-field",
+      title: "Magnetic Flux Density (B) Slider",
+      category: "MAGNETIC FIELD CONTROL",
+      description: "Regulate the electromagnet coil excitation from 0.00 to 0.80 Tesla (0 to 800 mT) with ±0.10 T step buttons. Notice the linear relationship between transverse potential $V_H$ and field $B$.",
+      placement: "left"
+    },
+    {
+      id: "hall-zero",
+      selector: "#hall-btn-zero-offset",
+      title: "Zero-Balance Potentiometer",
+      category: "MISALIGNMENT CALIBRATION",
+      description: "In physical Hall probes, transverse contacts are rarely perfectly aligned, creating an IR drop offset voltage $V_{offset}$. Click Zero Balance to auto-calibrate and nullify this offset before recording.",
+      placement: "left"
+    },
+    {
+      id: "hall-screen",
+      selector: "#hall-graph-canvas",
+      title: "Dual Display: Graph & Quantum Lattice",
+      category: "DYNAMIC VISUALIZATIONS",
+      description: "Toggle between the characteristic $V_H$ vs $B$ linear sweep curve and the microscopic Quantum Carrier Lattice View to observe electrons or holes deflecting under Lorentz forces in real time.",
+      placement: "left"
+    },
+    {
+      id: "hall-telemetry",
+      selector: "#exp-hall-effect-section .results-container",
+      title: "Real-Time Magnetotransport Telemetry",
+      category: "PHYSICAL CALCULATIONS",
+      description: "Inspect live calculated parameters: Measured Hall Voltage $V_H$, Applied Magnetic Field $B$, Hall Coefficient $R_H = \\frac{V_H t}{I B}$, and Carrier Density $n = \\frac{1}{|e| R_H}$ in clean scientific notation.",
+      placement: "top"
+    },
+    {
+      id: "hall-record",
+      selector: "#hall-btn-record",
+      title: "Record Observations & Lab Report",
+      category: "DATA LOGGING & ASSESSMENT",
+      description: "Click Record Observation to log the current measurement $(I, B, V_H, R_H, n)$ into your observation table. Complete challenges to earn XP and generate your official laboratory report!",
+      placement: "top"
+    }
+  ],
+
+  // -----------------------------------------------------------------------
+  // EXPERIMENT 6: PHYSICS SANDBOX
   // -----------------------------------------------------------------------
   sandbox: [
     {
@@ -743,6 +832,7 @@ class TutorialManager {
     });
 
     // Position Spotlight & Card
+    renderMathInDOM(this.cardEl);
     this.updatePositioning(targetEl, step.placement);
   }
 

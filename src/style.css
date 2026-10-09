@@ -1,6 +1,31 @@
 @import url('/fonts/fonts.css');
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+@import "katex/dist/katex.min.css";
 @import url('./homepage/homepage.css');
+
+/* KaTeX Global Math Typography & Integration */
+.katex {
+  font-size: 1.05em;
+  text-rendering: auto;
+}
+.katex-display {
+  margin: 0.75em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25em 0;
+}
+.formula-latex {
+  padding: 8px 14px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 8px;
+  margin: 10px 0;
+  text-align: center;
+}
+.tutorial-card-desc .katex {
+  font-size: 1.02em;
+  color: #38bdf8;
+}
 
 :root {
   --bg-main: #030611;
@@ -8350,8 +8375,8 @@ body.physix-offline [data-requires-online]::after {
 .modal-card-quiz {
   max-width: 680px;
   background: rgba(14, 20, 35, 0.96);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  /* fast composite */
+  /* no duplicate filter */
   border: 1px solid rgba(168, 85, 247, 0.25);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(168, 85, 247, 0.15);
 }
@@ -16054,5 +16079,343 @@ body.on-standalone-page .ai-context-strip {
   transform: translateY(-1px);
 }
 
+/* ========================================================
+   HALL EFFECT EXPERIMENT (EXP 4) SPECIFIC STYLES
+   ======================================================== */
+.hall-dashboard {
+  grid-template-columns: 1.45fr 1fr;
+  gap: 20px;
+}
 
-
+.hall-bench-card {
+  border-color: rgba(59, 130, 246, 0.22);
+  box-shadow: 0 8px 32px rgba(14, 165, 233, 0.08), 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.hall-specimen-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.hall-specimen-chip {
+  flex: 1 1 calc(50% - 4px);
+  min-width: 110px;
+  text-align: left;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.hall-specimen-chip:hover {
+  transform: translateY(-1px);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.hall-specimen-chip.active {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(30, 58, 138, 0.3) 100%) !important;
+  border-color: #38bdf8 !important;
+  color: #f0f9ff !important;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.3) !important;
+}
+
+.hall-mode-toggle {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.hall-mode-toggle .cs-scale-btn {
+  font-size: 11px;
+  padding: 6px 10px;
+}
+
+.hall-mode-toggle .cs-scale-btn.active {
+  background: rgba(14, 165, 233, 0.2) !important;
+  border-color: #38bdf8 !important;
+  color: #38bdf8 !important;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.25) !important;
+}
+
+#hall-bench-canvas,
+#hall-graph-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@media (max-width: 1024px) {
+  .hall-dashboard {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========================================================
+   REALISTIC DARK INDUSTRIAL CONCAVE BUTTON CONTROLLER
+   (MATCHING REFERENCE IMAGE)
+   ======================================================== */
+.hall-controller-plate {
+  position: relative;
+  background: linear-gradient(180deg, #2a2f3a 0%, #1e222b 40%, #161820 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 16px 22px 14px;
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1.5px 0 rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+}
+
+/* Brushed metal hairline reflection */
+.hall-controller-plate::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 11px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.02) 0px,
+    rgba(255, 255, 255, 0.02) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  pointer-events: none;
+}
+
+/* 4 Corner Countersunk Machine Screws */
+.screw-head {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #cbd5e1 0%, #64748b 50%, #334155 85%, #0f172a 100%);
+  border: 1px solid rgba(15, 23, 42, 0.9);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.5);
+  z-index: 2;
+}
+.screw-head::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 20%;
+  right: 20%;
+  height: 1.5px;
+  background: #0f172a;
+  transform: translateY(-50%) rotate(40deg);
+  box-shadow: 0 0.5px 0 rgba(255,255,255,0.4);
+}
+.screw-head.screw-tl { top: 8px; left: 8px; }
+.screw-head.screw-tr { top: 8px; right: 8px; }
+.screw-head.screw-bl { bottom: 8px; left: 8px; }
+.screw-head.screw-br { bottom: 8px; right: 8px; }
+
+/* Concave Button Unit Container */
+.concave-btn-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  flex: 1;
+  max-width: 160px;
+  position: relative;
+  z-index: 1;
+}
+
+.concave-btn-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 3D Concave Button Body */
+.concave-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Raised outer machined aluminum bezel collar */
+  background: radial-gradient(circle at 38% 32%, #cbd5e1 0%, #64748b 42%, #334155 78%, #0f172a 100%);
+  box-shadow: 
+    0 6px 14px rgba(0, 0, 0, 0.8),
+    0 2px 4px rgba(0, 0, 0, 0.6),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.7),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.95);
+  transition: transform 0.12s cubic-bezier(0.2, 0.8, 0.4, 1), box-shadow 0.12s ease;
+  user-select: none;
+  outline: none;
+}
+
+.concave-btn:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 
+    0 9px 18px rgba(0, 0, 0, 0.85),
+    0 3px 6px rgba(0, 0, 0, 0.6),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.85),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.95);
+}
+
+.concave-btn:active {
+  transform: translateY(2px) scale(0.97);
+  box-shadow: 
+    0 2px 5px rgba(0, 0, 0, 0.85),
+    inset 0 2.5px 4px rgba(0, 0, 0, 0.95);
+}
+
+/* Outer chrome rim inside the collar */
+.concave-btn-rim {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.65);
+  pointer-events: none;
+}
+
+/* Deep Sunken Concave Spherical Dish */
+.concave-btn-dish {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  /* Concave physics: ambient top light catches bottom inner wall, top lip casts deep shadow downward */
+  box-shadow: 
+    inset 0 9px 13px rgba(0, 0, 0, 0.88),
+    inset 0 3px 6px rgba(0, 0, 0, 0.65),
+    inset 0 -4px 8px rgba(255, 255, 255, 0.28),
+    0 1px 2px rgba(255, 255, 255, 0.18);
+  pointer-events: none;
+}
+
+/* 1. Red Concave Dish (Electromagnet Power) */
+.concave-btn-red .concave-btn-dish {
+  background: radial-gradient(circle at 50% 68%, #ef4444 0%, #b91c1c 45%, #7f1d1d 80%, #450a0a 100%);
+}
+.concave-btn-red .concave-btn-icon {
+  width: 22px;
+  height: 22px;
+  color: #fee2e2;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.85));
+}
+
+/* 2. Black Concave Dish (Sample Constant Current) */
+.concave-btn-black .concave-btn-dish {
+  background: radial-gradient(circle at 50% 68%, #3f3f46 0%, #27272a 45%, #18181b 80%, #09090b 100%);
+}
+
+/* 3. Blue Concave Dish (Magnetic Field Polarity) */
+.concave-btn-blue .concave-btn-dish {
+  background: radial-gradient(circle at 50% 68%, #3b82f6 0%, #1d4ed8 45%, #1e3a8a 80%, #0f172a 100%);
+}
+
+/* 4. Green Concave Dish (Specimen Current Direction) */
+.concave-btn-green .concave-btn-dish {
+  background: radial-gradient(circle at 50% 68%, #22c55e 0%, #15803d 45%, #14532d 80%, #052e16 100%);
+}
+
+/* Concentric lathe ring inside dish for authentic precision machining look */
+.concave-concentric-ring {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+}
+
+/* Adjacent Circular LED Indicator Dot */
+.concave-led-dot {
+  position: absolute;
+  top: 50%;
+  right: -13px;
+  transform: translateY(-50%);
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #18181b;
+  border: 1px solid #3f3f46;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.95);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+/* LED Lit / Glowing Active States */
+.concave-led-dot.led-red.active {
+  background: #ef4444;
+  border-color: #fca5a5;
+  box-shadow: 0 0 8px #ef4444, 0 0 15px rgba(239, 68, 68, 0.7), inset 0 1px 1px #ffffff;
+}
+
+.concave-led-dot.led-amber.active {
+  background: #f59e0b;
+  border-color: #fde68a;
+  box-shadow: 0 0 8px #f59e0b, 0 0 15px rgba(245, 158, 11, 0.7), inset 0 1px 1px #ffffff;
+}
+
+.concave-led-dot.led-blue.active {
+  background: #38bdf8;
+  border-color: #bae6fd;
+  box-shadow: 0 0 8px #38bdf8, 0 0 15px rgba(56, 189, 248, 0.7), inset 0 1px 1px #ffffff;
+}
+.concave-led-dot.led-blue.inverted {
+  background: #f43f5e;
+  border-color: #fecdd3;
+  box-shadow: 0 0 8px #f43f5e, 0 0 13px rgba(244, 63, 94, 0.6), inset 0 1px 1px #ffffff;
+}
+
+.concave-led-dot.led-green.active {
+  background: #22c55e;
+  border-color: #bbf7d0;
+  box-shadow: 0 0 8px #22c55e, 0 0 15px rgba(34, 197, 94, 0.7), inset 0 1px 1px #ffffff;
+}
+.concave-led-dot.led-green.inverted {
+  background: #eab308;
+  border-color: #fef08a;
+  box-shadow: 0 0 8px #eab308, 0 0 13px rgba(234, 179, 8, 0.6), inset 0 1px 1px #ffffff;
+}
+
+/* Industrial Stamped Text Label Beneath Each Button */
+.concave-btn-label {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-size: 8.5px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: #94a3b8;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+  min-height: 22px;
+}
+
+@media (max-width: 640px) {
+  .hall-controller-plate {
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 14px 14px;
+  }
+  .concave-btn-unit {
+    flex: 1 1 calc(50% - 16px);
+  }
+  .concave-btn {
+    width: 56px;
+    height: 56px;
+  }
+}

@@ -34,6 +34,7 @@ const CORE_PRECACHE_URLS = [
   '/src/content-protection.js',
   '/src/diffraction-grating.js',
   '/src/experiment-details-data.js',
+  '/src/hall-effect.js',
   '/src/optical-fibre.js',
   '/src/pdf-export.js',
   '/src/quiz-data.js',
