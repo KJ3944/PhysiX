@@ -14,7 +14,12 @@ export const EXPERIMENT_DETAILS = {
     difficulty: "Undergraduate / AP Physics",
     duration: "45 Minutes",
     engine: "Matter.js 2D Newtonian Kinematics",
-    accentColor: "#38bdf8",
+accentColor: "#38bdf8",
+    referenceBooks: [
+      { title: "Projectile Motion", source: "BCcampus Physics", url: "https://pressbooks.bccampus.ca/physics0312chooge/chapter/3-4-projectile-motion/", description: "Covers principles and equations of projectile motion." },
+      { title: "Projectile Motion", source: "OpenStax Physics", url: "https://openstax.org/books/physics/pages/5-3-projectile-motion", description: "Textbook section on projectile motion and two-dimensional kinematics." },
+      { title: "Two-Dimensional Kinematics", source: "Physics LibreTexts", url: "https://phys.libretexts.org/Bookshelves/University_Physics/Physics_(Boundless)/3.3%3A_Projectile_Motion", description: "Additional material on projectile motion and two-dimensional motion." }
+    ],
     aim: `<p class="manual-aim-text">To investigate the two-dimensional kinematic motion of a projectile fired at an initial elevation angle θ and launch speed v₀ in a gravitational field, to verify that horizontal and vertical motions are independent, and to determine how launch parameters affect the maximum apex height (H<sub>max</sub>), total flight duration (T), and horizontal ground range (R).</p>`,
     theory: `
       <div class="theory-block">
@@ -237,7 +242,13 @@ export const EXPERIMENT_DETAILS = {
     difficulty: "Undergraduate STEM Practical",
     duration: "45 Minutes",
     engine: "Waveguide Ray Tracing & Conical Divergence Solver",
-    accentColor: "#00f0ff",
+    accentColor: "#00f0ff"
+    referenceBooks: [
+      { title: "Fiber Optics Engineering", source: "M. Azadeh", url: "https://www-hep.phys.sinica.edu.tw/RadWork_www/Publications/Reference_Books/Fiber_Optics_Engineering_M.Azadeh/978-1-4419-0304-4.pdf", description: "Technical reference book on fibre-optic engineering." },
+      { title: "Total Internal Reflection", source: "OpenStax University Physics, Volume 3", url: "https://openstax.org/books/university-physics-volume-3/pages/1-4-total-internal-reflection", description: "Explains total internal reflection, the fundamental principle behind optical fibre light guidance." },
+      { title: "University Physics, Volume 3", source: "OpenStax", url: "https://openstax.org/details/books/university-physics-volume-3", description: "Broader physics textbook covering optics and related principles." }
+    ],
+,
     aim: `<p class="manual-aim-text">To determine the Numerical Aperture (NA) and maximum Acceptance Angle (θ<sub>a</sub>) of a step-index multimode optical fibre cable by measuring the divergence diameter of the output laser beam spot at varying distances on a calibrated optical bench.</p>`,
     theory: `
       <div class="theory-block">
@@ -454,6 +465,12 @@ export const EXPERIMENT_DETAILS = {
     duration: "45 Minutes",
     engine: "TCS3200 Optoelectronic Converter & Spectral Decomposition Solver",
     accentColor: "#10b981",
+
+    referenceBooks: [
+      { title: "Adafruit Color Sensors Guide", source: "Adafruit", url: "https://learn.adafruit.com/adafruit-color-sensors", description: "Practical material on colour sensors, their operation, and interfacing." },
+      { title: "Introduction to Physics", source: "OpenStax", url: "https://openstax.org/books/physics/pages/1-introduction", description: "Foundational physics concepts supporting understanding of light and measurement." },
+      { title: "TCS34725 Color Sensor", source: "ams OSRAM", url: "https://ams-osram.com/products/sensor-solutions/ambient-light-color-spectral-proximity-sensors/ams-tcs34725-color-sensor", description: "Manufacturer information on a colour-sensing device and its technical characteristics." }
+    ],
     aim: `<p class="manual-aim-text">To investigate the operational principles, spectral sensitivity, programmable frequency scaling, and RGB color identification accuracy of the TCS3200 programmable light-to-frequency optoelectronic sensor using sample swatches at varying calibrated distances.</p>`,
     theory: `
       <div class="theory-block">
@@ -683,7 +700,13 @@ export const EXPERIMENT_DETAILS = {
     difficulty: "All Levels STEM Practical",
     duration: "45 Minutes",
     engine: "Matter.js Velocity Verlet Rigid-Body Engine",
-    accentColor: "#a855f7",
+    accentColor: "#a855f7"
+    referenceBooks: [
+      { title: "University Physics, Volume 1", source: "OpenStax", url: "https://openstax.org/books/university-physics-volume-1/pages/preface", description: "General university physics textbook covering mechanics and foundational physical principles." },
+      { title: "Newton's Second Law", source: "OpenStax University Physics, Volume 1", url: "https://openstax.org/books/university-physics-volume-1/pages/5-3-newtons-second-law", description: "Explains the relationship between force, mass, and acceleration." },
+      { title: "Introduction to Work and Kinetic Energy", source: "OpenStax University Physics, Volume 1", url: "https://openstax.org/books/university-physics-volume-1/pages/7-introduction", description: "Introduces work and kinetic energy, providing additional context for mechanics simulations." }
+    ],
+,
     aim: `<p class="manual-aim-text">To investigate Newtonian rigid-body mechanics, conservation of linear momentum, coefficient of restitution (e), and the exchange between kinetic and gravitational potential energy in an interactive computational 2D physics environment.</p>`,
     theory: `
       <div class="theory-block">
@@ -884,7 +907,13 @@ export const EXPERIMENT_DETAILS = {
     difficulty: "Undergraduate Wave Optics Laboratory",
     duration: "45 Minutes",
     engine: "Fourier Wave Optics & Fraunhofer Multi-Slit Interference Solver",
-    accentColor: "#a855f7",
+    accentColor: "#a855f7"
+    referenceBooks: [
+      { title: "Diffraction Gratings", source: "OpenStax University Physics, Volume 3", url: "https://openstax.org/books/university-physics-volume-3/pages/4-4-diffraction-gratings", description: "Explains diffraction gratings and the physical principles governing their behaviour." },
+      { title: "Applications of Diffraction, Interference, and Coherence", source: "OpenStax Physics", url: "https://openstax.org/books/physics/pages/17-2-applications-of-diffraction-interference-and-coherence", description: "Covers applications of diffraction and interference phenomena." },
+      { title: "Understanding Diffraction and Interference", source: "OpenStax Physics", url: "https://openstax.org/books/physics/pages/17-1-understanding-diffraction-and-interference", description: "Introduces diffraction and interference and explains their underlying principles." }
+    ],
+,
     aim: `<p class="manual-aim-text">To study the diffraction of monochromatic light through a diffraction grating, observe the formation of principal maxima for different orders, verify the grating equation <strong>d sin θ = mλ</strong>, determine the wavelength of incident spectral lines, and analyze angular dispersion as a function of grating line density.</p>`,
     theory: `
       <div class="theory-block">
@@ -1602,6 +1631,12 @@ export const EXPERIMENT_DETAILS = {
     duration: "45 Minutes",
     engine: "Deterministic Shockley Semiconductor Diode Physics Solver",
     accentColor: "#f59e0b",
+
+    referenceBooks: [
+      { title: "Semiconductor Devices", source: "OpenStax University Physics, Volume 3", url: "https://openstax.org/books/university-physics-volume-3/pages/9-7-semiconductor-devices", description: "Educational material on semiconductor devices and their underlying physical principles." },
+      { title: "Introduction to Diodes", source: "Electronics Tutorials", url: "https://www.electronics-tutorials.ws/diode/diode_1.html", description: "Explains diode fundamentals, operation, and basic electrical characteristics." },
+      { title: "Diode Applications and Operation", source: "Electronics Tutorials", url: "https://www.electronics-tutorials.ws/diode/diode_2.html", description: "Additional learning material on diode behaviour and applications." }
+    ],
     aim: `<p class="manual-aim-text">To study the voltage - current (V-I) characteristics of a forward and reverse bias P-N Junction diode, determine the cut-in (knee) voltage, and evaluate the static and dynamic resistance in forward and reverse operating regions.</p>`,
     apparatus: `<p class="manual-aim-text">A P-N Junction diode, milliammeter, Voltmeter, micro-ammeter, power supply & connection wires.</p>`,
     theory: `
