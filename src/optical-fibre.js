@@ -282,35 +282,51 @@ export function createOpticalFibreExperiment(callbacks = {}) {
       ctx.stroke();
     }
 
-    // 2. Heavy Dark Blue Optical Bench Rail & Vernier Slider Track
-    const railY = height - 70;
-    const railStartX = 30;
-    const railEndX = width - 30;
-    const railH = 24;
+    // 2. Silver-Toned Dual-Rail Optical Bench with 7 Sliding Carriers
+    const railY = height - 55;
+    const railStartX = 20;
+    const railEndX = width - 20;
+    const railH = 22;
 
-    // Dark Blue Metallic Rail Body
+    // Dual parallel steel rails (silver-toned)
     const railGrad = ctx.createLinearGradient(0, railY, 0, railY + railH);
-    railGrad.addColorStop(0, "#1e3a8a");
-    railGrad.addColorStop(0.3, "#172554");
-    railGrad.addColorStop(0.7, "#0f172a");
-    railGrad.addColorStop(1, "#1e3a8a");
+    railGrad.addColorStop(0, "#d1d5db");
+    railGrad.addColorStop(0.3, "#9ca3af");
+    railGrad.addColorStop(0.7, "#6b7280");
+    railGrad.addColorStop(1, "#374151");
 
+    // Upper rail
     ctx.fillStyle = railGrad;
-    ctx.fillRect(railStartX, railY, railEndX - railStartX, railH);
-    ctx.strokeStyle = "#0284c7";
-    ctx.lineWidth = 1.8;
-    ctx.strokeRect(railStartX, railY, railEndX - railStartX, railH);
+    ctx.fillRect(railStartX, railY, railEndX - railStartX, 7);
+    ctx.strokeStyle = "#1f2937";
+    ctx.lineWidth = 0.8;
+    ctx.strokeRect(railStartX, railY, railEndX - railStartX, 7);
 
-    // Central T-Slot Track Line
-    ctx.fillStyle = "#0a0f1d";
-    ctx.fillRect(railStartX + 5, railY + 8, railEndX - railStartX - 10, 8);
-    ctx.strokeStyle = "rgba(56, 189, 248, 0.5)";
-    ctx.strokeRect(railStartX + 5, railY + 8, railEndX - railStartX - 10, 8);
+    // Lower rail
+    ctx.fillStyle = railGrad;
+    ctx.fillRect(railStartX, railY + 15, railEndX - railStartX, 7);
+    ctx.strokeRect(railStartX, railY + 15, railEndX - railStartX, 7);
 
-    // Razor-Sharp Precision Vernier Millimeter Scale on Rail
-    const scaleZeroX = 250; // Exact focal tip position at L = 0.0 cm
+    // Dark grey cast-iron arched bracket on far-left
+    ctx.fillStyle = "#374151";
+    ctx.beginPath();
+    ctx.moveTo(railStartX - 4, railY + 22);
+    ctx.lineTo(railStartX - 4, railY + 38);
+    ctx.quadraticCurveTo(railStartX + 6, railY + 48, railStartX + 16, railY + 38);
+    ctx.lineTo(railStartX + 16, railY + 22);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = "#1f2937";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Vernier millimeter scale between rails
+    ctx.fillStyle = "#1f2937";
+    ctx.fillRect(railStartX, railY + 8, railEndX - railStartX, 7);
+
+    const scaleZeroX = 230;
     const maxCm = 6.0;
-    const pxPerCm = (width - scaleZeroX - 90) / maxCm;
+    const pxPerCm = (width - scaleZeroX - 80) / maxCm;
 
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -322,26 +338,25 @@ export function createOpticalFibreExperiment(callbacks = {}) {
 
       ctx.beginPath();
       if (isWhole) {
-        ctx.strokeStyle = "#ffffff";
-        ctx.lineWidth = 2;
-        ctx.moveTo(sx, railY);
-        ctx.lineTo(sx, railY - 12);
+        ctx.strokeStyle = "#1f2937";
+        ctx.lineWidth = 1.5;
+        ctx.moveTo(sx, railY + 8);
+        ctx.lineTo(sx, railY + 4);
         ctx.stroke();
-
-        ctx.fillStyle = "#38bdf8";
-        ctx.font = "bold 10px 'JetBrains Mono', monospace";
-        ctx.fillText(`${Math.round(cm)}cm`, sx, railY + 36);
+        ctx.fillStyle = "#374151";
+        ctx.font = "bold 8px 'JetBrains Mono', monospace";
+        ctx.fillText(`${Math.round(cm)}cm`, sx, railY + 30);
       } else if (isHalf) {
-        ctx.strokeStyle = "#93c5fd";
-        ctx.lineWidth = 1.2;
-        ctx.moveTo(sx, railY);
-        ctx.lineTo(sx, railY - 8);
+        ctx.strokeStyle = "#4b5563";
+        ctx.lineWidth = 1;
+        ctx.moveTo(sx, railY + 8);
+        ctx.lineTo(sx, railY + 5);
         ctx.stroke();
       } else {
-        ctx.strokeStyle = "rgba(147, 197, 253, 0.4)";
-        ctx.lineWidth = 0.8;
-        ctx.moveTo(sx, railY);
-        ctx.lineTo(sx, railY - 4);
+        ctx.strokeStyle = "rgba(75, 85, 99, 0.5)";
+        ctx.lineWidth = 0.6;
+        ctx.moveTo(sx, railY + 8);
+        ctx.lineTo(sx, railY + 6);
         ctx.stroke();
       }
     }

@@ -4718,13 +4718,6 @@ const expHallSection = document.getElementById("exp-hall-effect-section");
 const expSandboxSection = document.getElementById("exp-sandbox-section");
 const expDiffractionSection = document.getElementById("exp-diffraction-section");
 const expDiodeSection = document.getElementById("exp-diode-section");
-const btnSwitchProj = document.getElementById("btn-switch-exp-projectile");
-const btnSwitchOpt = document.getElementById("btn-switch-exp-optical");
-const btnSwitchColour = document.getElementById("btn-switch-exp-colour");
-const btnSwitchHall = document.getElementById("btn-switch-exp-hall");
-const btnSwitchSandbox = document.getElementById("btn-switch-exp-sandbox");
-const btnSwitchDiffraction = document.getElementById("btn-switch-exp-diffraction");
-const btnSwitchDiode = document.getElementById("btn-switch-exp-diode");
 
 async function trackExperimentEngagement(expId) {
   if (!canPerformCloudOperation()) return;
@@ -4785,14 +4778,6 @@ function switchExperiment(expId, updateUrl = true) {
   expDiffractionSection?.classList.add("hidden");
   expDiodeSection?.classList.add("hidden");
 
-  btnSwitchProj?.classList.remove("active");
-  btnSwitchOpt?.classList.remove("active");
-  btnSwitchColour?.classList.remove("active");
-  btnSwitchHall?.classList.remove("active");
-  btnSwitchSandbox?.classList.remove("active");
-  btnSwitchDiffraction?.classList.remove("active");
-  btnSwitchDiode?.classList.remove("active");
-
   const routeSlug = normalizedId === "diode"
     ? "diode-vi"
     : (normalizedId === "diffraction"
@@ -4807,8 +4792,7 @@ function switchExperiment(expId, updateUrl = true) {
   }
 
   if (normalizedId === "diffraction") {
-    expDiffractionSection?.classList.remove("hidden");
-    btnSwitchDiffraction?.classList.add("active");
+    expDiffractionSection?.classList.remove("hidden");
 
     if (!diffractionExperimentInstance) {
       diffractionExperimentInstance = createDiffractionGratingExperiment({
@@ -4848,8 +4832,7 @@ function switchExperiment(expId, updateUrl = true) {
 
     showToast("Switched to Exp 4: Diffraction Grating");
   } else if (normalizedId === "sandbox") {
-    expSandboxSection?.classList.remove("hidden");
-    btnSwitchSandbox?.classList.add("active");
+    expSandboxSection?.classList.remove("hidden");
 
     if (!physicsSandboxExperimentInstance) {
       physicsSandboxExperimentInstance = createPhysicsSandboxExperiment({
@@ -4879,8 +4862,7 @@ function switchExperiment(expId, updateUrl = true) {
 
     showToast("Switched to Exp 6: Physics Sandbox");
   } else if (normalizedId === "hall-effect") {
-    expHallSection?.classList.remove("hidden");
-    btnSwitchHall?.classList.add("active");
+    expHallSection?.classList.remove("hidden");
 
     if (!hallEffectExperimentInstance) {
       hallEffectExperimentInstance = createHallEffectExperiment({
@@ -4920,8 +4902,7 @@ function switchExperiment(expId, updateUrl = true) {
 
     showToast("Switched to Exp 4: Hall Effect Experiment");
   } else if (normalizedId === "colour-sensor") {
-    expColourSection?.classList.remove("hidden");
-    btnSwitchColour?.classList.add("active");
+    expColourSection?.classList.remove("hidden");
 
     if (!colourSensorExperimentInstance) {
       colourSensorExperimentInstance = createColourSensorExperiment({
@@ -4961,8 +4942,7 @@ function switchExperiment(expId, updateUrl = true) {
 
     showToast("Switched to Exp 3: Study of Colour Sensor");
   } else if (normalizedId === "optical") {
-    expOptSection?.classList.remove("hidden");
-    btnSwitchOpt?.classList.add("active");
+    expOptSection?.classList.remove("hidden");
 
     if (!opticalExperimentInstance) {
       opticalExperimentInstance = createOpticalFibreExperiment({
@@ -5002,8 +4982,7 @@ function switchExperiment(expId, updateUrl = true) {
 
     showToast("Switched to Exp 2: Numerical Aperture of Optical Fibre");
   } else if (normalizedId === "diode") {
-    expDiodeSection?.classList.remove("hidden");
-    btnSwitchDiode?.classList.add("active");
+    expDiodeSection?.classList.remove("hidden");
 
     if (!diodeExperimentInstance) {
       diodeExperimentInstance = createDiodeExperiment({
@@ -5043,8 +5022,7 @@ function switchExperiment(expId, updateUrl = true) {
 
     showToast("Switched to Exp 5: Diode V-I Characteristics");
   } else {
-    expProjSection?.classList.remove("hidden");
-    btnSwitchProj?.classList.add("active");
+    expProjSection?.classList.remove("hidden");
 
     showToast("Switched to Exp 1: 2D Projectile Motion");
   }
@@ -5053,15 +5031,7 @@ function switchExperiment(expId, updateUrl = true) {
 
   // Automatic first-time interactive guided onboarding tour
   tutorialManager.maybeTriggerFirstTimeTutorial(normalizedId);
-}
-
-btnSwitchProj?.addEventListener("click", () => switchExperiment("projectile"));
-btnSwitchOpt?.addEventListener("click", () => switchExperiment("optical"));
-btnSwitchColour?.addEventListener("click", () => switchExperiment("colour-sensor"));
-btnSwitchHall?.addEventListener("click", () => switchExperiment("hall-effect"));
-btnSwitchSandbox?.addEventListener("click", () => switchExperiment("sandbox"));
-btnSwitchDiffraction?.addEventListener("click", () => switchExperiment("diffraction"));
-btnSwitchDiode?.addEventListener("click", () => switchExperiment("diode"));
+}
 
 // ==========================================
 // LAB & EXPERIMENT CARDS INTERACTION & WHITE LIGHT EFFECT
@@ -5076,7 +5046,8 @@ allExperimentCards.forEach(card => {
     const name = card.getAttribute("data-name") || "";
 
     let expId = null;
-    if (target === "diffraction" || target === "diffraction-grating" || name.toLowerCase().includes("diffraction")) expId = "diffraction-grating";
+    if (target === "diode" || target === "diode-vi" || name.toLowerCase().includes("diode") || name.toLowerCase().includes("p-n junction")) expId = "diode";
+    else if (target === "diffraction" || target === "diffraction-grating" || name.toLowerCase().includes("diffraction")) expId = "diffraction-grating";
     else if (target === "hall-effect" || name.toLowerCase().includes("hall effect")) expId = "hall-effect";
     else if (target === "sandbox" || name.toLowerCase().includes("sandbox")) expId = "sandbox";
     else if (target === "colour-sensor" || name.toLowerCase().includes("colour sensor")) expId = "colour-sensor";
@@ -5601,8 +5572,8 @@ let currentActiveDetailExpId = "projectile";
 
 export function openExperimentDetailsPage(expId) {
   tutorialManager.destroyTour();
-  const normalizedId = (expId === "sandbox" || expId === "hall-effect" || expId === "colour-sensor" || expId === "optical" || expId === "projectile" || expId === "diffraction" || expId === "diffraction-grating")
-    ? (expId === "diffraction-grating" ? "diffraction" : expId)
+  const normalizedId = (expId === "sandbox" || expId === "hall-effect" || expId === "colour-sensor" || expId === "optical" || expId === "projectile" || expId === "diffraction" || expId === "diffraction-grating" || expId === "diode" || expId === "diode-vi")
+    ? (expId === "diffraction-grating" ? "diffraction" : (expId === "diode-vi" ? "diode" : expId))
     : "projectile";
 
   const data = EXPERIMENT_DETAILS[normalizedId] || EXPERIMENT_DETAILS["projectile"];
@@ -5642,6 +5613,35 @@ export function openExperimentDetailsPage(expId) {
   if (formulasContent) formulasContent.innerHTML = data.formulas || "";
   if (obsContent) obsContent.innerHTML = data.observations || "";
   if (resultContent) resultContent.innerHTML = data.result || "";
+
+  // Render Reference Books & Learning Resources
+  const refsContent = document.getElementById("manual-content-references");
+  if (refsContent) {
+    const books = data.referenceBooks || [];
+    if (books.length > 0) {
+      refsContent.innerHTML = `
+        <h3 style="margin-bottom:16px; color:var(--accent-cyan, #00f0ff); font-size:1.1rem; letter-spacing:0.5px;">Reference Books & Learning Resources</h3>
+        <div class="refs-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:14px;">
+          ${books.map(b => `
+            <a href="${b.url}" target="_blank" rel="noopener noreferrer" class="ref-card" style="display:flex; flex-direction:column; gap:8px; padding:14px 16px; background:var(--card-bg, rgba(15,23,42,0.7)); border:1px solid var(--border-color, rgba(148,163,184,0.15)); border-radius:10px; text-decoration:none; color:var(--text-primary, #e2e8f0); transition:border-color 0.2s, transform 0.2s;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent-cyan, #00f0ff);"><path d="M4 19V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path><path d="M8 7h12M8 12h12M8 17h12"></path></svg>
+                <strong style="font-size:0.95rem; line-height:1.3;">${b.title}</strong>
+              </div>
+              <div style="font-size:0.8rem; color:var(--text-muted, #94a3b8);">${b.source}</div>
+              <div style="font-size:0.82rem; color:var(--text-secondary, #cbd5e1); line-height:1.5;">${b.description}</div>
+              <div style="font-size:0.75rem; color:var(--accent-cyan, #00f0ff); margin-top:auto; display:flex; align-items:center; gap:4px;">
+                <span>Open resource</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l9-9M7 7h9v9"></path></svg>
+              </div>
+            </a>
+          `).join("")}
+        </div>
+      `;
+    } else {
+      refsContent.innerHTML = "";
+    }
+  }
   renderMathInDOM(detailPage);
 
   renderMathInElement(detailPage);
@@ -5751,7 +5751,8 @@ function initExperimentsPage() {
     const name = card.getAttribute("data-name") || "";
 
     let expId = null;
-    if (target === "diffraction" || target === "diffraction-grating" || name.toLowerCase().includes("diffraction")) expId = "diffraction-grating";
+    if (target === "diode" || target === "diode-vi" || name.toLowerCase().includes("diode") || name.toLowerCase().includes("p-n junction")) expId = "diode";
+    else if (target === "diffraction" || target === "diffraction-grating" || name.toLowerCase().includes("diffraction")) expId = "diffraction-grating";
     else if (target === "hall-effect" || name.toLowerCase().includes("hall effect")) expId = "hall-effect";
     else if (target === "sandbox" || name.toLowerCase().includes("sandbox")) expId = "sandbox";
     else if (target === "colour-sensor" || name.toLowerCase().includes("colour sensor")) expId = "colour-sensor";
